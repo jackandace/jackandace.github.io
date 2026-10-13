@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>ガチャランキング 仕様＋モック</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap">
+<style>
+/* layout: 単一カラムの仕様書。仕様テーブル → 確認事項 → タブ切替の操作モック（モック部はTORAの実UIを再現した固定ライト配色） */
+:root{
+  --bg:#FBF9F6; --surface:#FFFFFF; --ink:#221D16; --sub:#6F6558; --line:#E7E0D5;
+  --accent:#B85C00; --accent-soft:#FBEEDF;
+  --red:#B3261E; --blue:#1D5FA8; --blue-soft:#E5EEF8;
+  --green:#2E7D46; --green-soft:#E6F2E9; --gray-soft:#EFEBE4;
+  --f-body:"IBM Plex Sans JP",system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --f-tora:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#181410; --surface:#221D17; --ink:#EFE9E0; --sub:#A99C8B; --line:#3A332A;
+    --accent:#E89A4A; --accent-soft:#3A2B18; --red:#E58B84; --blue:#7FB0E5; --blue-soft:#1E2E40;
+    --green:#8CC79E; --green-soft:#1F3326; --gray-soft:#2E2921; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#181410; --surface:#221D17; --ink:#EFE9E0; --sub:#A99C8B; --line:#3A332A;
+  --accent:#E89A4A; --accent-soft:#3A2B18; --red:#E58B84; --blue:#7FB0E5; --blue-soft:#1E2E40;
+  --green:#8CC79E; --green-soft:#1F3326; --gray-soft:#2E2921; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.8}
+.wrap{max-width:960px;margin:0 auto;padding-inline:20px;padding-block:44px 80px}
+header.doc{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:24px}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700;margin:0 0 8px}
+h1{font-size:26px;font-weight:700;margin:0 0 8px;line-height:1.4;text-wrap:balance}
+.meta{color:var(--sub);font-size:13px;margin:0}
+.box{background:var(--accent-soft);border-left:3px solid var(--accent);padding:14px 20px;border-radius:0 8px 8px 0;font-size:14px}
+.box p{margin:0 0 8px}
+.scrollx{overflow-x:auto}
+table.req{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+table.req th,table.req td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+table.req th{color:var(--sub);font-weight:500;font-size:12px}
+.st{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 9px;border-radius:99px;white-space:nowrap}
+.st.ok{background:var(--green-soft);color:var(--green)}
+.st.q{background:var(--blue-soft);color:var(--blue)}
+.st.add{background:var(--gray-soft);color:var(--sub)}
+section.feat{margin-top:52px;border-top:1px solid var(--line);padding-top:6px}
+.fnum{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:500;letter-spacing:.08em;margin:0}
+h2{font-size:20px;font-weight:700;margin:2px 0 14px;line-height:1.4}
+table.spec{width:100%;border-collapse:collapse;font-size:13.5px}
+table.spec th,table.spec td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+table.spec th{width:150px;color:var(--sub);font-weight:500;background:var(--gray-soft)}
+table.spec td b{font-weight:500;color:var(--ink)}
+table.cmp{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+table.cmp th,table.cmp td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.cmp th{background:var(--gray-soft);color:var(--sub);font-weight:500}
+table.cmp tr.rec td{background:var(--green-soft)}
+.q{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:12px 18px;margin-top:14px;font-size:13.5px}
+.q .lbl{font-weight:700;color:var(--blue);font-size:12px;letter-spacing:.06em}
+.q ol,.q ul{margin:6px 0 0;padding-left:22px;color:var(--sub)}
+.q li{margin-bottom:5px}
+.q li b{color:var(--ink);font-weight:500}
+.note{font-size:12.5px;color:var(--sub)}
+code{font-family:var(--f-mono);font-size:12.5px;background:var(--gray-soft);padding:1px 5px;border-radius:4px}
+
+/* controls above mock */
+.ctrl{display:flex;gap:14px 22px;flex-wrap:wrap;align-items:center;margin:16px 0 12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;overflow:hidden;background:var(--surface)}
+.seg button{font-family:inherit;font-size:12.5px;padding:6px 13px;border:none;background:transparent;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.ctrl .lb{font-size:12px;color:var(--sub);margin-right:6px}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ===== TORA UI 再現（固定ライト） ===== */
+.tr{--o:#F08A24;--o2:#FF6B1A;--rd:#E53935;--gr:#22B33A;--tx:#222;--mut:#888;--ln:#ECECEC;--pill:#F3F3F3;
+  font-family:var(--f-tora);color:var(--tx);font-size:13px;line-height:1.55}
+.stagewrap{overflow-x:auto;padding-bottom:4px}
+.stage{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+.device{background:#FBF6EC;background-image:radial-gradient(#EADFC9 1px,transparent 1px);background-size:14px 14px;border:1px solid #E6DCC8;border-radius:22px;padding:0;overflow:hidden;position:relative}
+.device.sp{width:380px;max-width:100%;height:720px}
+.device.pc{width:880px;height:700px;border-radius:12px}
+.device .scroller{height:100%;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){.device .scroller{scroll-behavior:auto}}
+.pcrow{display:flex;justify-content:center;gap:18px;align-items:flex-start;padding-inline:18px}
+.device.sp .pcrow{padding-inline:0;display:block}
+.col{background:#fff;width:100%;min-height:100%;position:relative}
+.device.pc .col{width:430px;flex:0 0 430px;box-shadow:0 0 0 1px #EFE7D6}
+.side{display:none}
+.device.pc .side{display:block;position:sticky;top:76px;width:270px;flex:0 0 270px;margin-top:76px}
+/* header */
+.th{position:sticky;top:0;z-index:5;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--ln)}
+.logo{display:flex;align-items:center;gap:6px;font-weight:800;font-size:19px;letter-spacing:.06em;color:#3A2A1A}
+.logo svg{width:30px;height:30px}
+.i{width:16px;height:16px;vertical-align:-3px;margin-right:4px;flex:0 0 auto}
+.hr{display:flex;gap:8px;align-items:center}
+.cpill{display:flex;align-items:center;gap:5px;background:var(--pill);border-radius:99px;padding:4px 10px;font-weight:700;font-size:12.5px}
+.coin{width:17px;height:17px;flex:0 0 auto;display:inline-block}
+.plus{color:var(--rd);font-weight:800}
+.rbtn{width:30px;height:30px;border-radius:50%;background:var(--pill);display:grid;place-items:center;font-size:13px}
+.av{width:32px;height:32px;border-radius:50%;background:#C9CED6;border:2px solid #fff;box-shadow:0 0 0 1px #DDD}
+.cats{display:flex;align-items:center;gap:22px;padding:0 12px;border-bottom:1px solid var(--ln);background:#fff}
+.cats span{padding:10px 0;color:#999;font-weight:700;font-size:13px}
+.cats span.on{color:var(--tx);border-bottom:3px solid #F2B01E}
+.cats .sort{margin-left:auto;border:1px solid #DDD;border-radius:6px;padding:3px 8px;font-size:11.5px;color:#333}
+.banner{margin:8px;border-radius:8px;height:126px;background:#E9DFCF;display:grid;place-items:center;color:#9C8B72;font-weight:700;font-size:13px}
+.grid{display:grid;grid-template-columns:1fr;gap:10px;padding:0 8px 80px}
+.device.pc .grid{grid-template-columns:1fr 1fr;gap:8px}
+.card{border-radius:8px;overflow:hidden;border:1px solid var(--ln);background:#fff;cursor:pointer;text-align:left;padding:0;font-family:inherit;color:inherit;display:block;width:100%}
+.card .img{aspect-ratio:16/10;position:relative;display:grid;place-items:center;color:rgba(255,255,255,.75);font-weight:700;font-size:12px;text-align:center}
+.card .img .ph{display:grid;place-items:center;gap:4px}
+.card .img .ph svg{width:44px;height:44px;opacity:.7}
+.card .img.dim::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.rtag{position:absolute;top:8px;left:8px;z-index:1;background:#fff;color:#333;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;line-height:1.3;text-align:left}
+.rtag b{display:block;font-size:15px;color:#C62828}
+.card .band{position:absolute;left:0;right:0;bottom:0;z-index:2;background:#111;color:#fff;font-size:10.5px;text-align:center;padding:4px 0;font-weight:500;white-space:nowrap}
+.card .band b{font-size:13px;margin-left:5px;font-family:var(--f-mono)}
+.card .band.rk{background:#B3261E;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;row-gap:0}
+.card .band.rk strong{display:flex;align-items:center;font-weight:800;font-size:11.5px;color:#FFE08A}
+.card .band.rk strong .i{width:14px;height:14px}
+.card .band.rk.end{background:#5D4037}
+.rklab{display:flex;align-items:center;gap:4px;margin:0 8px 8px;font-size:10.5px;color:#8D5A00;background:#FFF6DB;border-radius:4px;padding:2px 7px;width:max-content;max-width:calc(100% - 16px)}
+.rklab .i{width:13px;height:13px;margin:0}
+.card .ft{display:flex;align-items:flex-end;justify-content:space-between;padding:6px 8px 8px;gap:6px}
+.price{display:flex;align-items:center;gap:4px;font-weight:800;font-size:15px}
+.price small{font-size:10px;color:var(--mut);font-weight:500}
+.rem{flex:1;min-width:0;text-align:right;font-size:9.5px;color:#444}
+.rem b{font-size:10.5px}
+.bar{height:5px;background:#E6E6E6;border-radius:99px;overflow:hidden;margin-top:2px}
+.bar i{display:block;height:100%;background:var(--gr);border-radius:99px}
+.nav{position:sticky;bottom:0;z-index:5;background:#fff;border-top:1px solid var(--ln);display:grid;grid-template-columns:repeat(4,1fr);text-align:center;font-size:9.5px;color:#777;padding:6px 0 8px}
+.nav span.on{color:#E8A600;font-weight:700}
+.nav span{display:grid;justify-items:center;gap:1px}
+.nav svg{width:21px;height:21px}
+/* detail */
+.back{padding:8px 12px;font-size:12px;color:#555}
+.dbn{margin:0 8px;border-radius:8px;aspect-ratio:2/1;background:#7A5C8E;display:grid;place-items:center;color:rgba(255,255,255,.75);font-weight:700;font-size:12px;position:relative}
+.battle{margin:8px;border-radius:10px;background:#B3261E;color:#fff;padding:9px 12px;display:flex;align-items:center;gap:10px}
+.battle .bt{flex:1;min-width:0}
+.battle .bt b{display:flex;align-items:center;font-size:14px;font-weight:800;letter-spacing:.03em;color:#FFE08A}
+.battle .bt span{font-size:11px;opacity:.95}
+.battle .bt span em{font-style:normal;font-family:var(--f-mono);font-weight:500;font-size:12.5px}
+.chip{background:#fff;color:#B71C1C;border:none;border-radius:99px;padding:5px 10px;font-family:inherit;font-weight:800;font-size:11.5px;cursor:pointer;white-space:nowrap}
+.battle.end{background:#5D4037}
+.imp{margin:8px;border:1px solid #E5E5E5;border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.75;color:#333}
+.imp .t{font-weight:800;margin-bottom:4px}
+.imp .t span{color:var(--rd)}
+.imp ul{margin:0;padding-left:16px}
+.imp .fx{text-align:center;font-weight:700;margin:4px 0}
+.lim{margin:8px;border:2px solid #F7D24A;border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:center;font-size:12px}
+.lim .pl{background:var(--o);color:#fff;font-weight:800;border-radius:99px;padding:4px 10px;font-size:11.5px;white-space:nowrap}
+.lim small{color:#888;display:block;font-size:10.5px}
+.gnote{margin:8px;background:#F5F5F5;border-radius:6px;text-align:center;color:#888;font-size:11px;padding:7px}
+/* ranking section */
+.rks{margin:14px 8px;border-radius:12px;overflow:hidden;border:2px solid #F2B01E;background:#FFFBEF;scroll-margin-top:56px}
+.rkh{background:#F7C23C;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.rkh b{display:flex;align-items:center;font-size:15px;font-weight:800;color:#5D2E00}
+.rkh span{font-size:10.5px;color:#6D4100}
+.rkm{padding:6px 10px 10px}
+.rkl{list-style:none;margin:0;padding:0}
+.rkl li{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px dashed #F0DFAE;font-size:12.5px}
+.rkl li:last-child{border-bottom:none}
+.rkl .n{width:26px;height:22px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:500;color:#8D6E63;flex:0 0 auto}
+.rkl li.t1 .n,.rkl li.t2 .n,.rkl li.t3 .n{border-radius:6px;color:#fff;font-weight:700}
+.rkl li.t1 .n{background:linear-gradient(135deg,#FFD54F,#F9A825)}
+.rkl li.t2 .n{background:linear-gradient(135deg,#CFD8DC,#90A4AE)}
+.rkl li.t3 .n{background:linear-gradient(135deg,#FFAB91,#BF6A3D)}
+.rkl .ic{width:26px;height:26px;flex:0 0 auto;display:block}
+.rkl .ic svg,.icons svg{width:100%;height:100%;display:block}
+.rkl .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.rkl .pt{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500;color:#5D4037;display:flex;align-items:center;gap:3px}
+.rkl li.me{background:#FFF1C9;border-radius:6px;border-bottom-color:transparent}
+.mine{margin-top:8px;background:#fff;border:1.5px solid var(--o);border-radius:10px;padding:9px 11px;display:grid;gap:3px}
+.mine .l{font-size:10.5px;color:var(--o);font-weight:800}
+.mine .big{font-size:17px;font-weight:800}
+.mine .big small{font-size:11.5px;color:#777;font-weight:500;margin-left:6px}
+.mine .gap{font-size:12px;color:#333}
+.mine .gap b{color:var(--rd);font-family:var(--f-mono)}
+.mine .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px}
+.mine button{font-family:inherit;font-size:10.5px;background:#fff;border:1px solid #DDD;color:#555;border-radius:6px;padding:2px 8px;cursor:pointer}
+.pend{font-size:10.5px;color:#E65100}
+.rw{margin-top:9px;font-size:11.5px}
+.rw .h{font-weight:800;color:#5D2E00;margin-bottom:2px}
+.rw div.r{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted #E8D9A8;padding:3px 0}
+.rw div.r span:first-child{font-weight:700;white-space:nowrap}
+.rw div.r span:last-child{text-align:right}
+.rkfoot{font-size:10px;color:#8D6E63;margin-top:6px}
+.stay{display:block;margin-top:4px;background:#FFF6DB;border-radius:6px;padding:6px 8px;font-size:11.5px;color:#6D4100;line-height:1.6}
+.stay.ok{background:#E8F5E9;color:#1B5E20}
+.stay.mute{background:#F5F5F5;color:#777}
+/* 獲得商品 */
+.itab{background:none;border:none;font-family:inherit;padding:10px 0;color:#999;font-weight:700;font-size:13px;cursor:pointer;border-bottom:3px solid transparent}
+.itab.on{color:#222;border-bottom-color:#F2B01E}
+.ifilter{padding:8px 12px 0}
+.ifilter button{display:inline-flex;align-items:center;font-family:inherit;font-size:11.5px;font-weight:700;border:1px solid #E3D3AE;background:#fff;color:#8D5A00;border-radius:99px;padding:4px 10px;cursor:pointer}
+.ifilter button.on{background:#FFF1C9;border-color:#F2B01E}
+.ilist{padding:8px 8px 90px;display:grid;gap:8px}
+.item{display:flex;gap:10px;border:1px solid var(--ln);border-radius:8px;padding:8px;background:#fff}
+.item .thumb{width:62px;flex:0 0 62px;aspect-ratio:5/7;border-radius:5px;background:#7A8A99;display:grid;place-items:center}
+.item .thumb svg{width:32px;height:32px}
+.ib{flex:1;min-width:0;display:grid;gap:3px;align-content:start}
+.rkbadge{display:inline-flex;align-items:center;width:max-content;font-size:10px;font-weight:800;color:#8D5A00;background:#FFF1C9;border:1px solid #F2B01E;border-radius:4px;padding:0 6px}
+.rkbadge .i{width:12px;height:12px}
+.inm{font-weight:800;font-size:13px}
+.ist{font-size:10.5px;font-weight:700;color:#555;background:#F1F1F1;border-radius:3px;padding:0 5px;margin-left:6px}
+.isrc{font-size:10.5px;color:#888}
+.iship{font-size:10.5px;color:#1565C0;font-weight:700}
+.iauto{font-size:10.5px;color:#E65100;font-weight:700}
+.iact{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.iact button{font-family:inherit;font-weight:800;font-size:11.5px;border-radius:99px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.ib1{background:#F07A12;color:#fff;border:none}
+.ib2{background:#fff;color:#5D4037;border:1px solid #DDD}
+.tier{margin:4px 8px 10px}
+.tn{font-weight:800;font-size:12px;margin:0 4px 4px;color:#5D4037}
+.lineup{display:grid;gap:6px}
+.lineup div{aspect-ratio:5/7;border-radius:6px;background:#DDE3E8;position:relative}
+.lineup div::after{content:attr(data-x);position:absolute;right:4px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;border-radius:4px;padding:0 5px}
+.lh{margin:16px 12px 4px;font-weight:800;font-size:13px}
+.caut{margin:10px 12px 0;font-size:10.5px;color:#666;line-height:1.7}
+.spacer{height:150px}
+/* sticky bottom */
+.dock{position:sticky;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--ln);box-shadow:0 -2px 8px rgba(0,0,0,.05)}
+.rkbar{display:flex;align-items:center;gap:6px;background:#FFF1C9;padding:6px 12px;font-size:11.5px;border:none;width:100%;font-family:inherit;cursor:pointer;text-align:left;color:#4E2A00}
+.rkbar b{font-weight:800}
+.rkbar .go{margin-left:auto;font-weight:800;color:#B71C1C;white-space:nowrap}
+.device.pc .rkbar{display:none}
+.buy{padding:8px 12px 10px}
+.buy .top{display:flex;align-items:center;gap:10px}
+.buy .rem{text-align:right}
+.btns{display:flex;gap:8px;margin-top:8px}
+.btns button{flex:1;border:none;border-radius:99px;padding:10px 0;font-family:inherit;font-weight:800;font-size:13.5px;color:#fff;cursor:pointer;background:linear-gradient(180deg,#FF9A3C,#F07A12);box-shadow:0 3px 0 #C25B00}
+.btns button.x10{background:linear-gradient(180deg,#FF5A5A,#E53935);box-shadow:0 3px 0 #A31515}
+.btns button:active{transform:translateY(2px);box-shadow:none}
+.boxid{text-align:center;font-size:10.5px;color:#666;padding-bottom:6px}
+/* PC side panel */
+.sidep{background:#fff;border:2px solid #F2B01E;border-radius:12px;overflow:hidden}
+.sidep .rkh{flex-direction:column;align-items:flex-start;gap:0}
+.sidep .rkh b{font-size:13.5px}
+.sidep .rkl li{padding:4px 2px;font-size:11.5px}
+.sidep .rkl .ic{width:20px;height:20px;font-size:10px}
+.sidep .rkl .n{width:22px;height:18px;font-size:11px}
+.sidep .mine{margin:8px}
+.sidep .cnt{font-size:10.5px;color:#B71C1C;font-weight:700;padding:6px 10px 0}
+.pclabel{position:absolute;top:8px;right:12px;font-size:10px;color:#A1887F;font-family:var(--f-mono)}
+/* profile */
+.prof{padding:14px;min-height:560px}
+.prof h5{margin:4px 0 2px;font-size:15px;font-weight:800}
+.prof .lab{font-size:11.5px;color:#777;margin-top:12px}
+.icons{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:6px 0}
+.icons button{aspect-ratio:1;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;max-width:100%;background:none}
+.icons button.sel{border-color:var(--o);box-shadow:0 0 0 2px #FFE0B2}
+.icons{grid-template-columns:repeat(5,1fr)}
+.icons .up{border:1.5px dashed #C9B48F;background:#FFF8EA;color:#8D5A00;font-size:9.5px;font-weight:700;display:grid;place-items:center;line-height:1.2;text-align:center;overflow:hidden}
+.icons img,.ic img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.preview{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:11.5px;color:#666}
+.preview .ic{width:44px;height:44px;display:block}
+.prof input{width:100%;font-family:inherit;font-size:14px;padding:9px 11px;border-radius:8px;border:1px solid #DDD;background:#fff;color:#222}
+.save{width:100%;margin-top:12px;font-family:inherit;font-weight:800;font-size:14px;border:none;border-radius:99px;padding:11px;background:linear-gradient(180deg,#FF9A3C,#F07A12);color:#fff;cursor:pointer;box-shadow:0 3px 0 #C25B00}
+.save:disabled{opacity:.4;cursor:not-allowed}
+.sidenote{flex:1;min-width:240px}
+.sidenote ul{padding-left:18px;margin-top:0}
+
+/* ---- console mock (固定ライト) ---- */
+.mock{background:#F8FAFC;border:1px solid #CBD5E1;border-radius:10px;overflow:hidden;color:#0F172A;font-size:13px}
+.mock-bar{background:#fff;border-bottom:1px solid #E2E8F0;padding:8px 14px;font-size:11px;color:#64748B;font-family:var(--f-mono);display:flex;justify-content:space-between;gap:8px}
+.mock-body{padding:18px}
+.mock h4{margin:0 0 4px;font-size:15px;font-weight:700;color:#0F172A}
+.mock .hint{font-size:11.5px;color:#64748B;margin:0 0 12px}
+.mock button{font-family:inherit;font-size:12.5px;border-radius:6px;border:1px solid transparent;padding:6px 12px;cursor:pointer}
+.btn-p{background:#2563EB;color:#fff}
+.btn-g{background:#16A34A;color:#fff}
+.btn-o{background:#fff;color:#334155;border-color:#CBD5E1!important}
+.btn-d{background:#fff;color:#DC2626;border-color:#FCA5A5!important}
+.mock select,.mock input{font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid #CBD5E1;border-radius:6px;background:#fff;color:#0F172A}
+.form{display:grid;grid-template-columns:160px 1fr;gap:12px 16px;align-items:center;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:16px}
+.form label{color:#475569;font-size:12.5px}
+.form .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+.toggle{width:36px;height:20px;border-radius:99px;background:#CBD5E1;position:relative;cursor:pointer;flex:0 0 auto;border:none;padding:0!important}
+.toggle.on{background:#2563EB}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.toggle.on::after{left:18px}
+table.k{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid #E2E8F0}
+table.k th{background:#F1F5F9;color:#475569;font-weight:500;text-align:left;padding:8px;border-bottom:1px solid #E2E8F0;white-space:nowrap}
+table.k td{padding:7px 8px;border-bottom:1px solid #F1F5F9;vertical-align:middle}
+table.k input[type=number]{width:62px;text-align:right}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.flag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:99px;background:#FEE2E2;color:#B91C1C;margin-right:4px;white-space:nowrap}
+.flag.w{background:#FEF3C7;color:#92400E}
+.err{color:#DC2626;font-size:12px}
+.okc{color:#16A34A;font-size:12px}
+tr.ex td{color:#94A3B8;text-decoration:line-through}
+tr.ex td:first-child{text-decoration:none}
+.confirm{margin-top:12px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:12px;font-size:12.5px}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:var(--sub);font-size:12px}
+@media (max-width:640px){
+  .wrap{padding-inline:16px;padding-block:32px 64px}
+  h1{font-size:21px}
+  table.spec th{width:96px}
+  .form{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.toggle::after{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="doc">
+  <p class="eyebrow">TORA様 開発 ｜ 10月 新規追加実装 ｜ 仕様＋UIモック</p>
+  <h1>ガチャランキング機能（ランキングバトル）</h1>
+  <p class="meta">2026-10-13 たたき台 v3（報酬の付与ルール・獲得商品での扱いを追加、集計間隔を固定化） ｜ 作成: パレットグループ トレカ商事カンパニー ｜ モック内の数値・ニックネーム・報酬はすべてダミーです</p>
+</header>
+
+<div class="box">
+  <p>ガチャごとに「期間中の消費pt」で順位を競い、上位者に報酬を付与する機能です。いただいた要望に対する仕様方針を下表にまとめ、方針が決まっていない点は<b>確認事項</b>として後半に列挙しました。運用上必要になる「集計の確定と不正チェック」は弊社から追加しています。</p>
+  <div class="scrollx">
+  <table class="req">
+    <thead><tr><th>要望</th><th>仕様方針（本資料の提案）</th><th>状態</th></tr></thead>
+    <tbody>
+      <tr><td>ガチャ単位ランキング（全体バトルも検討）</td><td>10月はガチャ単位で実装。データは「ランキング単位」を持たせ、全体バトルは同じ仕組みで後追い追加</td><td><span class="st q">要確認</span></td></tr>
+      <tr><td>開催中であることが分かるUI（トップ・ガチャ詳細）</td><td>トップのカードは、販売開始カウントダウンと同じ下端の帯に「ランキングバトル開催中」を表示（タイマーなし。サムネイル上部の表記を隠さない）。ガチャ詳細はバナー直下にバトル帯</td><td><span class="st ok">方針案</span></td></tr>
+      <tr><td>注意事項の下に配置（スクロールしないと見えない問題）</td><td>SPは下部固定の購入エリアの上に「順位バー」を追加、タップでランキングへ移動。PCは空いている右側にランキングを追従表示</td><td><span class="st ok">方針案</span></td></tr>
+      <tr><td>表示件数10件／自分の消費とランクインまでのpt</td><td>上位10件＋自分の順位・消費pt・10位までの差分を常設。消費ptはワンタップで表示</td><td><span class="st ok">方針案</span></td></tr>
+      <tr><td>ニックネーム＋アイコン設定</td><td>マイページで設定。アイコンはデフォルト3〜5種から選択、または画像をアップロード</td><td><span class="st ok">方針案</span></td></tr>
+      <tr><td>リアルタイム更新（難しければ定期実行）</td><td>自分のptは即時、順位表は<b>全ガチャ共通で1分ごとに更新（固定）</b></td><td><span class="st ok">方針案</span></td></tr>
+      <tr><td>ガチャ単位でON/OFF</td><td>ガチャ編集画面にランキング設定タブを追加。期間・更新間隔もここで設定</td><td><span class="st ok">方針案</span></td></tr>
+      <tr><td>ランキング報酬設定（10スロット）</td><td>報酬行を最大10行。景品カードはガチャの景品登録と同じ項目（状態・交換コイン・配送限定）で設定</td><td><span class="st q">要確認</span></td></tr>
+      <tr><td>（追加）報酬の付与と獲得商品での扱い</td><td>確定待ちの間の表記、付与先（獲得商品の「未選択」）、48時間の自動交換、ランキング報酬の識別表示を、ガチャ景品と同じルールで定義</td><td><span class="st add">弊社追加</span></td></tr>
+      <tr><td>（追加）集計の確定・不正チェック</td><td>期間終了後に運営が結果を確認し、除外・繰り上げ後に報酬付与</td><td><span class="st add">弊社追加</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<section class="feat" id="unit">
+<p class="fnum">SPEC 1</p>
+<h2>ランキングの単位と集計ルール</h2>
+<table class="spec">
+<tr><th>ランキング単位</th><td><b>ガチャ単位</b>（1つのガチャに1つのランキング）。内部的には <code>scope = gacha / global</code> の項目を持たせ、<b>全体バトル（期間中にランキングONの全ガチャを合算）</b>は同じテーブル・同じ画面部品で追加できる設計にする。</td></tr>
+<tr><th>順位の指標</th><td>集計期間内に<b>そのガチャで消費したpt（コイン）の合計</b>。無料ガチャ・配送専用ptなど消費対象外の支払いは含めない。</td></tr>
+<tr><th>集計期間</th><td>ガチャごとに開始・終了日時を設定。初期値はガチャの公開期間。期間外の消費はカウントしない。</td></tr>
+<tr><th>同点の扱い</th><td>同ptの場合は<b>先にそのptへ到達したユーザーを上位</b>とする（最終消費日時の早い順）。表示上は同順位にしない。</td></tr>
+<tr><th>減算</th><td>ガチャの取り消し・返金があった場合は、該当ptを集計から差し引く。</td></tr>
+<tr><th>対象外ユーザー</th><td>凍結中アカウント、運営・テスト用アカウントは集計対象外（順位表に出さない）。</td></tr>
+</table>
+</section>
+
+<section class="feat" id="look">
+<p class="fnum">SPEC 2</p>
+<h2>開催中の見せ方（トップ・ガチャ詳細）</h2>
+<table class="spec">
+<tr><th>トップ一覧のカード</th><td>サムネイル上部には還元率表記が入るため、ラベルは上に置かない。画像下端の帯（販売前に「販売開始まで 05:28:57」が出る黒帯と同じ位置）を赤帯に変え、<b>「ランキングバトル開催中」の文言のみ</b>を表示する（終了タイマーは出さない）。SPは1カラム、PCは2カラムの現行レイアウトのまま。</td></tr>
+<tr><th>販売開始前</th><td>既存の「販売開始まで」黒帯を優先し、カード下部（価格・残り口数の下）に小さく<b>「ランキングバトル対象」</b>ラベルを出す。販売開始と同時に開催中の帯へ切り替わる。</td></tr>
+<tr><th>終了後</th><td>終了〜確定までは帯を「ランキングバトル 集計中」、確定後は「結果発表中」を<b>7日間</b>表示して外す（日数は要確認）。</td></tr>
+<tr><th>終了日時の見せ方</th><td>カードにはタイマーを出さず、ガチャ詳細のバトル帯とランキング欄に<b>集計期間（10/20 12:00〜10/31 23:59）</b>を表示する。</td></tr>
+<tr><th>ガチャ詳細の上部</th><td>メインバナーの直下に<b>バトル帯</b>（「ランキングバトル開催中」＋集計期間）を表示。右端に<b>「あなた 14位 ▶」チップ</b>を置き、タップでランキング欄へスクロール。</td></tr>
+<tr><th>ランキング欄の位置</th><td>重要事項（総還元率の算定基準）→ 購入制限 → 宝箱ゲージ注記 の下、<b>ラインナップの上</b>に挿入。</td></tr>
+<tr><th>スクロール対策（SP）</th><td>画面下部に固定されている購入エリア（価格・残り口数・ガチャボタン）の上に、1行の<b>順位バー</b>を追加:「あなた 14位 ｜ 10位まであと 2,601pt　ランキングを見る ▲」。タップでランキング欄へスクロールし、<b>ランキング欄が画面に入っている間はバーを隠す</b>。</td></tr>
+<tr><th>PCの見せ方</th><td>現行はPCでも中央にスマホ幅のカラムで表示され左右が空いているため、<b>画面幅1100px以上ではカラム右側にランキング（上位10件＋自分の状況）を追従表示</b>する。順位バーはPCでは出さない。本文中のランキング欄はSPと同じ位置に残す。</td></tr>
+</table>
+</section>
+
+<section class="feat" id="view">
+<p class="fnum">SPEC 3</p>
+<h2>ランキング欄の表示内容</h2>
+<table class="spec">
+<tr><th>表示件数</th><td><b>上位10件</b>（順位・アイコン・ニックネーム・消費pt）。1〜3位はメダル色で強調。11位以下は一覧に出さない。</td></tr>
+<tr><th>自分の状況</th><td>順位表の下に常設: <b>自分の順位</b>／<b>自分の消費pt</b>／<b>ランクインまであと○pt</b>（＝現在の10位のpt − 自分のpt ＋1）。ランクイン中は「ひとつ上の順位まであと○pt」に切り替える。未参加は「1回引くとランキングに参加できます」。</td></tr>
+<tr><th>配信への配慮</th><td>自分の消費ptは配信画面に映り込みやすい個人の課金情報のため、<b>初期状態は伏せ字（●●●pt）とし、タップで表示</b>する。順位と「あと○pt」は常時表示。</td></tr>
+<tr><th>報酬・期間</th><td>順位表の下に報酬一覧（例: 1位 ○○ ／ 2〜3位 ○○）と集計期間・最終更新時刻を表示。</td></tr>
+<tr><th>ニックネーム未設定</th><td>「ユーザー＋ID下4桁」で表示する。ランキング欄には設定導線を置かない（設定はマイページから）。</td></tr>
+</table>
+</section>
+
+<section class="feat" id="profile">
+<p class="fnum">SPEC 4</p>
+<h2>ニックネーム・アイコン設定</h2>
+<table class="spec">
+<tr><th>設定場所</th><td>マイページ ＞ プロフィール。</td></tr>
+<tr><th>ニックネーム</th><td>2〜10文字。絵文字・URL・電話番号形式は不可。<b>NGワード辞書</b>（運営が管理画面で追加可）に一致したら保存不可。重複は許可。</td></tr>
+<tr><th>変更制限</th><td>変更は<b>24時間に1回</b>まで（ランキング上での成りすまし・荒らし対策）。</td></tr>
+<tr><th>アイコン</th><td>運営が登録した<b>デフォルトアイコン（3〜5種）から選択</b>、または<b>ユーザー自身の画像をアップロード</b>。アップロードはJPG / PNG / WEBP・5MBまで、サーバー側で正方形にトリミングし縮小（256px程度）して保存する。未設定はデフォルトの1つ目。</td></tr>
+<tr><th>アップロード画像の扱い</th><td>アップロードは即時反映し、問題のある画像は運営が事後にリセットする運用を想定（事前承認制にする場合は承認待ちの間デフォルトアイコンを表示）。</td></tr>
+<tr><th>運営側の操作</th><td>管理画面のユーザー詳細から、ニックネーム・アイコンの強制リセット（初期状態に戻す）ができる。デフォルトアイコンの追加・差し替えも管理画面で行う。</td></tr>
+</table>
+</section>
+
+<section class="feat" id="update">
+<p class="fnum">SPEC 5</p>
+<h2>更新方式（リアルタイムか定期集計か）</h2>
+<p class="note" style="margin-top:0">完全なリアルタイム配信は、同時接続数が多い配信中や新弾公開直後に負荷が集中します。ユーザーが最も気にする「自分のpt」は即時に反映し、順位表だけを短い間隔で集計する案を推奨します。</p>
+<div class="scrollx">
+<table class="cmp">
+<thead><tr><th>方式</th><th>自分のpt</th><th>順位表</th><th>負荷・コスト</th><th>評価</th></tr></thead>
+<tbody>
+<tr><td>A. 完全リアルタイム（プッシュ配信）</td><td>即時</td><td>即時</td><td>ガチャを引くたびに全閲覧者へ配信。配信中の同時アクセスで負荷大</td><td>非推奨</td></tr>
+<tr class="rec"><td><b>B. ハイブリッド（推奨）</b></td><td><b>即時</b>（ガチャ結果と一緒に返す）</td><td><b>1分ごと（固定）</b>に集計、画面は表示中のみ再取得</td><td>集計は1分に1回。閲覧者数が増えても負荷はほぼ一定</td><td>推奨</td></tr>
+<tr><td>C. 定期集計のみ</td><td>5〜15分ごと</td><td>5〜15分ごと</td><td>最小</td><td>自分のptが増えないように見え問い合わせ要因になる</td></tr>
+</tbody>
+</table>
+</div>
+<table class="spec" style="margin-top:14px">
+<tr><th>集計間隔</th><td><b>全ガチャ共通で1分ごと（固定）</b>。ガチャ単位で間隔を選ぶ設定は設けない。画面には「最終更新 15:02（1分ごと）」と表示する。</td></tr>
+<tr><th>期間終了時</th><td>終了日時ちょうどで最終集計を行い、順位を<b>暫定確定</b>として固定。以降は表示が「集計中」→ 運営の確定後「最終結果」に変わる。</td></tr>
+</table>
+</section>
+
+<section class="feat" id="admin">
+<p class="fnum">SPEC 6</p>
+<h2>管理画面: ガチャ単位のON/OFFと報酬設定</h2>
+<table class="spec">
+<tr><th>設定場所</th><td>ガチャ（オリパ）編集画面に「ランキング」タブを追加。</td></tr>
+<tr><th>ON/OFF</th><td>ガチャ単位のトグル。期間中にOFFにした場合は表示を止めるだけで、集計データは保持する（再度ONで復帰）。OFFのガチャはトップのリボン・帯も出さない。</td></tr>
+<tr><th>設定項目</th><td>集計期間（開始・終了）／結果発表の表示日数／報酬スロット。表示件数（10件）と集計間隔（1分）は固定。</td></tr>
+<tr><th>報酬スロット</th><td><b>最大10行</b>。各行に<b>対象順位（○位〜○位）</b>と報酬を設定する。報酬は<b>景品カード</b>か<b>コイン付与</b>。景品カードは<b>ガチャの景品登録と同じルール</b>で、カードDBから選び、状態・交換コイン・配送限定を設定する（配送限定ONなら交換コインは設定不可）。<br>順位の範囲が重なる行は保存不可。1位〜10位に1行ずつ設定する使い方も、「4〜10位」のようにまとめる使い方もできる。</td></tr>
+<tr><th>期間中の変更</th><td>集計期間が始まった後は、報酬内容の変更時に確認を挟み、変更履歴（日時・操作者）を残す。</td></tr>
+</table>
+</section>
+
+<section class="feat" id="settle">
+<p class="fnum">SPEC 7（弊社追加）</p>
+<h2>結果の確定と報酬付与</h2>
+<p class="note" style="margin-top:0">ランキング報酬は複数アカウントでの上位独占を誘発しやすいため、終了と同時に自動付与せず、運営が一度確認してから付与する流れを提案します。</p>
+<table class="spec">
+<tr><th>流れ</th><td>期間終了 → 暫定結果を自動集計 → 運営が結果画面で確認 → 必要に応じて除外 → <b>［結果を確定して報酬付与］</b> → ユーザーにお知らせ通知</td></tr>
+<tr><th>確認用の表示</th><td>上位者ごとに注意フラグを出す: 凍結済み／同一の決済手段を使う別アカウントあり／同一端末からのログインあり／登録から7日以内。</td></tr>
+<tr><th>除外と繰り上げ</th><td>除外したユーザーは順位から外し、下位を<b>繰り上げ</b>る（繰り上げの有無は設定で選択）。除外理由を記録する。</td></tr>
+<tr><th>確定の期限</th><td>終了から<b>2営業日以内</b>に確定・付与する運用を想定（期限はユーザー画面に「11/2までに付与」と表示するため事前に決めておく）。</td></tr>
+<tr><th>付与</th><td>確定操作で一括付与。詳細は SPEC 8。</td></tr>
+<tr><th>履歴</th><td>確定後の結果・除外理由・付与記録はガチャごとに閲覧可能（CS対応用）。</td></tr>
+</table>
+</section>
+
+<section class="feat" id="grant">
+<p class="fnum">SPEC 8（弊社追加）</p>
+<h2>報酬の付与と獲得商品での扱い</h2>
+<p class="note" style="margin-top:0">報酬の景品カードは、ガチャで当たった景品と同じ扱いに統一します。運用・CSのルールを分けずに済むようにするためです。</p>
+<table class="spec">
+<tr><th>確定待ち（ステイ期間）の表記</th><td>終了〜確定までの間、ガチャ詳細のバトル帯とランキング欄に<b>「集計中：結果確定・報酬付与は11/2までに行います」</b>を表示。自分の欄には<b>「報酬対象（暫定）: ○○」</b>または「今回は報酬対象外です（暫定）」を出す。トップのカード帯は「ランキングバトル 集計中」。この期間、獲得商品には何も追加しない。</td></tr>
+<tr><th>確定後の表記</th><td>ランキング欄は「最終結果」に切り替え、自分の欄に「○○を付与しました」と付与先を案内。あわせてお知らせ（サイト内通知）で上位者に付与を伝える。</td></tr>
+<tr><th>景品カードの付与先</th><td>ガチャ景品と同じく<b>獲得商品の「未選択」</b>に追加。ユーザーは「発送する」か「コインに交換」を選ぶ。</td></tr>
+<tr><th>配送限定品</th><td>配送限定の報酬も<b>「未選択」に入る</b>（ガチャと同じ）。交換ボタンは出さず「発送する」のみ。</td></tr>
+<tr><th>48時間の自動交換</th><td>交換可の報酬は、ガチャ景品と同じく<b>付与から48時間で交換コインに自動交換</b>。起点は期間終了時ではなく<b>付与（確定）時刻</b>。付与のお知らせに「48時間以内に発送か交換を選んでください」と明記する。配送限定品は自動交換の対象外。</td></tr>
+<tr><th>コイン付与の報酬</th><td>獲得商品には入れず、確定時に所持コインへ直接加算。コイン履歴に「ランキング報酬（SAR確定 漆黒オリパ 5位）」として記録。</td></tr>
+<tr><th>ランキング報酬の識別</th><td>獲得商品の各行に入手区分を持たせ、<b>「ランキング報酬」バッジ</b>と入手元（どのバトルの何位か）を<b>未選択・発送待ち・発送済みのすべてで表示</b>。［ランキング報酬のみ］の絞り込みを追加。ガチャを引いた記録ではないためガチャ履歴には出さない。</td></tr>
+<tr><th>管理側の識別</th><td>配送管理・獲得商品の一覧に<b>入手区分（ガチャ／ランキング報酬）</b>の列とフィルタを追加。対象ランキングと順位から元の結果画面に辿れるようにする。</td></tr>
+</table>
+</section>
+
+<section class="feat" id="open">
+<p class="fnum">OPEN</p>
+<h2>確認事項（ご判断いただきたい点）</h2>
+<div class="q"><span class="lbl">TORA様へ確認</span>
+<ol>
+  <li><b>全体バトルの扱い</b>: 10月はガチャ単位のみで良いか。全体バトルを同時に出す場合、対象ガチャの選び方（ランキングONの全ガチャ／個別に指定）。</li>
+  <li><b>「10スロット」の意味</b>: 1〜10位に1つずつ報酬を設定する意味か、順位範囲つきの報酬行を最大10行持てる意味か（本資料は後者で設計。前者の使い方も可能）。</li>
+  <li><b>報酬の種類</b>: コイン付与・景品カード以外に必要なもの（称号、限定ガチャ参加権など）はあるか。</li>
+  <li><b>順位の指標</b>: 消費ptの合計で良いか（引いた回数ではなく金額ベース）。課金額消費タイプのガチャも同じ扱いで良いか。</li>
+  <li><b>自分の消費ptの伏せ字表示</b>: 配信者の利用を考え初期は伏せる案としたが、常時表示を希望されるか。</li>
+  <li><b>終了後の「結果発表中」表示の日数</b>（本資料は7日）と、トップで開催中ガチャを上位に並べる（並び替え・タブ追加）かどうか。</li>
+  <li><b>PCの右側追従表示</b>: 実装範囲に含めるか（含めない場合はPCもSPと同じ順位バーで対応）。</li>
+  <li><b>アップロードアイコンの審査</b>: 即時反映＋事後リセットで良いか、事前承認制にするか。</li>
+  <li><b>結果確定の運用担当と期限</b>: TORA様運営側で除外判断・確定操作を行う前提で良いか。終了から何日以内に付与するか（本資料は2営業日）。</li>
+  <li><b>報酬の自動交換</b>: ガチャ景品と同じ「付与から48時間で自動交換」で良いか（起点は付与時刻）。</li>
+</ol>
+</div>
+<div class="q" style="border-left-color:var(--accent)"><span class="lbl" style="color:var(--accent)">刀根さんへ確認（実装）</span>
+<ul>
+  <li>ガチャ結果APIで<b>自分の累計ptと順位を返す</b>改修の可否（推奨案Bと順位バーの前提）。</li>
+  <li>トップ一覧APIに<b>ランキング状態（開始前／開催中／集計中／結果発表）と終了日時</b>を追加できるか。</li>
+  <li>順位集計を<b>1分ごと（全ガチャ共通）のバッチ</b>で回した場合のDB負荷。</li>
+  <li>獲得商品に<b>入手区分（ガチャ／ランキング報酬）と入手元</b>を持たせる改修範囲と、48時間自動交換の処理をランキング報酬にもそのまま適用できるか。</li>
+  <li>取り消し・返金時のpt減算を既存の取り消し処理に組み込めるか。不正チェック用フラグ（決済手段・端末の重複）を既存データから出せる範囲。</li>
+</ul>
+</div>
+</section>
+
+<section class="feat" id="mock">
+<p class="fnum">MOCK</p>
+<h2>操作できるモック</h2>
+<p class="note" style="margin-top:0">ユーザー画面はTORAの現行UI（白カラム・クリーム地・オレンジのボタン・緑の残量バー）に合わせています。SP/PCとランキングの状態を切り替えて見え方を確認できます。トップの開催中カードを押すとガチャ詳細に移動します。</p>
+
+<div class="ctrl">
+  <div><span class="lb">画面</span>
+    <div class="seg" id="scrSeg">
+      <button type="button" data-v="top" aria-pressed="true">トップ</button><button type="button" data-v="detail" aria-pressed="false">ガチャ詳細</button><button type="button" data-v="items" aria-pressed="false">獲得商品</button><button type="button" data-v="profile" aria-pressed="false">プロフィール</button><button type="button" data-v="cfg" aria-pressed="false">管理: 設定</button><button type="button" data-v="res" aria-pressed="false">管理: 結果確定</button>
+    </div>
+  </div>
+  <div id="devWrap"><span class="lb">表示</span>
+    <div class="seg" id="devSeg"><button type="button" data-v="sp" aria-pressed="true">SP</button><button type="button" data-v="pc" aria-pressed="false">PC</button></div>
+  </div>
+  <div id="stWrap"><span class="lb">状態</span>
+    <div class="seg" id="stSeg"><button type="button" data-v="pre" aria-pressed="false">開始前</button><button type="button" data-v="live" aria-pressed="true">開催中</button><button type="button" data-v="agg" aria-pressed="false">集計中</button><button type="button" data-v="done" aria-pressed="false">結果発表</button></div>
+  </div>
+</div>
+
+<!-- user screens -->
+<div id="userArea" class="stagewrap">
+  <div class="stage">
+    <div class="device sp tr" id="device">
+      <div class="scroller" id="scroller">
+        <div class="pcrow">
+          <div class="col" id="col"></div>
+          <aside class="side" id="side"></aside>
+        </div>
+      </div>
+    </div>
+    <div class="sidenote note" id="sidenote"></div>
+  </div>
+</div>
+
+<!-- admin: cfg -->
+<div id="cfgArea" hidden>
+  <div class="mock">
+    <div class="mock-bar"><span>tora console / oripa / edit / 1063 — ランキング</span><span>MOCK</span></div>
+    <div class="mock-body">
+      <h4>ランキング設定</h4>
+      <p class="hint">SAR確定 漆黒オリパ（ID 1063）</p>
+      <div class="form">
+        <label for="rkon">ランキング</label>
+        <div class="row"><button type="button" class="toggle on" id="rkon" aria-pressed="true" aria-label="ランキングのON/OFF"></button><span id="rkonl">ON（トップ・ガチャ詳細に表示中）</span></div>
+        <label for="pstart">集計期間</label>
+        <div class="row"><input id="pstart" type="text" value="2026/10/20 12:00" style="width:150px"> 〜 <input id="pend" type="text" value="2026/10/31 23:59" style="width:150px"></div>
+        <label>集計間隔</label>
+        <div class="row"><b>1分ごと（全ガチャ共通・固定）</b><span class="hint" style="margin:0">自分のptはガチャ実行時に即時反映されます</span></div>
+        <label>表示件数</label>
+        <div class="row">上位10件（固定）</div>
+        <label for="postdays">結果発表の表示</label>
+        <div class="row"><select id="postdays"><option>3日間</option><option selected>7日間</option><option>14日間</option></select></div>
+      </div>
+      <h4 style="margin-top:20px">報酬スロット <span class="num" id="slotcnt" style="font-size:12px;color:#64748B;font-weight:500"></span></h4>
+      <p class="hint">景品カードはガチャの景品登録と同じ項目（状態・交換コイン・配送限定）で設定します。配送限定をONにすると交換コインは設定できません。対象順位の範囲が重ならないように設定してください（最大10行）。</p>
+      <div class="scrollx"><table class="k" id="rwtbl"></table></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px">
+        <button type="button" class="btn-o" id="addrw">＋ 報酬行を追加</button>
+        <span id="rwmsg"></span>
+        <button type="button" class="btn-p" id="rwsave" style="margin-left:auto">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- admin: result -->
+<div id="resArea" hidden>
+  <div class="mock">
+    <div class="mock-bar"><span>tora console / oripa / 1063 / ranking / result</span><span>MOCK</span></div>
+    <div class="mock-body">
+      <h4>ランキング結果（暫定）</h4>
+      <p class="hint">集計期間 10/20 12:00〜10/31 23:59 ｜ 最終集計 10/31 23:59 ｜ 状態: <b id="rstate">確定待ち</b></p>
+      <div class="form" style="grid-template-columns:auto 1fr;margin-bottom:12px">
+        <label for="promote">除外時の繰り上げ</label>
+        <div class="row"><button type="button" class="toggle on" id="promote" aria-pressed="true" aria-label="繰り上げのON/OFF"></button><span id="promotel">下位を繰り上げる</span></div>
+      </div>
+      <div class="scrollx"><table class="k" id="restbl"></table></div>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <button type="button" class="btn-p" id="settle">結果を確定して報酬付与</button>
+      </div>
+      <div id="confirmbox" class="confirm" hidden></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>パレットグループ トレカ商事カンパニー ｜ ガチャランキング 仕様書兼モック 2026-10-13 v2 ｜ モック内の数値・ニックネーム・報酬・画像はサンプルです</footer>
+</div>
+
+<script>
+(function(){
+/* シンプルな線画アイコン（プリセットアバター12種＝耳3型×色） */
+var ICONS=["#F08A24","#5C9E52","#E0A82E","#D9534F","#3E8EC4","#7E6BC4","#D2689A","#B98A4A","#8B6CC4","#E07B39","#7D8A99","#A6763A"];
+function av(i){
+  var c=ICONS[i],t=i%3,ears;
+  if(t===0)ears='<path d="M8 13 9 5l6 5z M24 13 23 5l-6 5z" fill="'+c+'"/>';
+  else if(t===1)ears='<circle cx="9.5" cy="9.5" r="3.6" fill="'+c+'"/><circle cx="22.5" cy="9.5" r="3.6" fill="'+c+'"/>';
+  else ears='<ellipse cx="12" cy="7" rx="2.3" ry="5.5" fill="'+c+'"/><ellipse cx="20" cy="7" rx="2.3" ry="5.5" fill="'+c+'"/>';
+  return '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15.5" fill="#FFF6E8" stroke="#EADBC2"/>'+ears+
+    '<circle cx="16" cy="18" r="9" fill="'+c+'"/><ellipse cx="16" cy="21" rx="4.6" ry="3.4" fill="#fff" opacity=".9"/>'+
+    '<circle cx="12.6" cy="16.5" r="1.3" fill="#2B2B2B"/><circle cx="19.4" cy="16.5" r="1.3" fill="#2B2B2B"/><path d="M15 20.3h2l-1 1.1z" fill="#2B2B2B"/></svg>';
+}
+var SVG={
+  trophy:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v4.5a5 5 0 0 1-10 0z" fill="#F7C23C" stroke="#8D5A00" stroke-width="1.3"/><path d="M7 6H4.6a2.6 2.6 0 0 0 2.9 3.4M17 6h2.4a2.6 2.6 0 0 1-2.9 3.4" fill="none" stroke="#8D5A00" stroke-width="1.3"/><path d="M12 13.5V16M8.5 20h7l-.9-4h-5.2z" fill="#F7C23C" stroke="#8D5A00" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+  key:'<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="8" cy="12" r="4" fill="none" stroke="#C7922B" stroke-width="2"/><path d="M12 12h9M18 12v3M21 12v2" stroke="#C7922B" stroke-width="2" stroke-linecap="round"/></svg>',
+  tiger:'<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 12 7 3l7 6z M26 12 25 3l-7 6z" fill="#F08A24" stroke="#3A2A1A" stroke-width="1.2" stroke-linejoin="round"/><circle cx="16" cy="17" r="11" fill="#F5A04A" stroke="#3A2A1A" stroke-width="1.2"/><path d="M16 6.5v4M12.5 7.5l1 3M19.5 7.5l-1 3M5.5 17h4M22.5 17h4" stroke="#3A2A1A" stroke-width="1.3" stroke-linecap="round"/><ellipse cx="16" cy="21.5" rx="5" ry="3.6" fill="#FFF3E0"/><circle cx="12" cy="16" r="1.4" fill="#3A2A1A"/><circle cx="20" cy="16" r="1.4" fill="#3A2A1A"/><path d="M14.8 20h2.4l-1.2 1.3z" fill="#3A2A1A"/></svg>',
+  card:'<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="2"><rect x="10" y="8" width="20" height="28" rx="3"/><rect x="18" y="12" width="20" height="28" rx="3" fill="rgba(255,255,255,.15)"/></svg>'
+};
+var NAVI=[
+  '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  '<path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/>',
+  '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+  '<circle cx="12" cy="9" r="3.5"/><path d="M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/>'
+];
+var users=[
+ {id:"a",nm:"黒炎のブリーダー",ic:3,pt:184500,at:1},{id:"b",nm:"SAR狩り",ic:8,pt:142000,at:2},
+ {id:"c",nm:"トラ吉",ic:0,pt:98500,at:3},{id:"d",nm:"リザ推し",ic:9,pt:76000,at:4},
+ {id:"e",nm:"たまごかけ",ic:7,pt:54500,at:5},{id:"f",nm:"ユーザー8812",ic:10,pt:41000,at:6},
+ {id:"g",nm:"深夜の開封民",ic:5,pt:33500,at:7},{id:"h",nm:"PSA10しか勝たん",ic:4,pt:29000,at:8},
+ {id:"i",nm:"にゃんこ",ic:6,pt:25500,at:9},{id:"j",nm:"ガチャ職人",ic:2,pt:21000,at:10},
+ {id:"k",nm:"ぴか",ic:1,pt:20500,at:11},{id:"l",nm:"もちもち",ic:11,pt:19000,at:12},
+ {id:"m",nm:"開封おじさん",ic:3,pt:18900,at:13}
+];
+var me={id:"me",nm:"ユーザー3747",ic:0,pt:18400,at:14,named:false};
+var coins=1349586, shown=false, snapshot=null, pending=false, rkOn=true, intv=1, timer=null;
+var scr="top", dev="sp", st="live";
+var END=Date.now()+((2*24+8)*3600+12*60+40)*1000, OPEN=Date.now()+(5*3600+28*60+57)*1000;
+var rewards=[{f:1,t:1,k:"景品カード",c:"漆黒の竜 SAR",st:"PSA10",coin:0,ship:true,q:1},{f:2,t:3,k:"景品カード",c:"リザードンex SAR",st:"美品",coin:65000,ship:false,q:1},{f:4,t:10,k:"コイン付与",c:"",amt:5000,q:1}];
+function rwLabel(r){return r.k==="コイン付与"?fmt(r.amt||0)+"pt":esc(r.c||"（未選択）")+(r.st?"【"+esc(r.st)+"】":"")+(r.ship?"（配送限定）":"")+(r.q>1?" ×"+r.q:"");}
+function rewardOf(rank){return rewards.filter(function(w){return rank>=w.f&&rank<=w.t;})[0];}
+function fmt(n){return n.toLocaleString("ja-JP");}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function all(){return users.concat([me]).slice().sort(function(x,y){return y.pt-x.pt||x.at-y.at;});}
+function takeSnap(){snapshot=all().map(function(u){return {id:u.id,nm:u.nm,ic:u.ic,pt:u.pt};});}
+function now(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);}
+function pad(n){return ("0"+n).slice(-2);}
+function cd(t,withDay){var s=Math.max(0,Math.floor((t-Date.now())/1000));var d=Math.floor(s/86400);s%=86400;var h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (withDay&&d?d+"日 ":"")+pad(h)+":"+pad(m)+":"+pad(x);}
+function coin(){return '<svg class="coin" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="#F7C23C" stroke="#C98A0B" stroke-width="1.2"/><ellipse cx="10" cy="12.2" rx="3" ry="2.4" fill="#8D5A00"/><circle cx="6.5" cy="8.6" r="1.2" fill="#8D5A00"/><circle cx="8.9" cy="6.9" r="1.2" fill="#8D5A00"/><circle cx="11.5" cy="6.9" r="1.2" fill="#8D5A00"/><circle cx="13.7" cy="8.7" r="1.2" fill="#8D5A00"/></svg>';}
+function iconHtml(i){return '<span class="ic">'+av(i)+'</span>';}
+function meIcon(){return me.img?'<span class="ic"><img src="'+me.img+'" alt=""></span>':iconHtml(me.ic);}
+function myRank(){return snapshot.findIndex(function(u){return u.id==="me";})+1;}
+function gapInfo(){
+  var r=myRank(),i=r-1;
+  if(r===1)return {r:r,txt:"現在1位です"};
+  if(r<=10)return {r:r,txt:"ひとつ上（"+(r-1)+"位）まで あと <b>"+fmt(snapshot[i-1].pt-me.pt+1)+"</b>pt",short:(r-1)+"位まであと "+fmt(snapshot[i-1].pt-me.pt+1)+"pt"};
+  var g=snapshot[9].pt-me.pt+1;
+  return g>0?{r:r,txt:"ランクイン（10位）まで あと <b>"+fmt(g)+"</b>pt",short:"10位まであと "+fmt(g)+"pt"}:{r:r,txt:"次回集計でランクインの見込みです",short:"次回集計でランクイン見込み"};
+}
+
+/* ---------- header / nav ---------- */
+function header(){return '<div class="th"><span class="logo">TORA</span><div class="hr"><span class="cpill">'+coin()+'<span class="num" id="coinv">'+fmt(coins)+'</span><span class="plus">⊕</span></span><span class="rbtn">'+SVG.key+'</span><span class="av"></span></div></div>';}
+function nav(on){var it=["オリパガチャ","獲得商品","ガチャ履歴","マイページ"];return '<div class="nav">'+it.map(function(x,i){return '<span class="'+(i===on?"on":"")+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">'+NAVI[i]+'</svg>'+x+'</span>';}).join("")+'</div>';}
+
+/* ---------- TOP ---------- */
+/* ラベルはサムネイル上部の還元率表記を隠さないよう、下端の帯（販売開始タイマーと同じ位置）にまとめる */
+function bandFor(){
+  if(!rkOn)return {band:"",lab:""};
+  if(st==="pre")return {band:'<div class="band">販売開始まで<b class="cdOpen">'+cd(OPEN)+'</b></div>',dim:true,lab:'<div class="rklab">'+SVG.trophy+'ランキングバトル対象（販売開始と同時に開催）</div>'};
+  if(st==="live")return {band:'<div class="band rk"><strong>'+SVG.trophy+'ランキングバトル開催中</strong></div>',lab:""};
+  if(st==="agg")return {band:'<div class="band rk end"><strong>'+SVG.trophy+'ランキングバトル</strong><span>集計中・結果確定待ち</span></div>',lab:""};
+  return {band:'<div class="band rk end"><strong>'+SVG.trophy+'ランキングバトル</strong><span>結果発表中</span></div>',lab:""};
+}
+function renderTop(){
+  var b=bandFor();
+  var cards=[
+    {rk:true,ttl:"SAR確定 漆黒オリパ",bg:"#6B5A8E",rate:"111.1",price:500,rem:1284,tot:3000},
+    {rk:false,ttl:"極 100/77",bg:"#9A7B4F",rate:"105.0",price:100000,rem:100,tot:100,pre:true},
+    {rk:false,ttl:"ポケカ BOXオリパ",bg:"#4F7FA6",rate:"98.5",price:3000,rem:420,tot:1000},
+    {rk:false,ttl:"遊戯王 レリーフ確定",bg:"#5E8A5A",rate:"102.3",price:800,rem:77,tot:500}
+  ];
+  var h=header()+'<div class="cats"><span class="on">ポケモン</span><span>319</span><span>遊戯王</span><span>ホビー</span><span class="sort">オススメ順 ⌄</span></div>'+
+    '<div class="banner">キャンペーンバナー（画像）</div><div class="grid">';
+  cards.forEach(function(c){
+    var band="",dim=false,lab="";
+    if(c.rk){band=b.band;dim=!!b.dim;lab=b.lab;}
+    else if(c.pre){band='<div class="band">販売開始まで<b class="cdOpen2">'+cd(OPEN-3600000)+'</b></div>';dim=true;}
+    h+='<button type="button" class="card" '+(c.rk?'id="rkCard"':'')+' aria-label="'+c.ttl+'"><div class="img'+(dim?" dim":"")+'" style="background:'+c.bg+'">'+
+      '<span class="ph">'+SVG.card+'サムネイル画像<br>'+c.ttl+'</span>'+band+'</div>'+
+      '<div class="ft"><span class="price">'+coin()+fmt(c.price)+'<small>/1回</small></span><span class="rem">残り <b>'+fmt(c.rem)+'</b> / '+fmt(c.tot)+'<div class="bar"><i style="width:'+(c.rem/c.tot*100)+'%"></i></div></span></div>'+lab+'</button>';
+  });
+  h+='</div>'+nav(0);
+  document.getElementById("col").innerHTML=h;
+  document.getElementById("rkCard").addEventListener("click",function(){setScr("detail");});
+  document.getElementById("side").innerHTML="";
+  document.getElementById("sidenote").innerHTML='<p style="margin-top:0"><b>トップ一覧</b></p><ul>'+
+    '<li>SPは1カラム、PCは2カラムです（「表示」で切替）。</li>'+
+    '<li>「ランキングバトル開催中」はサムネイル下端の帯（販売開始タイマーと同じ位置）に文言のみで表示します。サムネイル上部の表記を隠しません。</li>'+
+    '<li>開始前は販売開始タイマーを優先し、カード下に「ランキングバトル対象」の小ラベルを出します。</li>'+
+    '<li>「状態」で開始前 → 開催中 → 集計中 → 結果発表の表示を確認できます。</li>'+
+    '<li>管理: 設定でランキングをOFFにすると、リボンと帯が消えます。</li>'+
+    '<li>開催中カードを押すとガチャ詳細へ移動します。</li></ul>';
+}
+
+/* ---------- DETAIL ---------- */
+function battleBar(){
+  if(!rkOn)return "";
+  var g=gapInfo();
+  var T=SVG.trophy;
+  if(st==="pre")return '<div class="battle end"><div class="bt"><b>'+T+'ランキングバトル対象ガチャ</b><span>10/20 12:00 開始予定</span></div><button type="button" class="chip jump">報酬を見る ▶</button></div>';
+  if(st==="live")return '<div class="battle"><div class="bt"><b>'+T+'ランキングバトル開催中！</b><span>期間 10/20 12:00 〜 10/31 23:59</span></div><button type="button" class="chip jump">あなた '+g.r+'位 ▶</button></div>';
+  if(st==="agg")return '<div class="battle end"><div class="bt"><b>'+T+'ランキングバトル 集計中</b><span>結果確定・報酬付与は11/2（月）までに行います</span></div><button type="button" class="chip jump">暫定 '+g.r+'位 ▶</button></div>';
+  return '<div class="battle end"><div class="bt"><b>'+T+'ランキングバトル 結果発表</b><span>あなたは '+g.r+'位でした</span></div><button type="button" class="chip jump">結果を見る ▶</button></div>';
+}
+function rankList(n){
+  return snapshot.slice(0,n).map(function(u,i){
+    return '<li class="'+(i<3?"t"+(i+1):"")+(u.id==="me"?" me":"")+'"><span class="n">'+(i+1)+'</span>'+(u.id==="me"?meIcon():iconHtml(u.ic))+'<span class="nm">'+esc(u.id==="me"?me.nm+"（あなた）":u.nm)+'</span><span class="pt">'+fmt(u.pt)+'</span></li>';
+  }).join("");
+}
+function mineBox(){
+  var g=gapInfo();
+  if(st==="pre")return '<div class="mine"><span class="l">あなたの状況</span><span class="gap">開始後に1回引くとランキングに参加できます</span></div>';
+  var lbl=st==="done"?"最終結果":st==="agg"?"暫定順位":"あなたの状況";
+  return '<div class="mine"><span class="l">'+lbl+'</span>'+
+    '<span class="big">'+g.r+'位<small>消費 '+(shown?fmt(me.pt)+"pt":"●●●pt")+'</small></span>'+
+    (st==="live"?'<span class="gap">'+g.txt+'</span>':'')+
+    (pending&&st==="live"?'<span class="pend">あなたのptは反映済み。順位は次回集計で更新されます</span>':'')+
+    stayNote(g.r)+
+    '<span class="row"><button type="button" class="showpt">'+(shown?"消費ptを隠す":"消費ptを表示")+'</button></span></div>';
+}
+function stayNote(r){
+  var w=rewardOf(r);
+  if(st==="agg")return w?'<span class="stay">報酬対象（暫定）: '+rwLabel(w)+'<br>結果確定後、11/2（月）までに付与されます</span>':'<span class="stay mute">今回は報酬対象外です（暫定）</span>';
+  if(st==="done")return w?'<span class="stay ok">'+rwLabel(w)+' を付与しました<br>'+(w.k==="コイン付与"?'所持コインに加算済みです':'獲得商品の「未選択」から発送・交換を選べます')+'</span>':'<span class="stay mute">今回は報酬対象外でした</span>';
+  return "";
+}
+function rewardsHtml(){
+  return '<div class="rw"><div class="h">ランキング報酬</div>'+rewards.slice().sort(function(a,b){return a.f-b.f;}).map(function(r){
+    return '<div class="r"><span>'+(r.f===r.t?r.f+"位":r.f+"〜"+r.t+"位")+'</span><span>'+rwLabel(r)+'</span></div>';}).join("")+'</div>';
+}
+function rkHead(){
+  var right=st==="live"?"最終更新 "+now()+"（1分ごと）":st==="agg"?"集計中":st==="done"?"最終結果":"開始前";
+  return '<div class="rkh"><b>'+SVG.trophy+'ランキングバトル</b><span>'+right+'</span></div>';
+}
+function rankSection(){
+  if(!rkOn)return "";
+  var body=st==="pre"?'<p style="margin:6px 4px;font-size:12px;color:#6D4100">10/20 12:00 から開始します。期間中にこのガチャで消費したptで順位を競います。</p>':'<ol class="rkl">'+rankList(10)+'</ol>';
+  return '<section class="rks" id="rkSec">'+rkHead()+'<div class="rkm">'+body+mineBox()+rewardsHtml()+'<div class="rkfoot">集計期間 10/20 12:00 〜 10/31 23:59 ／ 同ptは先に到達した方が上位 ／ 報酬は終了後、運営の結果確定を経て付与されます</div></div></section>';
+}
+function dock(){
+  var g=gapInfo(),bar="";
+  if(rkOn&&st!=="pre"){
+    var t=SVG.trophy+(st==="live"?'あなた <b>'+g.r+'位</b>｜'+(g.short||g.txt.replace(/<[^>]+>/g,"")):st==="agg"?'暫定 <b>'+g.r+'位</b>｜集計中':'結果発表 あなたは <b>'+g.r+'位</b>');
+    bar='<button type="button" class="rkbar jump" id="rkbar">'+t+'<span class="go">ランキングを見る ▲</span></button>';
+  }
+  return '<div class="dock">'+bar+'<div class="buy"><div class="top"><span class="price">'+coin()+'500<small>/1回</small></span><span class="rem">残り <b>1,284</b> / 3,000<div class="bar"><i style="width:43%"></i></div></span></div>'+
+    '<div class="btns"><button type="button" id="d1">1回引く</button><button type="button" class="x10" id="d10">10回引く</button></div></div><div class="boxid">ガチャBOX ID 1063</div></div>';
+}
+function sidePanel(){
+  if(!rkOn||dev!=="pc")return "";
+  var g=gapInfo();
+  return '<div class="sidep">'+rkHead()+
+    (st==="pre"?'<p style="font-size:11.5px;padding:8px 10px;margin:0">10/20 12:00 開始予定</p>':'<div class="rkm"><ol class="rkl">'+rankList(10)+'</ol></div>')+mineBox()+'</div>';
+}
+function renderDetail(keepScroll){
+  var sc=document.getElementById("scroller"),pos=sc.scrollTop;
+  var h=header()+'<div class="back">‹ ガチャ一覧に戻る</div>'+
+    '<div class="dbn"><span class="ph" style="display:grid;place-items:center;gap:4px">'+SVG.card+'メインバナー画像</span></div>'+battleBar()+
+    '<div class="imp"><div class="t"><span>【重要事項】</span> ご購入前に必ずご確認ください。</div><ul><li>表示している総還元率は理論値であり、特定の口の抽選ごとに相当するコイン数の獲得を保証するものではありません。</li></ul><div class="fx">「封入商品全体の当社所定コイン数の合計 ÷（総口数 × 1口の価格）× 100」</div><ul><li>獲得商品のコイン数は当社独自の基準値です。</li><li>抽選結果は完全ランダムです。</li></ul></div>'+
+    '<div class="lim"><span class="pl">購入制限</span><div>このガチャは1日500口まで引けます。<small>毎日24時にリセットされます。</small><b>本日の残り利用回数：500口</b></div></div>'+
+    '<div class="gnote">※ このオリパは宝箱ゲージの対象外です</div>'+
+    rankSection()+
+    lineup()+
+    '<p class="caut">【注意事項】オリパでは一部傷ありが出ることがあります。仕様上、商品の返金・交換はできません。</p><div class="spacer"></div>'+dock();
+  document.getElementById("col").innerHTML=h;
+  document.getElementById("side").innerHTML=sidePanel();
+  if(keepScroll)sc.scrollTop=pos;
+  bindDetail();
+  document.getElementById("sidenote").innerHTML='<p style="margin-top:0"><b>ガチャ詳細</b></p><ul>'+
+    '<li>バナー直下の<b>バトル帯</b>で開催中であることと集計期間を表示。右のチップでランキング欄へ移動します。</li>'+
+    '<li>ランキング欄は重要事項・購入制限・宝箱注記の下、ラインナップの上です。</li>'+
+    '<li>SPでは下部固定の購入エリアの上に<b>順位バー</b>。ランキング欄が見えている間は自動で隠れます。</li>'+
+    '<li>PCでは右側にランキングを追従表示します（順位バーは出しません）。</li>'+
+    '<li>「状態」を集計中・結果発表にすると、確定待ちの表記と付与後の案内に切り替わります。</li><li>［1回引く］で自分のptは即時に増え、順位表は約4秒後の「次回集計」で反映されます（実運用では1分間隔）。</li></ul>';
+}
+/* ラインナップ: 現行どおり上位賞は大きく、下位賞ほど列数が増える（列数は賞・景品数で変わる） */
+function lineup(){
+  var tiers=[["S賞",2,["✕1","✕1"]],["A賞",2,["✕2","✕3"]],["B賞",3,["✕5","✕5","✕5"]],["C賞",4,["✕8","✕8","✕10","✕12"]],["還元のみ",4,["✕43","✕60","✕88","✕120"]]];
+  return '<div class="lh">ラインナップ</div>'+tiers.map(function(t){
+    return '<div class="tier"><div class="tn">'+t[0]+'</div><div class="lineup" style="grid-template-columns:repeat('+t[1]+',1fr)">'+t[2].map(function(x){return '<div data-x="'+x+'"></div>';}).join("")+'</div></div>';
+  }).join("");
+}
+function bindDetail(){
+  var sc=document.getElementById("scroller");
+  document.querySelectorAll("#device .jump").forEach(function(b){b.addEventListener("click",function(){var s=document.getElementById("rkSec");if(s)sc.scrollTop=s.offsetTop-56;});});
+  document.querySelectorAll("#device .showpt").forEach(function(b){b.addEventListener("click",function(){shown=!shown;renderDetail(true);});});
+  document.getElementById("d1").addEventListener("click",function(){draw(1);});
+  document.getElementById("d10").addEventListener("click",function(){draw(10);});
+  checkBar();
+}
+function checkBar(){
+  var sc=document.getElementById("scroller"),sec=document.getElementById("rkSec"),bar=document.getElementById("rkbar");
+  if(!sec||!bar)return;
+  var r=sec.getBoundingClientRect(),s=sc.getBoundingClientRect();
+  bar.hidden=(r.top<s.bottom-160&&r.bottom>s.top+120);
+}
+document.getElementById("scroller").addEventListener("scroll",function(){if(scr==="detail")checkBar();},{passive:true});
+function draw(n){
+  if(st!=="live"){return;}
+  var cost=500*n;if(coins<cost)return;coins-=cost;me.pt+=cost;me.at=99;
+  pending=true;renderDetail(true);
+  clearTimeout(timer);timer=setTimeout(function(){pending=false;takeSnap();if(scr==="detail")renderDetail(true);},4000);
+}
+
+/* ---------- PROFILE ---------- */
+var selIc=me.ic, selImg=null;
+function renderProfile(){
+  var h=header()+'<div class="back">‹ マイページ</div><div class="prof"><h5>プロフィール</h5><div style="font-size:11.5px;color:#777">ランキングに表示される名前とアイコンです</div>'+
+    '<div class="lab">アイコン（用意されたものから選ぶか、画像をアップロード）</div><div class="icons" id="icons"></div>'+
+    '<input type="file" id="upfile" accept="image/png,image/jpeg,image/webp" hidden>'+
+    '<div id="upmsg" style="font-size:10.5px;color:#888">JPG / PNG / WEBP、5MBまで。正方形に切り抜いて表示されます。</div>'+
+    '<div class="lab"><label for="nick">ニックネーム（2〜10文字）</label></div><input id="nick" type="text" maxlength="12" autocomplete="off" value="'+(me.named?esc(me.nm):"")+'" placeholder="例: トラ吉">'+
+    '<div id="nickmsg" style="font-size:11px;margin-top:4px;min-height:16px"></div>'+
+    '<button type="button" class="save" id="nicksave">保存する</button>'+
+    '<div style="font-size:10.5px;color:#888;margin-top:10px">ニックネームの変更は24時間に1回までです。不適切な名前は運営によりリセットされることがあります。</div></div>'+nav(3);
+  document.getElementById("col").innerHTML=h;document.getElementById("side").innerHTML="";
+  var ic=document.getElementById("icons");
+  function ri(){
+    ic.innerHTML="";
+    [0,1,2,3].forEach(function(i){var b=document.createElement("button");b.type="button";b.innerHTML=av(i);b.setAttribute("aria-label","用意されたアイコン"+(i+1));if(!selImg&&i===selIc)b.className="sel";b.addEventListener("click",function(){selIc=i;selImg=null;ri();});ic.appendChild(b);});
+    var u=document.createElement("button");u.type="button";u.className="up"+(selImg?" sel":"");u.setAttribute("aria-label","画像をアップロード");
+    u.innerHTML=selImg?'<img src="'+selImg+'" alt="">':'＋<br>画像を<br>選ぶ';
+    u.addEventListener("click",function(){document.getElementById("upfile").click();});ic.appendChild(u);
+  }
+  ri();
+  document.getElementById("upfile").addEventListener("change",function(e){
+    var f=e.target.files&&e.target.files[0],m=document.getElementById("upmsg");if(!f)return;
+    if(!/^image\/(png|jpeg|webp)$/.test(f.type)){m.textContent="JPG・PNG・WEBPの画像を選んでください";m.style.color="#E53935";return;}
+    if(f.size>5*1024*1024){m.textContent="5MB以下の画像を選んでください";m.style.color="#E53935";return;}
+    var r=new FileReader();r.onload=function(){selImg=r.result;m.textContent="画像を選択しました。保存すると反映されます";m.style.color="#2E7D32";ri();};r.readAsDataURL(f);
+  });
+  var nick=document.getElementById("nick"),msg=document.getElementById("nickmsg"),sv=document.getElementById("nicksave");
+  var NG=["管理者","運営","http","www"];
+  function validate(show){
+    var v=nick.value.trim(),e="";
+    if(v.length<2)e="2文字以上で入力してください";else if(v.length>10)e="10文字以内で入力してください";
+    else if(NG.some(function(w){return v.indexOf(w)>=0;}))e="使用できない言葉が含まれています";
+    else if(/[\u{1F300}-\u{1FAFF}]/u.test(v))e="絵文字は使用できません";
+    if(show){msg.textContent=e||"使用できます";msg.style.color=e?"#E53935":"#2E7D32";}
+    sv.disabled=!!e;return !e;
+  }
+  nick.addEventListener("input",function(){validate(true);});
+  sv.addEventListener("click",function(){if(!validate(true))return;me.nm=nick.value.trim();me.ic=selIc;me.img=selImg;me.named=true;takeSnap();msg.textContent="保存しました。ランキングに反映されます（次回の変更は24時間後から）";msg.style.color="#2E7D32";});
+  validate(false);
+  document.getElementById("sidenote").innerHTML='<p style="margin-top:0"><b>プロフィール設定</b></p><ul>'+
+    '<li>アイコンは用意された4種から選ぶか、［画像を選ぶ］で手元の画像をアップロードできます（モック内でのみ表示し、どこにも送信しません）。</li>'+
+    '<li>「管理者」「運営」はモック用のNGワードです。入力すると保存できません。</li><li>1文字や11文字以上でもエラーになります。</li>'+
+    '<li>保存後にガチャ詳細を開くと、ランキングの自分の欄に反映されています。</li></ul>';
+}
+
+/* ---------- 獲得商品 ---------- */
+var itab="un", ionlyRk=false;
+var ITEMS=[
+ {tab:"un",nm:"漆黒の竜 SAR",st:"PSA10",coin:0,ship:true,rk:"ランキングバトル 1位（SAR確定 漆黒オリパ）",at:"11/2 14:00 付与"},
+ {tab:"un",nm:"リザードンex SAR",st:"美品",coin:65000,ship:false,rk:"ランキングバトル 3位（SAR確定 漆黒オリパ）",at:"11/2 14:00 付与",left:"47時間12分"},
+ {tab:"un",nm:"ピカチュウ AR",st:"普通",coin:1200,ship:false,rk:"",at:"11/1 22:41 獲得（SAR確定 漆黒オリパ）",left:"20時間05分"},
+ {tab:"wait",nm:"ミュウ SAR",st:"美品",coin:42000,ship:false,rk:"ランキングバトル 2位（極 100/77）",at:"10/20 発送依頼"},
+ {tab:"sent",nm:"ルギア V SA",st:"美品",coin:30000,ship:false,rk:"",at:"10/12 発送済み"}
+];
+function renderItems(){
+  var tabs=[["un","未選択"],["wait","発送待ち"],["sent","発送済み"]];
+  var h=header()+'<div class="cats">'+tabs.map(function(t){return '<button type="button" class="itab'+(itab===t[0]?" on":"")+'" data-t="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>'+
+    '<div class="ifilter"><button type="button" id="onlyRk" class="'+(ionlyRk?"on":"")+'" aria-pressed="'+ionlyRk+'">'+SVG.trophy+'ランキング報酬のみ</button></div><div class="ilist">';
+  ITEMS.filter(function(x){return x.tab===itab&&(!ionlyRk||x.rk);}).forEach(function(x){
+    h+='<div class="item"><div class="thumb">'+SVG.card+'</div><div class="ib">'+
+      (x.rk?'<span class="rkbadge">'+SVG.trophy+'ランキング報酬</span>':'')+
+      '<div class="inm">'+x.nm+'<span class="ist">'+x.st+'</span></div>'+
+      '<div class="isrc">'+(x.rk?x.rk+' ／ ':'')+x.at+'</div>'+
+      (itab==="un"?(x.ship?'<div class="iship">配送限定（コイン交換不可・自動交換されません）</div>':'<div class="iauto">あと'+x.left+'で自動的にコインへ交換されます</div>')+
+        '<div class="iact"><button type="button" class="ib1">発送する</button>'+(x.ship?'':'<button type="button" class="ib2">'+coin()+fmt(x.coin)+'に交換</button>')+'</div>':
+        '<div class="isrc" style="color:#2E7D32">'+(itab==="wait"?"発送準備中":"発送済み")+'</div>')+
+      '</div></div>';
+  });
+  h+='</div>'+nav(1);
+  document.getElementById("col").innerHTML=h;document.getElementById("side").innerHTML="";
+  document.querySelectorAll("#device .itab").forEach(function(b){b.addEventListener("click",function(){itab=b.getAttribute("data-t");renderItems();});});
+  document.getElementById("onlyRk").addEventListener("click",function(){ionlyRk=!ionlyRk;renderItems();});
+  document.getElementById("sidenote").innerHTML='<p style="margin-top:0"><b>獲得商品</b></p><ul>'+
+    '<li>ランキングの景品カードは、ガチャで当たった景品と同じく<b>「未選択」</b>に入ります（配送限定品も同じ）。</li>'+
+    '<li>交換できる景品は、ガチャと同じく<b>付与から48時間で自動的にコインへ交換</b>されます。配送限定品は自動交換されません。</li>'+
+    '<li>「ランキング報酬」バッジと入手元（どのバトルの何位か）を、未選択・発送待ち・発送済みのどこでも表示します。</li>'+
+    '<li>［ランキング報酬のみ］で絞り込めます。コイン付与の報酬はここには入らず、所持コインに直接加算されます。</li></ul>';
+}
+
+/* ---------- switching ---------- */
+function setSeg(id,v){document.querySelectorAll("#"+id+" button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-v")===v?"true":"false");});}
+function render(){
+  var user=(scr==="top"||scr==="detail"||scr==="profile"||scr==="items");
+  document.getElementById("userArea").hidden=!user;
+  document.getElementById("cfgArea").hidden=scr!=="cfg";
+  document.getElementById("resArea").hidden=scr!=="res";
+  document.getElementById("devWrap").hidden=!user;
+  document.getElementById("stWrap").hidden=!(scr==="top"||scr==="detail");
+  var d=document.getElementById("device");d.className="device tr "+dev;
+  if(!user)return;
+  document.getElementById("scroller").scrollTop=0;
+  if(scr==="top")renderTop();else if(scr==="detail")renderDetail(false);else if(scr==="items")renderItems();else renderProfile();
+}
+function setScr(v){scr=v;setSeg("scrSeg",v);render();}
+document.querySelectorAll("#scrSeg button").forEach(function(b){b.addEventListener("click",function(){setScr(b.getAttribute("data-v"));});});
+document.querySelectorAll("#devSeg button").forEach(function(b){b.addEventListener("click",function(){dev=b.getAttribute("data-v");setSeg("devSeg",dev);render();});});
+document.querySelectorAll("#stSeg button").forEach(function(b){b.addEventListener("click",function(){st=b.getAttribute("data-v");setSeg("stSeg",st);if(scr==="detail")renderDetail(true);else render();});});
+setInterval(function(){
+  document.querySelectorAll("#device .cdEnd").forEach(function(e){e.textContent=cd(END,true);});
+  document.querySelectorAll("#device .cdOpen").forEach(function(e){e.textContent=cd(OPEN);});
+  document.querySelectorAll("#device .cdOpen2").forEach(function(e){e.textContent=cd(OPEN-3600000);});
+},1000);
+takeSnap();render();
+
+/* ---------- admin settings ---------- */
+var rkonBtn=document.getElementById("rkon");
+rkonBtn.addEventListener("click",function(){rkOn=!rkOn;rkonBtn.classList.toggle("on",rkOn);rkonBtn.setAttribute("aria-pressed",rkOn);document.getElementById("rkonl").textContent=rkOn?"ON（トップ・ガチャ詳細に表示中）":"OFF（表示停止・集計データは保持）";});
+var tbl=document.getElementById("rwtbl");
+function overlaps(){var bad=[];rewards.forEach(function(a,i){if(!(a.f>=1&&a.t>=a.f&&a.t<=10))bad.push(i);rewards.forEach(function(b,j){if(i<j&&a.f<=b.t&&b.f<=a.t){bad.push(i);bad.push(j);}});});return bad;}
+function renderRw(){
+  var bad=overlaps();
+  var h='<thead><tr><th>#</th><th>対象順位</th><th>種別</th><th>景品（カードDBから選択）／付与pt</th><th>状態</th><th>交換コイン</th><th>配送限定</th><th>数量</th><th></th></tr></thead><tbody>';
+  rewards.forEach(function(r,i){
+    var card=r.k==="景品カード";
+    h+='<tr'+(bad.indexOf(i)>=0?' style="background:#FEF2F2"':'')+'><td class="num" style="color:#94A3B8">'+(i+1)+'</td>'+
+    '<td style="white-space:nowrap"><input type="number" min="1" max="10" id="rf'+i+'" value="'+r.f+'" aria-label="開始順位"> 位 〜 <input type="number" min="1" max="10" id="rt'+i+'" value="'+r.t+'" aria-label="終了順位"> 位</td>'+
+    '<td><select id="rk'+i+'" aria-label="種別"><option'+(card?" selected":"")+'>景品カード</option><option'+(!card?" selected":"")+'>コイン付与</option></select></td>'+
+    (card?'<td><input type="text" id="rc'+i+'" value="'+esc(r.c||"")+'" placeholder="カード名で検索" style="width:170px" aria-label="景品カード"></td>'+
+      '<td><select id="rs'+i+'" aria-label="状態">'+["PSA10","美品","普通","傷あり"].map(function(x){return '<option'+(r.st===x?" selected":"")+'>'+x+'</option>';}).join("")+'</select></td>'+
+      '<td><input type="number" min="0" id="ro'+i+'" value="'+(r.coin||0)+'" style="width:92px" aria-label="交換コイン"'+(r.ship?" disabled":"")+'></td>'+
+      '<td><button type="button" class="toggle'+(r.ship?" on":"")+'" id="rp'+i+'" aria-pressed="'+!!r.ship+'" aria-label="配送限定"></button></td>'
+     :'<td><input type="number" min="0" id="ra'+i+'" value="'+(r.amt||0)+'" style="width:110px" aria-label="付与pt"> pt</td><td style="color:#CBD5E1">—</td><td style="color:#CBD5E1">—</td><td style="color:#CBD5E1">—</td>')+
+    '<td><input type="number" min="1" id="rq'+i+'" value="'+r.q+'" aria-label="数量"></td>'+
+    '<td><button type="button" class="btn-d" data-del="'+i+'">削除</button></td></tr>';
+  });
+  tbl.innerHTML=h+'</tbody>';
+  rewards.forEach(function(r,i){
+    ["f","t","q"].forEach(function(k){document.getElementById("r"+k+i).addEventListener("change",function(e){r[k]=parseInt(e.target.value||"0",10);renderRw();});});
+    document.getElementById("rk"+i).addEventListener("change",function(e){r.k=e.target.value;if(r.k==="景品カード"&&!r.st){r.st="美品";r.coin=0;}renderRw();});
+    if(r.k==="景品カード"){
+      document.getElementById("rc"+i).addEventListener("input",function(e){r.c=e.target.value;});
+      document.getElementById("rs"+i).addEventListener("change",function(e){r.st=e.target.value;});
+      document.getElementById("ro"+i).addEventListener("change",function(e){r.coin=+e.target.value;});
+      document.getElementById("rp"+i).addEventListener("click",function(){r.ship=!r.ship;renderRw();});
+    }else{
+      document.getElementById("ra"+i).addEventListener("change",function(e){r.amt=+e.target.value;});
+    }
+  });
+  tbl.querySelectorAll("[data-del]").forEach(function(b){b.addEventListener("click",function(){rewards.splice(+b.getAttribute("data-del"),1);renderRw();});});
+  document.getElementById("slotcnt").textContent=rewards.length+" / 10";
+  var add=document.getElementById("addrw");add.disabled=rewards.length>=10;add.style.opacity=rewards.length>=10?.4:1;
+  var m=document.getElementById("rwmsg");m.className=bad.length?"err":"okc";m.textContent=bad.length?"対象順位が重なっているか、1〜10位の範囲外の行があります（赤い行）":"";
+  var sv=document.getElementById("rwsave");sv.disabled=!!bad.length;sv.style.opacity=bad.length?.4:1;
+}
+document.getElementById("addrw").addEventListener("click",function(){if(rewards.length>=10)return;var last=rewards.reduce(function(a,b){return Math.max(a,b.t);},0);var n=Math.min(last+1,10);rewards.push({f:n,t:n,k:"景品カード",c:"",st:"美品",coin:0,ship:false,q:1});renderRw();});
+document.getElementById("rwsave").addEventListener("click",function(){var m=document.getElementById("rwmsg");m.className="okc";m.textContent="保存しました（ガチャ詳細の報酬一覧に反映）";});
+renderRw();
+
+/* ---------- admin result ---------- */
+var res=[
+ {nm:"黒炎のブリーダー",uid:"8f2c…a91",pt:184500,fl:[]},{nm:"SAR狩り",uid:"1b7e…4d0",pt:142000,fl:["同一決済手段の別アカウント 2件"]},
+ {nm:"トラ吉",uid:"77aa…e12",pt:98500,fl:[]},{nm:"リザ推し",uid:"c03d…9b4",pt:76000,fl:[]},
+ {nm:"たまごかけ",uid:"5e91…027",pt:54500,fl:["w:登録7日以内"]},{nm:"ユーザー8812",uid:"9d44…8812",pt:41000,fl:["同一端末ログイン（SAR狩り）"]},
+ {nm:"深夜の開封民",uid:"e6b0…33f",pt:33500,fl:[]},{nm:"PSA10しか勝たん",uid:"0a1f…c57",pt:29000,fl:[]},
+ {nm:"にゃんこ",uid:"4c2e…b80",pt:25500,fl:[]},{nm:"ガチャ職人",uid:"b7d3…61a",pt:21000,fl:[]},
+ {nm:"ぴか",uid:"2f5a…d09",pt:20500,fl:[]},{nm:"もちもち",uid:"6e8c…14b",pt:19000,fl:[]}
+];
+var promote=true,settled=false;
+function rewardFor(r){var x=rewardOf(r);return x?rwLabel(x):"—";}
+function renderRes(){
+  var t=document.getElementById("restbl"),h='<thead><tr><th>除外</th><th>暫定</th><th>確定順位</th><th>ニックネーム</th><th>ユーザーID</th><th>消費pt</th><th>注意フラグ</th><th>付与する報酬</th></tr></thead><tbody>',r=0;
+  res.forEach(function(u,i){
+    var fr;if(u.ex){fr="—";}else{r=promote?r+1:i+1;fr=r;}
+    var fl=u.fl.map(function(f){return f.indexOf("w:")===0?'<span class="flag w">'+f.slice(2)+'</span>':'<span class="flag">'+f+'</span>';}).join("");
+    var show=(typeof fr==="number"&&fr<=10);
+    h+='<tr class="'+(u.ex?"ex":"")+'"><td><input type="checkbox" id="ex'+i+'"'+(u.ex?" checked":"")+(settled?" disabled":"")+' aria-label="除外"></td>'+
+       '<td class="num">'+(i+1)+'</td><td class="num"><b>'+(u.ex?"除外":fr)+'</b></td><td>'+u.nm+'</td><td class="num" style="color:#64748B">'+u.uid+'</td>'+
+       '<td class="num">'+fmt(u.pt)+'</td><td>'+(fl||'<span style="color:#CBD5E1">—</span>')+'</td><td>'+(show&&!u.ex?rewardFor(fr):'<span style="color:#CBD5E1">—</span>')+'</td></tr>';
+  });
+  t.innerHTML=h+'</tbody>';
+  res.forEach(function(u,i){document.getElementById("ex"+i).addEventListener("change",function(e){u.ex=e.target.checked;document.getElementById("confirmbox").hidden=true;renderRes();});});
+}
+var pb=document.getElementById("promote");
+pb.addEventListener("click",function(){if(settled)return;promote=!promote;pb.classList.toggle("on",promote);pb.setAttribute("aria-pressed",promote);document.getElementById("promotel").textContent=promote?"下位を繰り上げる":"繰り上げない（該当順位は欠番）";renderRes();});
+document.getElementById("settle").addEventListener("click",function(){
+  if(settled)return;
+  var exn=res.filter(function(u){return u.ex;}).length,box=document.getElementById("confirmbox");
+  box.hidden=false;
+  box.innerHTML='<b>この内容で結果を確定しますか？</b><br>除外 '+exn+'名 ／ 繰り上げ: '+(promote?"あり":"なし")+'。確定後は順位の変更ができず、コインは即時付与、景品カードは獲得商品として付与されます。'+
+    '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn-g" id="go">確定して付与する</button><button type="button" class="btn-o" id="back">戻る</button></div>';
+  document.getElementById("back").addEventListener("click",function(){box.hidden=true;});
+  document.getElementById("go").addEventListener("click",function(){settled=true;document.getElementById("rstate").textContent="確定済み（"+now()+"）";box.innerHTML='<span class="okc" style="font-size:13px">結果を確定し、報酬を付与しました。ユーザー画面は「結果発表」に切り替わります。</span>';var s=document.getElementById("settle");s.disabled=true;s.style.opacity=.4;renderRes();});
+});
+renderRes();
+})();
+</script>
+
+</body>
+</html>
