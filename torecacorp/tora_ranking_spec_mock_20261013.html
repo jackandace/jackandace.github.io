@@ -12,7 +12,7 @@
   --bg:#FBF9F6; --surface:#FFFFFF; --ink:#221D16; --sub:#6F6558; --line:#E7E0D5;
   --accent:#B85C00; --accent-soft:#FBEEDF;
   --red:#B3261E; --blue:#1D5FA8; --blue-soft:#E5EEF8;
-  --green:#2E7D46; --green-soft:#E6F2E9; --gray-soft:#EFEBE4;
+  --green:#2E7D46; --green-soft:#E6F2E9; --gray-soft:#EFEBE4; --chg:#C62828; --chg-soft:#FDECEA;
   --f-body:"IBM Plex Sans JP",system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   --f-tora:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
@@ -21,13 +21,13 @@
   :root:not([data-theme="light"]){
     --bg:#181410; --surface:#221D17; --ink:#EFE9E0; --sub:#A99C8B; --line:#3A332A;
     --accent:#E89A4A; --accent-soft:#3A2B18; --red:#E58B84; --blue:#7FB0E5; --blue-soft:#1E2E40;
-    --green:#8CC79E; --green-soft:#1F3326; --gray-soft:#2E2921; color-scheme:dark;
+    --green:#8CC79E; --green-soft:#1F3326; --gray-soft:#2E2921; --chg:#FF8A80; --chg-soft:#3D2321; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#181410; --surface:#221D17; --ink:#EFE9E0; --sub:#A99C8B; --line:#3A332A;
   --accent:#E89A4A; --accent-soft:#3A2B18; --red:#E58B84; --blue:#7FB0E5; --blue-soft:#1E2E40;
-  --green:#8CC79E; --green-soft:#1F3326; --gray-soft:#2E2921; color-scheme:dark;
+  --green:#8CC79E; --green-soft:#1F3326; --gray-soft:#2E2921; --chg:#FF8A80; --chg-soft:#3D2321; color-scheme:dark;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.8}
@@ -44,7 +44,7 @@ table.req th,table.req td{text-align:left;vertical-align:top;padding:8px 10px;bo
 table.req th{color:var(--sub);font-weight:500;font-size:12px}
 .st{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 9px;border-radius:99px;white-space:nowrap}
 .st.ok{background:var(--green-soft);color:var(--green)}
-.st.q{background:var(--blue-soft);color:var(--blue)}
+.st.ask{background:var(--blue-soft);color:var(--blue)}
 .st.add{background:var(--gray-soft);color:var(--sub)}
 section.feat{margin-top:52px;border-top:1px solid var(--line);padding-top:6px}
 .fnum{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:500;letter-spacing:.08em;margin:0}
@@ -63,6 +63,14 @@ table.cmp tr.rec td{background:var(--green-soft)}
 .q li{margin-bottom:5px}
 .q li b{color:var(--ink);font-weight:500}
 .note{font-size:12.5px;color:var(--sub)}
+.v4{color:var(--chg)}
+.v4 b{color:var(--chg)!important}
+.v4tag{display:inline-block;background:#C62828;color:#fff;font-family:var(--f-mono);font-size:10px;font-weight:700;border-radius:3px;padding:0 5px;margin-right:6px;vertical-align:1px;line-height:1.6}
+.v4box{background:var(--chg-soft);border-left:3px solid var(--chg);padding:12px 18px;border-radius:0 8px 8px 0;font-size:13.5px;margin-bottom:16px}
+.v4box ol{margin:6px 0 0;padding-left:20px}
+.v4box li{margin-bottom:3px}
+.v4box a{color:var(--chg)}
+.v4hl{outline:2px dashed #E53935;outline-offset:2px;border-radius:6px}
 code{font-family:var(--f-mono);font-size:12.5px;background:var(--gray-soft);padding:1px 5px;border-radius:4px}
 
 /* controls above mock */
@@ -295,7 +303,7 @@ tr.ex td:first-child{text-decoration:none}
 .who .ic{width:22px;height:22px;display:block;flex:0 0 auto}
 .upic{border-radius:50%;background:#94A3B8;color:#fff;font-size:8px;display:grid!important;place-items:center}
 .badnm{color:#B91C1C}
-.rsts{display:flex;gap:4px;margin-top:4px}
+.rsts{display:inline-flex;gap:4px;margin-top:4px}
 .btn-o.mini{font-size:11px!important;padding:2px 7px!important}
 .btn-o.mini:disabled{opacity:.4;cursor:not-allowed}
 .rlog{font-size:10.5px;color:#64748B;margin-top:2px}
@@ -316,8 +324,19 @@ footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:v
 <header class="doc">
   <p class="eyebrow">TORA様 開発 ｜ 10月 新規追加実装 ｜ 仕様＋UIモック</p>
   <h1>ガチャランキング機能（ランキングバトル）</h1>
-  <p class="meta"><span data-ver>2026-10-14 たたき台 v4</span>（レビュー反映: 自分の数値の伏せ字範囲、表示名・アイコンの強制リセット、アイコン審査方針） ｜ 作成: パレットグループ トレカ商事カンパニー ｜ モック内の数値・ニックネーム・報酬はすべてダミーです</p>
+  <p class="meta"><span data-ver>2026-10-14 たたき台 v4</span><span class="v4">（レビュー反映: 自分の数値の伏せ字範囲、表示名・アイコンの強制リセット、アイコン審査方針）</span> ｜ 作成: パレットグループ トレカ商事カンパニー ｜ モック内の数値・ニックネーム・報酬はすべてダミーです</p>
 </header>
+
+<div class="v4box" id="v4">
+  <b class="v4">v4（2026-10-14）での変更箇所</b> <span class="note">— 本文では<span class="v4">赤字</span>と<span class="v4tag">v4</span>印、モック内では<span style="outline:2px dashed #E53935;outline-offset:1px;border-radius:4px">赤い点線</span>で示しています。</span>
+  <ol>
+    <li><a href="#view">自分の数値の伏せ字</a>: 消費pt・あと○pt・順位表の自分の行をまとめて伏せる／表示する（逆算防止）。状態は端末に記憶。</li>
+    <li>ヘッダーとフッターの版数を統一。</li>
+    <li><a href="#profile">表示名・アイコンの強制リセット</a>: ニックネームを「ユーザー＋ID下4桁」、アイコンをデフォルトに戻す。結果確定画面の各行とユーザー詳細から操作。</li>
+    <li><a href="#profile">NGワード</a>: 管理画面での辞書編集をやめ、固定リストのみに。</li>
+    <li><a href="#profile">アップロードアイコンの審査</a>: 即時反映＋事後リセットで決定。確認事項から削除。</li>
+  </ol>
+</div>
 
 <div class="box">
   <p>ガチャごとに「期間中の消費pt」で順位を競い、上位者に報酬を付与する機能です。いただいた要望に対する仕様方針を下表にまとめ、方針が決まっていない点は<b>確認事項</b>として後半に列挙しました。運用上必要になる「集計の確定と不正チェック」は弊社から追加しています。</p>
@@ -325,14 +344,14 @@ footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:v
   <table class="req">
     <thead><tr><th>要望</th><th>仕様方針（本資料の提案）</th><th>状態</th></tr></thead>
     <tbody>
-      <tr><td>ガチャ単位ランキング（全体バトルも検討）</td><td>10月はガチャ単位で実装。データは「ランキング単位」を持たせ、全体バトルは同じ仕組みで後追い追加</td><td><span class="st q">要確認</span></td></tr>
+      <tr><td>ガチャ単位ランキング（全体バトルも検討）</td><td>10月はガチャ単位で実装。データは「ランキング単位」を持たせ、全体バトルは同じ仕組みで後追い追加</td><td><span class="st ask">要確認</span></td></tr>
       <tr><td>開催中であることが分かるUI（トップ・ガチャ詳細）</td><td>トップのカードは、販売開始カウントダウンと同じ下端の帯に「ランキングバトル開催中」を表示（タイマーなし。サムネイル上部の表記を隠さない）。ガチャ詳細はバナー直下にバトル帯</td><td><span class="st ok">方針案</span></td></tr>
       <tr><td>注意事項の下に配置（スクロールしないと見えない問題）</td><td>SPは下部固定の購入エリアの上に「順位バー」を追加、タップでランキングへ移動。PCは空いている右側にランキングを追従表示</td><td><span class="st ok">方針案</span></td></tr>
       <tr><td>表示件数10件／自分の消費とランクインまでのpt</td><td>上位10件＋自分の順位・消費pt・10位までの差分を常設。消費ptはワンタップで表示</td><td><span class="st ok">方針案</span></td></tr>
-      <tr><td>ニックネーム＋アイコン設定</td><td>マイページで設定。アイコンはデフォルト3〜5種から選択、または画像をアップロード（即時反映）。不適切なものは管理画面から強制リセット</td><td><span class="st ok">方針案</span></td></tr>
+      <tr><td>ニックネーム＋アイコン設定</td><td>マイページで設定。アイコンはデフォルト3〜5種から選択、または画像をアップロード<span class="v4">（即時反映）。不適切なものは管理画面から強制リセット <span class="v4tag">v4</span></span></td><td><span class="st ok">方針案</span></td></tr>
       <tr><td>リアルタイム更新（難しければ定期実行）</td><td>自分のptは即時、順位表は<b>全ガチャ共通で1分ごとに更新（固定）</b></td><td><span class="st ok">方針案</span></td></tr>
       <tr><td>ガチャ単位でON/OFF</td><td>ガチャ編集画面にランキング設定タブを追加。期間・更新間隔もここで設定</td><td><span class="st ok">方針案</span></td></tr>
-      <tr><td>ランキング報酬設定（10スロット）</td><td>報酬行を最大10行。景品カードはガチャの景品登録と同じ項目（状態・交換コイン・配送限定）で設定</td><td><span class="st q">要確認</span></td></tr>
+      <tr><td>ランキング報酬設定（10スロット）</td><td>報酬行を最大10行。景品カードはガチャの景品登録と同じ項目（状態・交換コイン・配送限定）で設定</td><td><span class="st ask">要確認</span></td></tr>
       <tr><td>（追加）報酬の付与と獲得商品での扱い</td><td>確定待ちの間の表記、付与先（獲得商品の「未選択」）、48時間の自動交換、ランキング報酬の識別表示を、ガチャ景品と同じルールで定義</td><td><span class="st add">弊社追加</span></td></tr>
       <tr><td>（追加）集計の確定・不正チェック</td><td>期間終了後に運営が結果を確認し、除外・繰り上げ後に報酬付与</td><td><span class="st add">弊社追加</span></td></tr>
     </tbody>
@@ -374,7 +393,7 @@ footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:v
 <table class="spec">
 <tr><th>表示件数</th><td><b>上位10件</b>（順位・アイコン・ニックネーム・消費pt）。1〜3位はメダル色で強調。11位以下は一覧に出さない。</td></tr>
 <tr><th>自分の状況</th><td>順位表の下に常設: <b>自分の順位</b>／<b>自分の消費pt</b>／<b>ランクインまであと○pt</b>（＝現在の10位のpt − 自分のpt ＋1）。ランクイン中は「ひとつ上の順位まであと○pt」に切り替える。未参加は「1回引くとランキングに参加できます」。</td></tr>
-<tr><th>配信への配慮</th><td>自分の消費ptは配信画面に映り込みやすい個人の課金情報のため、<b>自分の数値をまとめて伏せ字（●●●）</b>にする。対象は「消費pt」「あと○pt」（ランキング欄・下部の順位バーとも）「順位表の自分の行のpt」の3つ。差分と他人のptから逆算できないよう、必ずまとめて切り替える。<br><b>初期状態は伏せた状態</b>。［自分の数値を表示］で3つまとめて表示し、選んだ状態は<b>端末に記憶</b>する（配信しない人が毎回押さなくて済むように）。順位は常に表示。<br>なお10位以内では、上下の順位の人のptから自分のptの範囲は推測できる。ランキングに参加する以上避けられないため許容する。</td></tr>
+<tr class="v4"><th>配信への配慮</th><td><span class="v4tag">v4</span>自分の消費ptは配信画面に映り込みやすい個人の課金情報のため、<b>自分の数値をまとめて伏せ字（●●●）</b>にする。対象は「消費pt」「あと○pt」（ランキング欄・下部の順位バーとも）「順位表の自分の行のpt」の3つ。差分と他人のptから逆算できないよう、必ずまとめて切り替える。<br><b>初期状態は伏せた状態</b>。［自分の数値を表示］で3つまとめて表示し、選んだ状態は<b>端末に記憶</b>する（配信しない人が毎回押さなくて済むように）。順位は常に表示。<br>なお10位以内では、上下の順位の人のptから自分のptの範囲は推測できる。ランキングに参加する以上避けられないため許容する。</td></tr>
 <tr><th>報酬・期間</th><td>順位表の下に報酬一覧（例: 1位 ○○ ／ 2〜3位 ○○）と集計期間・最終更新時刻を表示。</td></tr>
 <tr><th>ニックネーム未設定</th><td>「ユーザー＋ID下4桁」で表示する。ランキング欄には設定導線を置かない（設定はマイページから）。</td></tr>
 </table>
@@ -385,11 +404,11 @@ footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:v
 <h2>ニックネーム・アイコン設定</h2>
 <table class="spec">
 <tr><th>設定場所</th><td>マイページ ＞ プロフィール。</td></tr>
-<tr><th>ニックネーム</th><td>2〜10文字。絵文字・URL・電話番号形式は不可。<b>基本的なNGワード</b>（固定リスト）に一致したら保存不可。管理画面でNGワードを編集する機能は設けず、すり抜けた名前は事後リセットで対応する。重複は許可。</td></tr>
+<tr class="v4"><th>ニックネーム</th><td><span class="v4tag">v4</span>2〜10文字。絵文字・URL・電話番号形式は不可。<b>基本的なNGワード</b>（固定リスト）に一致したら保存不可。管理画面でNGワードを編集する機能は設けず、すり抜けた名前は事後リセットで対応する。重複は許可。</td></tr>
 <tr><th>変更制限</th><td>変更は<b>24時間に1回</b>まで（ランキング上での成りすまし・荒らし対策）。</td></tr>
 <tr><th>アイコン</th><td>運営が登録した<b>デフォルトアイコン（3〜5種）から選択</b>、または<b>ユーザー自身の画像をアップロード</b>。アップロードはJPG / PNG / WEBP・5MBまで、サーバー側で正方形にトリミングし縮小（256px程度）して保存する。未設定はデフォルトの1つ目。</td></tr>
-<tr><th>アップロード画像の扱い</th><td><b>即時反映＋事後リセット</b>（決定）。オープンチャット等で報告を受けたら運営がリセットする。事前承認は運用負荷が大きいため行わない。</td></tr>
-<tr><th>運営側の操作</th><td>不適切な表示名・画像を<b>強制リセット</b>できる。リセット内容は2つだけ: <b>ニックネームを「ユーザー＋ID下4桁」に戻す</b>／<b>アイコンをデフォルト画像に戻す</b>。操作場所は<b>管理画面のユーザー詳細</b>と<b>ランキング結果画面の各行</b>（ランキング上で気づくことが多いため）。操作履歴（日時・操作者）を残す。デフォルトアイコンの追加・差し替えも管理画面で行う。</td></tr>
+<tr class="v4"><th>アップロード画像の扱い</th><td><span class="v4tag">v4</span><b>即時反映＋事後リセット</b>（決定）。オープンチャット等で報告を受けたら運営がリセットする。事前承認は運用負荷が大きいため行わない。</td></tr>
+<tr class="v4"><th>運営側の操作</th><td><span class="v4tag">v4</span>不適切な表示名・画像を<b>強制リセット</b>できる。リセット内容は2つだけ: <b>ニックネームを「ユーザー＋ID下4桁」に戻す</b>／<b>アイコンをデフォルト画像に戻す</b>。操作場所は<b>管理画面のユーザー詳細</b>と<b>ランキング結果画面の各行</b>（ランキング上で気づくことが多いため）。操作履歴（日時・操作者）を残す。デフォルトアイコンの追加・差し替えも管理画面で行う。</td></tr>
 </table>
 </section>
 
@@ -553,7 +572,7 @@ footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);color:v
     <div class="mock-bar"><span>tora console / oripa / 1063 / ranking / result</span><span>MOCK</span></div>
     <div class="mock-body">
       <h4>ランキング結果（暫定）</h4>
-      <p class="hint">不適切な表示名・アイコンは各行の［名前を戻す］［アイコンを戻す］でリセットできます（ニックネームは「ユーザー＋ID下4桁」、アイコンはデフォルトに戻ります）。同じ操作は管理画面のユーザー詳細にもあります。</p>
+      <p class="hint" style="color:#C62828"><span class="v4tag">v4</span>不適切な表示名・アイコンは各行の［名前を戻す］［アイコンを戻す］でリセットできます（ニックネームは「ユーザー＋ID下4桁」、アイコンはデフォルトに戻ります）。同じ操作は管理画面のユーザー詳細にもあります。</p>
       <p class="hint">集計期間 10/20 12:00〜10/31 23:59 ｜ 最終集計 10/31 23:59 ｜ 状態: <b id="rstate">確定待ち</b></p>
       <div class="form" style="grid-template-columns:auto 1fr;margin-bottom:12px">
         <label for="promote">除外時の繰り上げ</label>
@@ -702,7 +721,7 @@ function mineBox(){
     (st==="live"?'<span class="gap">'+g.txt+'</span>':'')+
     (pending&&st==="live"?'<span class="pend">あなたのptは反映済み。順位は次回集計で更新されます</span>':'')+
     stayNote(g.r)+
-    '<span class="row"><button type="button" class="showpt" aria-pressed="'+shown+'">'+(shown?"自分の数値を隠す":"自分の数値を表示")+'</button></span></div>';
+    '<span class="row v4hl"><button type="button" class="showpt" aria-pressed="'+shown+'">'+(shown?"自分の数値を隠す":"自分の数値を表示")+'</button></span></div>';
 }
 function stayNote(r){
   var w=rewardOf(r);
@@ -757,7 +776,7 @@ function renderDetail(keepScroll){
     '<li>ランキング欄は重要事項・購入制限・宝箱注記の下、ラインナップの上です。</li>'+
     '<li>SPでは下部固定の購入エリアの上に<b>順位バー</b>。ランキング欄が見えている間は自動で隠れます。</li>'+
     '<li>PCでは右側にランキングを追従表示します（順位バーは出しません）。</li>'+
-    '<li>「状態」を集計中・結果発表にすると、確定待ちの表記と付与後の案内に切り替わります。</li><li>［自分の数値を表示］で、消費pt・あと○pt・順位表の自分の行・下部の順位バーがまとめて切り替わります（状態は端末に記憶）。</li><li>［1回引く］で自分のptは即時に増え、順位表は約4秒後の「次回集計」で反映されます（実運用では1分間隔）。</li></ul>';
+    '<li>「状態」を集計中・結果発表にすると、確定待ちの表記と付与後の案内に切り替わります。</li><li class="v4"><span class="v4tag">v4</span>［自分の数値を表示］で、消費pt・あと○pt・順位表の自分の行・下部の順位バーがまとめて切り替わります（状態は端末に記憶）。</li><li>［1回引く］で自分のptは即時に増え、順位表は約4秒後の「次回集計」で反映されます（実運用では1分間隔）。</li></ul>';
 }
 /* ラインナップ: 現行どおり上位賞は大きく、下位賞ほど列数が増える（列数は賞・景品数で変わる） */
 function lineup(){
@@ -960,7 +979,7 @@ function renderRes(){
     var show=(typeof fr==="number"&&fr<=10);
     h+='<tr class="'+(u.ex?"ex":"")+'"><td><input type="checkbox" id="ex'+i+'"'+(u.ex?" checked":"")+(settled?" disabled":"")+' aria-label="除外"></td>'+
        '<td class="num">'+(i+1)+'</td><td class="num"><b>'+(u.ex?"除外":fr)+'</b></td><td><div class="who">'+resIcon(u)+'<span'+(u.bad?' class="badnm"':'')+'>'+esc(u.nm)+'</span></div>'+
-       '<div class="rsts"><button type="button" class="btn-o mini" data-rn="'+i+'"'+(u.nm==="ユーザー"+tail4(u.uid)?" disabled":"")+'>名前を戻す</button><button type="button" class="btn-o mini" data-ri="'+i+'"'+(!u.up&&(u.ic||0)===DEF_ICON?" disabled":"")+'>アイコンを戻す</button></div>'+(u.log?'<div class="rlog">'+u.log+'</div>':'')+'</td><td class="num" style="color:#64748B">'+u.uid+'</td>'+
+       '<div class="rsts v4hl"><button type="button" class="btn-o mini" data-rn="'+i+'"'+(u.nm==="ユーザー"+tail4(u.uid)?" disabled":"")+'>名前を戻す</button><button type="button" class="btn-o mini" data-ri="'+i+'"'+(!u.up&&(u.ic||0)===DEF_ICON?" disabled":"")+'>アイコンを戻す</button></div>'+(u.log?'<div class="rlog">'+u.log+'</div>':'')+'</td><td class="num" style="color:#64748B">'+u.uid+'</td>'+
        '<td class="num">'+fmt(u.pt)+'</td><td>'+(fl||'<span style="color:#CBD5E1">—</span>')+'</td><td>'+(show&&!u.ex?rewardFor(fr):'<span style="color:#CBD5E1">—</span>')+'</td></tr>';
   });
   t.innerHTML=h+'</tbody>';
