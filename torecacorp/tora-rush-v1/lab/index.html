@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>TORA-RUSH テストモデル｜体験パターン4種</title>
+<style>
+:root{--bg:#fff;--fg:#1d1d1f;--mut:#6b6b70;--line:#e3e3e6;--soft:#f6f6f7;
+--g:#2e9e44;--r:#e0352b;--k:#e2b322;--rb:linear-gradient(90deg,#ff4d4d,#ffb84d,#ffe84d,#4dd97a,#4db8ff,#a64dff)}
+@media (prefers-color-scheme:dark){:root{--bg:#161618;--fg:#ececee;--mut:#a0a0a6;--line:#2e2e32;--soft:#202023}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.7 "Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--line)}
+header .in{max-width:1000px;margin:0 auto;padding:10px 16px 0}
+h1{font-size:17px;margin:0}
+.meta{font-size:12px;color:var(--mut)}
+nav{display:flex;overflow-x:auto;scrollbar-width:none;margin-top:6px}
+nav a{white-space:nowrap;padding:8px 12px;font-size:13px;color:var(--mut);text-decoration:none;border-bottom:2px solid transparent}
+nav a.act{color:var(--fg);border-bottom-color:var(--fg);font-weight:700}
+main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
+.tab{display:none}.tab.act{display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:24px;align-items:start}
+@media (max-width:760px){.tab.act{grid-template-columns:1fr}}
+.stage{position:relative;width:100%;aspect-ratio:9/16;border-radius:18px;overflow:hidden;background:#0d0b14;color:#fff;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:none}
+.memo h2{font-size:16px;margin:0 0 6px}
+.memo h3{font-size:13.5px;margin:14px 0 4px}
+.memo p,.memo li{font-size:13px}
+.memo ul{padding-left:18px;margin:4px 0}
+.memo table{border-collapse:collapse;width:100%;font-size:12.5px}
+.memo td,.memo th{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+.memo th{color:var(--mut);font-weight:600;white-space:nowrap}
+.note{font-size:12px;color:var(--mut)}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;font-size:13px}
+.ctl select,.ctl button{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:4px 10px;background:var(--bg);color:var(--fg)}
+.btnx{cursor:pointer}
+.hud{position:absolute;top:8px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;text-shadow:0 1px 2px #000;z-index:6;pointer-events:none}
+.hud button{pointer-events:auto;border:1px solid rgba(255,255,255,.7);background:rgba(0,0,0,.35);color:#fff;border-radius:4px;font:inherit;font-size:11px;padding:1px 9px;cursor:pointer}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.startbtn{border:2px solid #fff;border-radius:999px;padding:10px 30px;font-weight:800;letter-spacing:.1em;font-size:16px;background:rgba(0,0,0,.35);color:#fff;cursor:pointer}
+.tier{font-weight:900}
+/* ---------- A: loop wait ---------- */
+#A .vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+#A .vid.show{opacity:1}
+#A .ov{position:absolute;inset:0;display:none;z-index:5}
+#A .ov.on{display:block}
+#aStart{background:rgba(0,0,0,.55)}
+.oshi{position:absolute;left:50%;top:79%;transform:translate(-50%,-50%);width:118px;height:118px;border-radius:50%;cursor:pointer}
+.oshi .cap{position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff8a7a,#e0352b 55%,#8e140d);box-shadow:0 8px 0 #5b0c07,0 10px 18px rgba(0,0,0,.6),inset 0 -6px 10px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font:900 26px/1 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 2px 0 #6d0f09;animation:oshibob .55s ease-in-out infinite}
+.oshi .rim{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,220,120,.95);box-shadow:0 0 16px rgba(255,190,60,.9);animation:rim 1s ease-in-out infinite}
+@keyframes oshibob{50%{transform:translateY(3px);box-shadow:0 5px 0 #5b0c07,0 7px 14px rgba(0,0,0,.6),inset 0 -6px 10px rgba(0,0,0,.35)}}
+@keyframes rim{50%{transform:scale(1.08);opacity:.6}}
+.oshi.pressed .cap{transform:translateY(7px);box-shadow:0 1px 0 #5b0c07,inset 0 -3px 8px rgba(0,0,0,.4);animation:none}
+.oshilbl{position:absolute;left:0;right:0;top:calc(79% + 66px);text-align:center;font-size:12px;font-weight:700;text-shadow:0 1px 3px #000}
+.flashA{position:absolute;left:0;top:58%;width:100%;height:42%;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(255,255,230,.95),rgba(255,190,60,.7) 35%,rgba(255,80,0,0) 70%);animation:fl .3s ease-out forwards;z-index:7}
+@keyframes fl{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+.resA{position:absolute;left:6%;right:6%;bottom:5%;background:rgba(10,8,20,.85);border:1px solid rgba(255,215,120,.6);border-radius:12px;padding:12px 14px}
+.resA .rw{display:flex;justify-content:space-between;padding:3px 2px;border-bottom:1px solid rgba(255,255,255,.12)}
+.timeline{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.timeline span{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--mut)}
+.timeline span.cur{color:var(--fg);border-color:var(--fg);font-weight:700}
+.timeline span.wait{border-style:dashed}
+/* ---------- B: renda ---------- */
+#B .stage{background:radial-gradient(ellipse at 50% 30%,#3a1430,#0d0b14 70%)}
+.bTitle{position:absolute;top:9%;left:0;right:0;text-align:center}
+.bTitle .t1{font:900 40px/1 "Hiragino Mincho ProN","Yu Mincho",serif;letter-spacing:.08em;text-shadow:0 0 10px #ff4d00,0 3px 0 #6d0f09}
+.bTitle .t2{font-size:13px;margin-top:6px;opacity:.9}
+.gauge{position:absolute;left:12%;right:12%;top:30%;height:26px;border-radius:13px;background:#1b1724;border:2px solid #4a4058;overflow:hidden}
+.gauge .seg{position:absolute;top:0;bottom:0;border-right:2px solid #0d0b14;opacity:.25}
+.gauge .fill{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .08s linear}
+.glbl{position:absolute;left:12%;right:12%;top:calc(30% + 30px);display:flex;font-size:11px;font-weight:700}
+.glbl span{flex:1;text-align:center}
+.timer{position:absolute;top:40%;left:0;right:0;text-align:center;font:900 46px/1 system-ui;opacity:.95}
+.count{position:absolute;top:calc(40% + 50px);left:0;right:0;text-align:center;font-size:13px;opacity:.8}
+.renda{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);width:150px;height:150px;border-radius:50%;cursor:pointer;touch-action:manipulation}
+.renda .cap{position:absolute;inset:10px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff3a0,#e2b322 50%,#7a5a00);box-shadow:0 9px 0 #4e3a00,0 12px 22px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font:900 30px/1 "Hiragino Sans",sans-serif;color:#3a2a00;transition:transform .04s}
+.renda.hit .cap{transform:translateY(7px);box-shadow:0 2px 0 #4e3a00,0 4px 10px rgba(0,0,0,.6)}
+.renda .rim{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,240,160,.9);animation:rim .5s ease-in-out infinite}
+.spark{position:absolute;width:8px;height:8px;border-radius:50%;pointer-events:none;background:#ffe27a;box-shadow:0 0 8px #ffb000}
+.shake{animation:shake .12s}
+@keyframes shake{25%{transform:translate(2px,-1px)}50%{transform:translate(-2px,1px)}75%{transform:translate(1px,2px)}}
+.bRes{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:5}
+.bRes.on{display:flex}
+.big7{font:900 120px/1 Georgia,serif;-webkit-text-stroke:3px #fff;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.2);opacity:0}}
+.kakusei{font:900 22px/1 "Hiragino Sans",sans-serif;color:#ffe27a;text-shadow:0 0 10px #ff6a00;margin-bottom:6px;animation:pop .4s}
+/* ---------- C: pack ---------- */
+#C .stage{background:radial-gradient(ellipse at 50% 40%,#22304a,#0b0f1a 70%)}
+.pack{position:absolute;left:50%;top:50%;width:62%;aspect-ratio:5/8;transform:translate(-50%,-50%);transition:transform .5s cubic-bezier(.3,.8,.3,1),opacity .4s}
+.pack .body,.pack .lid{position:absolute;left:0;right:0;background:linear-gradient(160deg,#2b1a4a,#120a24 60%,#2b1a4a);border:2px solid #c9a227;overflow:hidden}
+.pack .lid{top:0;height:16%;border-bottom:none;border-radius:10px 10px 0 0;transform-origin:0% 100%;transition:transform .55s cubic-bezier(.3,.6,.3,1),opacity .55s}
+.pack .body{top:16%;bottom:0;border-top:none;border-radius:0 0 10px 10px}
+.pack .stripes{position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(201,162,39,.0) 0 14px,rgba(201,162,39,.22) 14px 22px);}
+.pack .logo{position:absolute;left:0;right:0;top:28%;text-align:center}
+.pack .logo .a{font:900 34px/1 "Hiragino Mincho ProN","Yu Mincho",serif;color:#f4d46a;text-shadow:0 2px 0 #5a3d00,0 0 12px rgba(255,200,60,.5)}
+.pack .logo .b{font-size:11px;letter-spacing:.3em;color:#e9dcb0;margin-top:6px}
+.pack .lid .crimp{position:absolute;left:0;right:0;top:0;height:10px;background:repeating-linear-gradient(90deg,#c9a227 0 3px,#8a6d12 3px 6px);opacity:.8}
+.cutguide{position:absolute;left:-2%;right:-2%;top:16%;height:0;border-top:2px dashed rgba(255,255,255,.55)}
+.cutline{position:absolute;left:0;top:calc(16% - 2px);height:4px;width:0;background:linear-gradient(90deg,#fff7c0,#ffd34d);box-shadow:0 0 10px #ffd34d,0 0 20px #ff9a00;border-radius:2px}
+.cutdot{position:absolute;top:calc(16% - 9px);left:-9px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 0 14px #ffd34d;display:none}
+.guide{position:absolute;left:0;right:0;top:calc(50% - 31%*1.6/2 - 46px);text-align:center;font-size:13px;font-weight:700;text-shadow:0 1px 3px #000}
+.guide .arr{display:inline-block;animation:arr 1s ease-in-out infinite}
+@keyframes arr{50%{transform:translateX(10px)}}
+.pack.opened .lid{transform:translate(30%,-180%) rotate(-28deg);opacity:0}
+.pack.gone{transform:translate(-50%,40%);opacity:0}
+.cards{position:absolute;left:50%;top:50%;width:58%;aspect-ratio:63/88;transform:translate(-50%,-50%)}
+.card{position:absolute;inset:0;border-radius:10px;transition:transform .45s cubic-bezier(.3,.8,.3,1),opacity .45s;box-shadow:0 8px 20px rgba(0,0,0,.5);overflow:hidden;background:#f5f1e6;color:#222}
+.card .rank{position:absolute;top:8px;left:10px;font:900 18px/1 system-ui}
+.card .art{position:absolute;left:8%;right:8%;top:14%;height:52%;border-radius:6px}
+.card .nm{position:absolute;left:10px;right:10px;bottom:14%;font-weight:800;font-size:14px}
+.card .sub{position:absolute;left:10px;right:10px;bottom:6%;font-size:11px;opacity:.7}
+.card.rare.lit{box-shadow:0 0 0 3px #fff,0 0 24px 6px rgba(255,220,80,.9)}
+.card.rare.lit::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.65) 45%,transparent 60%);background-size:250% 100%;animation:shine 1.6s linear infinite;mix-blend-mode:screen}
+@keyframes shine{from{background-position:150% 0}to{background-position:-100% 0}}
+.cardhint{position:absolute;left:0;right:0;bottom:7%;text-align:center;font-size:12px;font-weight:700;text-shadow:0 1px 3px #000}
+/* ---------- D: baccarat ---------- */
+#D .stage{background:radial-gradient(ellipse at 50% 45%,#11603a,#06301c 75%)}
+.bc{position:absolute;left:50%;top:48%;width:58%;aspect-ratio:63/88;transform:translate(-50%,-50%)}
+.bc .back,.bc .front,.bc .flap{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:10px}
+.bc .back{background:#7d1020;border:6px solid #f4efe4;box-shadow:0 8px 18px rgba(0,0,0,.45)}
+.bc .back::before{content:"";position:absolute;inset:6px;border-radius:4px;background:repeating-linear-gradient(45deg,#9a1a2c 0 6px,#7d1020 6px 12px);border:1px solid #d9b25a}
+.bc .back::after{content:"TORA";position:absolute;left:0;right:0;top:44%;text-align:center;font:900 22px/1 "Hiragino Mincho ProN",serif;color:#f1d27a;letter-spacing:.2em}
+.face{position:absolute;inset:0;border-radius:10px;background:#fbf8f0;border:1px solid #ccc;overflow:hidden}
+.face .pip{position:absolute;font:900 20px/1 Georgia,serif}
+.face .num{position:absolute;font:900 30px/1 Georgia,serif}
+.face .c7{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:900 120px/1 Georgia,serif}
+.bc .flap{overflow:hidden;pointer-events:none;display:none}
+
+.bc .flap::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.25),rgba(0,0,0,0) 40%,rgba(255,255,255,.25));pointer-events:none}
+.bc .front{display:none}
+.bc.done .front{display:block;animation:flipin .45s ease-out}
+@keyframes flipin{from{transform:rotateY(90deg)}}
+.bc.done .back,.bc.done .flap{display:none}
+.bchint{position:absolute;left:0;right:0;bottom:12%;text-align:center;font-size:12.5px;font-weight:700;text-shadow:0 1px 3px #000}
+.bchint .up{display:inline-block;animation:upup 1s ease-in-out infinite}
+@keyframes upup{50%{transform:translateY(-6px)}}
+.squeezeTitle{position:absolute;top:8%;left:0;right:0;text-align:center;font-weight:800;letter-spacing:.1em}
+footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+<header><div class="in">
+<h1>TORA-RUSH テストモデル｜体験パターン4種</h1>
+<div class="meta">11/15 ゆうぽんさんとのやり取りから試作｜スマホで開いて触ってください｜<a href="../">V1デモ・仕様に戻る</a></div>
+<nav id="nav">
+<a href="#A" data-t="A">① 動いたまま待機</a>
+<a href="#B" data-t="B">② 一撃！連打</a>
+<a href="#C" data-t="C">③ スワイプでパック開封</a>
+<a href="#D" data-t="D">④ スワイプでバカラめくり</a>
+</nav>
+</div></header>
+<main>
+
+<!-- ================= A ================= -->
+<section class="tab" id="A">
+<div>
+  <div class="stage" id="aStage">
+    <video class="vid" id="va" playsinline webkit-playsinline preload="auto"></video>
+    <video class="vid" id="vb" playsinline webkit-playsinline preload="auto"></video>
+    <div class="hud"><span id="aHud">待機中</span><button type="button" id="aSkip">スキップ</button></div>
+    <div class="ov on" id="aStart"><div class="center"><button class="startbtn" type="button">START</button><div class="note" style="color:#ddd;margin-top:8px">音が出ます</div></div></div>
+    <div class="ov" id="aWait">
+      <div class="oshi" id="oshi"><div class="rim"></div><div class="cap">押せ！</div></div>
+      <div class="oshilbl">映像は動いたまま待機中</div>
+    </div>
+    <div class="ov" id="aRes"><div class="resA">
+      <div style="font-size:12px;opacity:.75;margin-bottom:4px">獲得した7（例）</div>
+      <div class="rw"><span class="tier" style="color:var(--g)">緑7</span><span>×1</span></div>
+      <div class="rw"><span class="tier" style="color:var(--r)">赤7</span><span>×1</span></div>
+      <div class="rw"><span class="tier" style="color:var(--k)">金7</span><span>×1</span></div>
+      <div class="rw"><span class="tier" style="background:var(--rb);-webkit-background-clip:text;background-clip:text;color:transparent">虹7</span><span>×1</span></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px"><span>合計 4個</span><b style="font-size:20px">85万 相当</b></div>
+      <button class="startbtn" type="button" id="aAgain" style="width:100%;margin-top:10px;font-size:13px;padding:6px">もう一度</button>
+    </div></div>
+  </div>
+  <div class="timeline" id="aTl"></div>
+</div>
+<div class="memo">
+<h2>① 映像は動いたまま待機し、タップで次へ進む</h2>
+<p>ゆうぽんさんの要望：<i>画面を完全に止めるのではなく、動いている状態で待機させ、「押せ！」を押したら次に進む</i></p>
+<h3>しくみ（素材を分けてシステムで組み上げる）</h3>
+<ul>
+<li>1ゲームを3つの素材に分ける：<b>導入</b>（1回だけ流す）→ <b>待機ループ</b>（タップまでくり返す）→ <b>本編</b>（タップ後、リールが回って7が揃う）</li>
+<li>動画を2つ重ねて置き、片方を再生している間にもう片方で次の素材を読み込んでおく。タップした瞬間に切り替えるので、待ち時間がない</li>
+<li>秒数を指定して止める方式ではないので、端末によってタイミングがずれない</li>
+<li>このテストでは、サンプル映像を切り出して素材を作った（待機ループは1.4秒を往復させ、リールは止まった静止画を合成）。下の並びが、今流れている素材</li>
+</ul>
+<h3>納品してもらう素材（1ゲームあたり）</h3>
+<table>
+<tr><th>素材</th><th>中身</th><th>長さ</th></tr>
+<tr><td>導入</td><td>キャラ登場 →「7を揃えてコンボを決めろ！」が出る。リールは止まったまま</td><td>1秒前後</td></tr>
+<tr><td>待機ループ</td><td>文字が出た状態でキャラや背景が動き続ける。<b>最初と最後のコマが同じ</b>（つなぎ目がわからないループ）。リールは止まったまま</td><td>1〜3秒</td></tr>
+<tr><td>本編</td><td>押した瞬間からリールが回る → 7揃い → 7ロゴ → キャラ → TORAMI RUSH</td><td>約10秒</td></tr>
+</table>
+<p class="note">音：待機ループは無音で書き出し、BGMはシステム側で流しっぱなしにする（テストでは待機中は無音）。iPhoneでも2つの動画を順に鳴らせるよう、STARTを押したときに両方の再生を許可させている。</p>
+</div>
+</section>
+
+<!-- ================= B ================= -->
+<section class="tab" id="B">
+<div>
+  <div class="stage" id="bStage">
+    <div class="bTitle"><div class="t1">一撃！</div><div class="t2">連打で7を引き寄せろ</div></div>
+    <div class="gauge" id="gauge"></div>
+    <div class="glbl"><span style="color:var(--g)">緑</span><span style="color:var(--r)">赤</span><span style="color:var(--k)">金</span><span>虹</span></div>
+    <div class="timer" id="bTimer">3.0</div>
+    <div class="count" id="bCount">ボタンを押すとスタート</div>
+    <div class="renda" id="renda"><div class="rim"></div><div class="cap">連打!!</div></div>
+    <div class="bRes" id="bRes"><div class="kakusei" id="kakusei"></div><div class="big7" id="big7">7</div><div style="margin-top:8px;font-weight:800" id="bResTxt"></div><button class="startbtn" type="button" id="bAgain" style="margin-top:16px;font-size:13px;padding:6px 20px">もう一度</button></div>
+  </div>
+  <div class="ctl">結果（サーバーで決定済みの想定）<select id="bTier"><option value="r">ランダム</option><option value="0">緑</option><option value="1">赤</option><option value="2">金</option><option value="3">虹</option></select></div>
+</div>
+<div class="memo">
+<h2>② 一撃！ボタン連打</h2>
+<ul>
+<li>3秒間ボタンを連打してゲージを溜め、最後に7が揃う。押すたびにボタンが沈み、火花が出て画面が揺れる（Androidは振動も）</li>
+<li><b>結果は連打の回数では変わらない。</b>当たる7はガチャを引いた時点でサーバーが決めている。連打が足りなくても、最後に「覚醒！」でゲージが結果の色まで伸びる（パチスロの連打演出と同じ考え方）</li>
+<li>連打で結果が変わるように見せると、結果に影響する操作だと誤解されるおそれがあるので、注意書きを入れる想定</li>
+</ul>
+<h3>入れる場所の案</h3>
+<ul><li>各ゲームの「押せ！」の代わり、またはTORAMI RUSHの色を決めるタイミング（緑→赤→金→虹への昇格演出）</li></ul>
+<p class="note">Webの技術だけで作れる。素材はボタン・ゲージの絵と効果音があれば十分。</p>
+</div>
+</section>
+
+<!-- ================= C ================= -->
+<section class="tab" id="C">
+<div>
+  <div class="stage" id="cStage">
+    <div class="pack" id="pack">
+      <div class="lid"><div class="stripes"></div><div class="crimp"></div></div>
+      <div class="body"><div class="stripes"></div><div class="logo"><div class="a">虎巻</div><div class="b">TORA PACK</div></div></div>
+      <div class="cutguide"></div><div class="cutline" id="cutline"></div><div class="cutdot" id="cutdot"></div>
+    </div>
+    <div class="guide" id="cGuide">線を左から右へなぞって開封 <span class="arr">→</span></div>
+    <div class="cards" id="cards"></div>
+    <div class="cardhint" id="cHint"></div>
+  </div>
+  <div class="ctl"><button class="btnx" type="button" id="cReset">最初から</button></div>
+</div>
+<div class="memo">
+<h2>③ スワイプでパック開封</h2>
+<p>参考：ポケポケ（Pokémon TCG Pocket）の開封のように、パックの上の線を指でなぞって切り、カードを1枚ずつめくる流れ。</p>
+<ul>
+<li>指の位置に合わせて光る切り口が伸び、8割以上なぞると上の部分が飛んで開封される。途中で指を離すと切り口は戻る</li>
+<li>開封後はカードを左右にスワイプして1枚ずつめくる。最後の1枚がレアだと光る</li>
+<li>パックのデザインは仮のオリジナル（虎巻・TORA PACK）。本番はTORA様の素材に差し替える</li>
+</ul>
+<h3>Webで再現できるか</h3>
+<ul>
+<li>なぞる・切れる・飛ぶ・めくる、の基本の動きは、このとおりWebの技術だけで作れる</li>
+<li>ポケポケのような立体感（パックのたわみ、カードが光を反射する、ホロ加工）まで寄せるなら、WebGL（PixiJSやThree.jsなど）を使い、デザイナーの素材（パック・カードの絵、光の質感）が必要。ここは工数が一番増える</li>
+<li>オリパの景品カードの画像を使う場合、カードの画像の扱い（権利・表示の範囲）は確認が要る</li>
+</ul>
+</div>
+</section>
+
+<!-- ================= D ================= -->
+<section class="tab" id="D">
+<div>
+  <div class="stage" id="dStage">
+    <div class="squeezeTitle">SQUEEZE</div>
+    <div class="bc" id="bc">
+      <div class="back"></div>
+      <div class="flap" id="flap"></div>
+      <div class="front" id="bcFront"></div>
+    </div>
+    <div class="bchint" id="dHint">カードの下のほうから上へゆっくりスワイプしてめくる <span class="up">↑</span></div>
+  </div>
+  <div class="ctl">結果（サーバーで決定済みの想定）<select id="dTier"><option value="r">ランダム</option><option value="0">緑</option><option value="1">赤</option><option value="2">金</option><option value="3">虹</option></select><button class="btnx" type="button" id="dReset">最初から</button></div>
+</div>
+<div class="memo">
+<h2>④ スワイプでバカラめくり（絞り）</h2>
+<ul>
+<li>伏せたカードの下の端を指で持ち上げるようにスワイプすると、めくれた部分に表の面が少しずつ見える（逆さまに見えるのは本物の絞りと同じ）</li>
+<li>半分近くまでめくると、カードが表に返って結果が出る。途中で指を離すと元に戻る</li>
+<li>表の面の端にマーク（7の色）を置いているので、少しめくっただけで「赤っぽい…？」と期待を持たせられる</li>
+</ul>
+<h3>入れる場所の案</h3>
+<ul><li>最後の1ゲームや、虹7・高額景品のときだけの特別演出として使うと効果が大きい</li></ul>
+<p class="note">Webの技術だけで作れる。斜めの角からめくる・紙のしなりを出すなど、さらに本物に寄せる場合は工数が増える。</p>
+</div>
+</section>
+
+<section class="tab" id="SUM" style="display:none"></section>
+<div class="memo" style="margin-top:24px;border-top:1px solid var(--line);padding-top:12px">
+<h2>4つのまとめ（工数はあくまで目安）</h2>
+<table>
+<tr><th>パターン</th><th>Webで作れるか</th><th>目安</th><th>必要な素材</th></tr>
+<tr><td>① 動いたまま待機</td><td>作れる（このテストで確認）</td><td>＋1.5〜2日（再生のしくみの組み直し）</td><td>導入・待機ループ・本編に分けた映像、BGM単体</td></tr>
+<tr><td>② 一撃！連打</td><td>作れる</td><td>1〜1.5日</td><td>ボタン・ゲージの絵、効果音</td></tr>
+<tr><td>③ パック開封</td><td>基本の動きは作れる。ポケポケ並みの質感はWebGL＋素材が必要</td><td>基本3日／質感まで5〜8日</td><td>パック・カードの絵、光の質感、効果音</td></tr>
+<tr><td>④ バカラめくり</td><td>作れる</td><td>2〜3日</td><td>カードの表・裏の絵、効果音</td></tr>
+</table>
+<p class="note">どれも、結果はガチャを引いた時点でサーバーが決めている。演出の操作で結果は変わらない。</p>
+</div>
+<footer>パレットグループ トレカ商事カンパニー｜テストモデル（2026-11-15）｜映像は11/13受領のサンプルを切り出して仮に使用</footer>
+</main>
+
+<script>
+/* ---------- tabs ---------- */
+(()=>{
+const tabs=["A","B","C","D"];
+function show(t){if(!tabs.includes(t))t="A";tabs.forEach(x=>document.getElementById(x).classList.toggle("act",x===t));document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("act",a.dataset.t===t));
+  if(t!=="A")window.__stopA&&window.__stopA();}
+document.getElementById("nav").addEventListener("click",e=>{const a=e.target.closest("a");if(!a)return;e.preventDefault();history.replaceState(null,"","#"+a.dataset.t);show(a.dataset.t)});
+show(location.hash.slice(1));
+})();
+const vib=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+const TIERS=[{n:"緑",c:"#2e9e44"},{n:"赤",c:"#e0352b"},{n:"金",c:"#e2b322"},{n:"虹",c:"rainbow"}];
+const pickTier=sel=>{const v=document.getElementById(sel).value;return v==="r"?[0,0,0,1,1,1,2,2,3][Math.floor(Math.random()*9)]:+v};
+
+/* ---------- A: loop wait engine ---------- */
+(()=>{
+const SEQ=[{f:"op",k:"play",l:"OP"}];
+for(let i=1;i<=4;i++)SEQ.push({f:`g${i}_lead`,k:"play",l:`G${i} 導入`},{f:`g${i}_loop`,k:"wait",l:`G${i} 待機ループ`},{f:`g${i}_main`,k:"play",l:`G${i} 本編`+(i===2?"（復活）":"")});
+const src=s=>`assets/${s.f}.mp4`;
+const els=[document.getElementById("va"),document.getElementById("vb")];
+const $=id=>document.getElementById(id);
+let cur=0,idx=-1,running=false;
+$("aTl").innerHTML=SEQ.map((s,i)=>`<span id="tl${i}" class="${s.k==="wait"?"wait":""}">${s.l}</span>`).join("");
+function mark(){SEQ.forEach((s,i)=>$("tl"+i).classList.toggle("cur",i===idx))}
+function prep(el,i){if(i>=SEQ.length){el.removeAttribute("src");return}el.loop=SEQ[i].k==="wait";el.src=src(SEQ[i]);el.load()}
+function startAt(i){
+  idx=i;mark();const el=els[cur],other=els[1-cur];
+  const s=SEQ[i];
+  $("aHud").textContent=s.l+(s.k==="wait"?"（タップ待ち）":"");
+  const p=el.play();
+  const vis=()=>{el.classList.add("show");other.classList.remove("show");other.pause();prep(other,i+1)};
+  if(p&&p.then)p.then(vis).catch(()=>{$("aHud").textContent="再生できませんでした。もう一度STARTを押してください";$("aStart").classList.add("on")});else vis();
+  $("aWait").classList.toggle("on",s.k==="wait");
+}
+function next(){if(!running)return;cur=1-cur;if(idx+1>=SEQ.length){finish();return}startAt(idx+1)}
+els.forEach(el=>el.addEventListener("ended",()=>{if(running&&el===els[cur]&&SEQ[idx].k!=="wait")next()}));
+function finish(){running=false;$("aWait").classList.remove("on");$("aRes").classList.add("on");$("aHud").textContent="リザルト";idx=-1;mark()}
+$("aStart").addEventListener("click",()=>{
+  $("aStart").classList.remove("on");$("aRes").classList.remove("on");running=true;cur=0;
+  // unlock both elements inside the user gesture (iOS)
+  prep(els[0],0);prep(els[1],1);
+  const u=els[1].play();if(u&&u.then)u.then(()=>els[1].pause()).catch(()=>{});
+  startAt(0);
+});
+$("oshi").addEventListener("click",()=>{
+  if(!running||SEQ[idx].k!=="wait")return;
+  const o=$("oshi");o.classList.add("pressed");setTimeout(()=>o.classList.remove("pressed"),150);vib(30);
+  const f=document.createElement("div");f.className="flashA";$("aStage").appendChild(f);setTimeout(()=>f.remove(),320);
+  $("aWait").classList.remove("on");next();
+});
+$("aSkip").addEventListener("click",()=>{if(!running)return;els.forEach(e=>{e.pause()});finish()});
+$("aAgain").addEventListener("click",()=>{$("aRes").classList.remove("on");$("aStart").classList.add("on");els.forEach(e=>{e.pause();e.classList.remove("show")});$("aHud").textContent="待機中"});
+window.__stopA=()=>{if(running){els.forEach(e=>e.pause());running=false;$("aWait").classList.remove("on");$("aStart").classList.add("on");els.forEach(e=>e.classList.remove("show"));$("aHud").textContent="待機中";idx=-1;mark()}};
+})();
+
+/* ---------- B: renda ---------- */
+(()=>{
+const $=id=>document.getElementById(id);
+const g=$("gauge");
+const segCols=["#2e9e44","#e0352b","#e2b322","#b04fd6"];
+g.innerHTML=segCols.map((c,i)=>`<div class="seg" style="left:${i*25}%;width:25%;background:${c}"></div>`).join("")+'<div class="fill" id="gfill"></div>';
+const fill=$("gfill");
+let state="idle",taps=0,t0=0,raf=0,power=0,res=0;
+const DUR=3000,FULL=30; // 30 taps = full
+function setFill(p){p=Math.max(0,Math.min(1,p));fill.style.width=(p*100)+"%";
+  const i=Math.min(3,Math.floor(p*4-1e-9));fill.style.background=i<3?segCols[i]:"linear-gradient(90deg,#ff4d4d,#ffb84d,#ffe84d,#4dd97a,#4db8ff,#a64dff)";}
+function spark(){const st=$("bStage"),r=$("renda").getBoundingClientRect(),sr=st.getBoundingClientRect();
+  for(let k=0;k<6;k++){const s=document.createElement("div");s.className="spark";const x=r.left-sr.left+r.width/2,y=r.top-sr.top+r.height/2;s.style.left=x+"px";s.style.top=y+"px";st.appendChild(s);
+    const a=Math.random()*Math.PI*2,d=60+Math.random()*60;s.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`,opacity:0}],{duration:400,easing:"ease-out"}).onfinish=()=>s.remove();}}
+function tick(){const el=performance.now()-t0;const left=Math.max(0,DUR-el);$("bTimer").textContent=(left/1000).toFixed(1);if(left<=0){end();return}raf=requestAnimationFrame(tick)}
+function end(){state="end";cancelAnimationFrame(raf);
+  const userLv=Math.min(3,Math.floor(power*4-1e-9));
+  const target=(res+1)/4;
+  const after=()=>{const T=TIERS[res];const b7=$("big7");
+    if(T.c==="rainbow"){b7.style.background="linear-gradient(90deg,#ff4d4d,#ffb84d,#ffe84d,#4dd97a,#4db8ff,#a64dff)";b7.style.webkitBackgroundClip="text";b7.style.backgroundClip="text";b7.style.color="transparent"}else{b7.style.background="none";b7.style.color=T.c}
+    $("bResTxt").textContent=`${T.n}7 揃い！（連打 ${taps}回）`;$("bRes").classList.add("on");vib([40,60,80]);};
+  if(power<target){$("kakusei").textContent="覚醒！";fill.style.transition="width .6s cubic-bezier(.2,.8,.2,1)";setFill(target);setTimeout(()=>{fill.style.transition="";after()},750)}
+  else{$("kakusei").textContent="";setFill(target);setTimeout(after,300)}
+}
+$("renda").addEventListener("pointerdown",e=>{e.preventDefault();
+  if(state==="end")return;
+  if(state==="idle"){state="run";taps=0;power=0;res=pickTier("bTier");t0=performance.now();tick()}
+  taps++;power=Math.min(1,taps/FULL);setFill(power);$("bCount").textContent=`${taps} 回`;
+  const r=$("renda");r.classList.add("hit");setTimeout(()=>r.classList.remove("hit"),60);
+  const st=$("bStage");st.classList.remove("shake");void st.offsetWidth;st.classList.add("shake");spark();vib(12);
+});
+$("bAgain").addEventListener("click",()=>{state="idle";$("bRes").classList.remove("on");setFill(0);$("bTimer").textContent="3.0";$("bCount").textContent="ボタンを押すとスタート"});
+setFill(0);
+})();
+
+/* ---------- C: pack ---------- */
+(()=>{
+const $=id=>document.getElementById(id);
+const pack=$("pack"),line=$("cutline"),dot=$("cutdot"),cards=$("cards");
+let cutting=false,prog=0,opened=false,top=0;
+const CARDS=[{r:"C",n:"ノーマル景品A",c:"#9bb7d4"},{r:"C",n:"ノーマル景品B",c:"#b8d49b"},{r:"U",n:"アンコモン景品",c:"#d4c19b"},{r:"R",n:"レア景品",c:"#d49bb7"},{r:"SR",n:"スーパーレア景品",c:"linear-gradient(135deg,#ffd34d,#ff7a59,#b04fd6)",rare:true}];
+function reset(){opened=false;prog=0;cutting=false;pack.classList.remove("opened","gone");line.style.width="0";dot.style.display="none";cards.innerHTML="";$("cGuide").style.display="";$("cHint").textContent="";top=0}
+function rel(e){const r=pack.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}}
+$("cStage").addEventListener("pointerdown",e=>{if(opened)return;const p=rel(e);if(p.y>-0.08&&p.y<0.32&&p.x<0.35){cutting=true;prog=Math.max(0,p.x);$("cStage").setPointerCapture(e.pointerId);dot.style.display="block";upd()}});
+$("cStage").addEventListener("pointermove",e=>{if(!cutting)return;const p=rel(e);if(p.x>prog)prog=Math.min(1,p.x);upd();if(prog>=0.85)open()});
+const stop=()=>{if(!cutting)return;cutting=false;dot.style.display="none";if(!opened){line.style.transition="width .25s";line.style.width="0";setTimeout(()=>line.style.transition="",260);prog=0}};
+$("cStage").addEventListener("pointerup",stop);$("cStage").addEventListener("pointercancel",stop);
+function upd(){line.style.width=(prog*100)+"%";dot.style.left=`calc(${prog*100}% - 9px)`;vib(4)}
+function open(){if(opened)return;opened=true;cutting=false;dot.style.display="none";line.style.width="100%";vib([20,30,40]);$("cGuide").style.display="none";
+  pack.classList.add("opened");
+  setTimeout(()=>{pack.classList.add("gone");
+    cards.innerHTML=CARDS.slice().reverse().map((c,i)=>`<div class="card ${c.rare?"rare":""}" data-i="${CARDS.length-1-i}" style="transform:translateY(60%) scale(.9);opacity:0"><div class="rank">${c.r}</div><div class="art" style="background:${c.c}"></div><div class="nm">${c.n}</div><div class="sub">仮のカード（本番は景品画像）</div></div>`).join("");
+    [...cards.children].forEach((el,i)=>setTimeout(()=>{el.style.transform="translateY(0) scale(1)";el.style.opacity=1},80+i*60));
+    $("cHint").textContent="カードを左右にスワイプしてめくる";top=0;
+  },450);}
+let sx=null,card=null;
+cards.addEventListener("pointerdown",e=>{const el=topCard();if(!el)return;sx=e.clientX;card=el;card.style.transition="none";cards.setPointerCapture(e.pointerId)});
+cards.addEventListener("pointermove",e=>{if(sx===null||!card)return;const dx=e.clientX-sx;card.style.transform=`translateX(${dx}px) rotate(${dx/18}deg)`});
+const fin=e=>{if(sx===null||!card)return;const dx=e.clientX-sx;card.style.transition="";
+  if(Math.abs(dx)>60){card.style.transform=`translateX(${dx>0?140:-140}%) rotate(${dx>0?25:-25}deg)`;card.style.opacity=0;const c=card;setTimeout(()=>c.remove(),450);vib(15);top++;if(!topCard()){} if(cards.children.length<=2)$("cHint").textContent=cards.children.length===2?"最後の1枚…！":"";const vis=[...cards.children].filter(x=>x.style.opacity!=="0");if(vis.length===1){setTimeout(()=>{vis[0].classList.add("lit");vib([30,50,30])},250)}}
+  else card.style.transform="";
+  sx=null;card=null;};
+cards.addEventListener("pointerup",fin);cards.addEventListener("pointercancel",fin);
+function topCard(){const k=[...cards.children].filter(c=>c.style.opacity!=="0");return k.length>1?k[k.length-1]:null}
+$("cReset").addEventListener("click",reset);
+reset();
+})();
+
+/* ---------- D: baccarat squeeze ---------- */
+(()=>{
+const $=id=>document.getElementById(id);
+const bc=$("bc"),flap=$("flap"),front=$("bcFront"),back=bc.querySelector(".back");
+let res=0,dragging=false,sy=0,d=0,H=0,done=false;
+function faceHTML(t){const T=TIERS[t];const col=T.c==="rainbow"?"#b04fd6":T.c;
+  const seven=T.c==="rainbow"?`<div class="c7" style="background:linear-gradient(90deg,#ff4d4d,#ffb84d,#ffe84d,#4dd97a,#4db8ff,#a64dff);-webkit-background-clip:text;background-clip:text;color:transparent">7</div>`:`<div class="c7" style="color:${col}">7</div>`;
+  return `<div class="face"><div class="num" style="left:8px;top:6px;color:${col}">7</div><div class="pip" style="left:10px;top:40px;color:${col}">◆</div><div class="num" style="right:8px;bottom:6px;color:${col};transform:rotate(180deg)">7</div><div class="pip" style="right:10px;bottom:40px;color:${col};transform:rotate(180deg)">◆</div>
+  <div class="pip" style="left:44%;bottom:10px;color:${col}">◆</div>${seven}<div style="position:absolute;left:0;right:0;bottom:22%;text-align:center;font-weight:800;color:${col}">${T.n}7</div></div>`}
+function reset(){res=pickTier("dTier");done=false;d=0;bc.classList.remove("done");front.innerHTML=faceHTML(res);flap.innerHTML=faceHTML(res);render();$("dHint").innerHTML='カードの下のほうから上へゆっくりスワイプしてめくる <span class="up">↑</span>'}
+function render(){H=bc.getBoundingClientRect().height||1;const dd=Math.min(d,H*0.5);
+  back.style.clipPath=`inset(0 0 ${dd}px 0 round 10px)`;
+  if(dd<1){flap.style.display="none";return}
+  flap.style.display="block";
+  flap.style.top=(H-2*dd)+"px";flap.style.height=dd+"px";
+  const inner=flap.firstElementChild;inner.style.position="absolute";inner.style.left="0";inner.style.right="0";inner.style.top="0";inner.style.height=H+"px";
+  inner.style.transformOrigin="50% 0";inner.style.transform=`translateY(${H}px) scaleY(-1)`;
+  bc.style.transform=`translate(-50%,-50%) rotate(${Math.min(dd/H*6,3)}deg)`;
+}
+bc.addEventListener("pointerdown",e=>{if(done)return;const r=bc.getBoundingClientRect();if(e.clientY<r.top+r.height*0.55)return;dragging=true;sy=e.clientY;bc.setPointerCapture(e.pointerId);flap.style.transition="none"});
+bc.addEventListener("pointermove",e=>{if(!dragging)return;d=Math.max(0,sy-e.clientY);render();if(d>H*0.46)reveal()});
+const up=()=>{if(!dragging)return;dragging=false;if(done)return;const s=d,t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/220);d=s*(1-k);render();if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)};
+bc.addEventListener("pointerup",up);bc.addEventListener("pointercancel",up);
+function reveal(){if(done)return;done=true;dragging=false;bc.style.transform="translate(-50%,-50%)";back.style.clipPath="";flap.style.display="none";bc.classList.add("done");vib([30,40,60]);$("dHint").textContent=`${TIERS[res].n}7！`}
+$("dReset").addEventListener("click",reset);$("dTier").addEventListener("change",reset);
+addEventListener("resize",render);
+reset();
+})();
+</script>
+</body>
+</html>
