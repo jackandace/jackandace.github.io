@@ -111,6 +111,11 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
 .card.rare.lit{box-shadow:0 0 0 3px #fff,0 0 24px 6px rgba(255,220,80,.9)}
 .card.rare.lit::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.65) 45%,transparent 60%);background-size:250% 100%;animation:shine 1.6s linear infinite;mix-blend-mode:screen}
 @keyframes shine{from{background-position:150% 0}to{background-position:-100% 0}}
+.card .cb{position:absolute;inset:0;display:none;border-radius:10px;background:linear-gradient(160deg,#2b1a4a,#120a24 60%,#2b1a4a);border:2px solid #c9a227}
+.card .cb::after{content:"虎巻";position:absolute;left:0;right:0;top:44%;text-align:center;font:900 22px/1 "Hiragino Mincho ProN",serif;color:#f4d46a}
+.card.down .cb{display:block}
+.card.flipin{animation:cflip .35s ease-out}
+@keyframes cflip{0%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
 .cardhint{position:absolute;left:0;right:0;bottom:7%;text-align:center;font-size:12px;font-weight:700;text-shadow:0 1px 3px #000}
 /* ---------- D: baccarat ---------- */
 #D .stage{background:radial-gradient(ellipse at 50% 45%,#11603a,#06301c 75%)}
@@ -134,6 +139,32 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
 .bchint .up{display:inline-block;animation:upup 1s ease-in-out infinite}
 @keyframes upup{50%{transform:translateY(-6px)}}
 .squeezeTitle{position:absolute;top:8%;left:0;right:0;text-align:center;font-weight:800;letter-spacing:.1em}
+.steps{position:absolute;top:calc(8% + 26px);left:0;right:0;display:flex;justify-content:center;gap:6px;font-size:11px}
+.steps span{border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:1px 8px;opacity:.6}
+.steps span.on{opacity:1;border-color:#ffe27a;color:#ffe27a;font-weight:700}
+.steps span.ok{opacity:.9;background:rgba(255,226,122,.18)}
+.bc2{position:absolute;left:50%;top:47%;width:60%;aspect-ratio:63/88;transform:translate(-50%,-50%) rotate(0deg);transition:transform .35s ease}
+.bc2.free{transition:none}
+.bc2 .back2,.bc2 .front2{position:absolute;inset:0}
+.back2 .backin{position:absolute;inset:0;border-radius:9px;background:#7d1020;border:6px solid #f4efe4;box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.back2 .backin::before{content:"";position:absolute;inset:6px;border-radius:4px;background:repeating-linear-gradient(45deg,#9a1a2c 0 6px,#7d1020 6px 12px);border:1px solid #d9b25a}
+.back2 .backin::after{content:"TORA";position:absolute;left:0;right:0;top:45%;text-align:center;font:900 20px/1 "Hiragino Mincho ProN",serif;color:#f1d27a;letter-spacing:.2em}
+.flapWrap{position:absolute;inset:0;pointer-events:none;filter:drop-shadow(0 5px 6px rgba(0,0,0,.45))}
+.flap2{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 0;display:none}
+.flap2 .shade{position:absolute;inset:0;pointer-events:none}
+.front2{display:none}
+.bc2.done .front2{display:block;animation:flipin2 .45s ease-out}
+@keyframes flipin2{from{transform:rotateY(90deg)}}
+.bc2.done .back2,.bc2.done .flapWrap{display:none}
+.card9{position:absolute;inset:0;border-radius:9px;background:#fbf8f0;border:1px solid #cfcabd;overflow:hidden}
+.card9 .p{position:absolute;width:15%;aspect-ratio:4/5;transform:translate(-50%,-50%);background:#c8102e;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.card9 .tora{position:absolute;left:0;right:0;bottom:4%;text-align:center;font:700 9px/1 sans-serif;letter-spacing:.3em;color:#b9b2a0}
+.rot{position:absolute;left:0;right:0;bottom:4%;display:flex;justify-content:center;gap:14px}
+.rot button{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.25);color:#fff;font-size:20px;cursor:pointer}
+#D .bchint{bottom:calc(4% + 50px)}
+.dRes{position:absolute;left:0;right:0;top:calc(47% + 31%*88/63*0.5 + 10px);text-align:center;font-weight:900;font-size:20px;display:none;text-shadow:0 2px 4px #000}
+.dRes.on{display:block;animation:pop .4s}
+
 footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);padding-top:10px}
 </style>
 </head>
@@ -242,7 +273,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <p>参考：ポケポケ（Pokémon TCG Pocket）の開封のように、パックの上の線を指でなぞって切り、カードを1枚ずつめくる流れ。</p>
 <ul>
 <li>指の位置に合わせて光る切り口が伸び、8割以上なぞると上の部分が飛んで開封される。途中で指を離すと切り口は戻る</li>
-<li>開封後はカードを左右にスワイプして1枚ずつめくる。最後の1枚がレアだと光る</li>
+<li>開封後はカードを<b>上にスワイプ</b>して1枚ずつめくる。下のカードは裏向きのまま隠しておき、上のカードがはけてから表に返すので、<b>次のカードが先に見えない</b>。最後の1枚がレアだと光る</li>
 <li>パックのデザインは仮のオリジナル（虎巻・TORA PACK）。本番はTORA様の素材に差し替える</li>
 </ul>
 <h3>Webで再現できるか</h3>
@@ -259,25 +290,37 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <div>
   <div class="stage" id="dStage">
     <div class="squeezeTitle">SQUEEZE</div>
-    <div class="bc" id="bc">
-      <div class="back"></div>
-      <div class="flap" id="flap"></div>
-      <div class="front" id="bcFront"></div>
+    <div class="steps" id="dSteps"><span data-s="1">① 角からちょい</span><span data-s="2">② 横からちょい</span><span data-s="3">③ 絞ってオープン</span></div>
+    <div class="bc2" id="bc2">
+      <div class="back2" id="back2"><div class="backin"></div></div>
+      <div class="flapWrap"><div class="flap2" id="flap2"></div></div>
+      <div class="front2" id="front2"></div>
     </div>
-    <div class="bchint" id="dHint">カードの下のほうから上へゆっくりスワイプしてめくる <span class="up">↑</span></div>
+    <div class="rot"><button type="button" id="rotL" aria-label="左に回す">⟲</button><button type="button" id="rotR" aria-label="右に回す">⟳</button></div>
+    <div class="bchint" id="dHint"></div>
+    <div class="dRes" id="dRes"></div>
   </div>
-  <div class="ctl">結果（サーバーで決定済みの想定）<select id="dTier"><option value="r">ランダム</option><option value="0">緑</option><option value="1">赤</option><option value="2">金</option><option value="3">虹</option></select><button class="btnx" type="button" id="dReset">最初から</button></div>
+  <div class="ctl">結果（サーバーで決定済みの想定）<select id="dTier"><option value="r">ランダム</option><option value="0">6（緑）</option><option value="1">7（赤）</option><option value="2">8（金）</option><option value="3">9（虹）</option></select><button class="btnx" type="button" id="dReset">最初から</button></div>
 </div>
 <div class="memo">
 <h2>④ スワイプでバカラめくり（絞り）</h2>
 <ul>
-<li>伏せたカードの下の端を指で持ち上げるようにスワイプすると、めくれた部分に表の面が少しずつ見える（逆さまに見えるのは本物の絞りと同じ）</li>
-<li>半分近くまでめくると、カードが表に返って結果が出る。途中で指を離すと元に戻る</li>
-<li>表の面の端にマーク（7の色）を置いているので、少しめくっただけで「赤っぽい…？」と期待を持たせられる</li>
+<li><b>どこからでもめくれる：</b>カードの端や角を指でつまんで、好きな方向へ引くと、そこから折れるようにめくれる（360度）。めくれた部分に表の面が裏返しで見える。指を離すと戻る</li>
+<li><b>向きを変えられる：</b>下の ⟲ ⟳ で90度ずつ回せる。スマホは2本指でひねると好きな角度に回せる</li>
+<li><b>3段階の絞り：</b>① 角からちょいめくり → ② 横からちょいめくり → ③ 絞りながらギリギリまでめくってオープン。半分近くめくって指を離すと表に返る</li>
 </ul>
-<h3>入れる場所の案</h3>
-<ul><li>最後の1ゲームや、虹7・高額景品のときだけの特別演出として使うと効果が大きい</li></ul>
-<p class="note">Webの技術だけで作れる。斜めの角からめくる・紙のしなりを出すなど、さらに本物に寄せる場合は工数が増える。</p>
+<h3>ひりつかせるための図柄の置き方</h3>
+<ul>
+<li>トランプの数字カード（6〜9）にして、<b>端の列（柱）のマークが「3つか4つか」</b>で数字が変わるようにした。6・7・8は3つ、9は4つ</li>
+<li>柱のマークは、カードの横の端から<b>約15〜20%の位置</b>に置いてある。少しめくっただけでは見えず、もう少しめくると先が見える、という「見えるか見えないか」の位置</li>
+<li>真ん中のマークで7か8かが決まる（7は上に1つ、8は上下に2つ）。真ん中は最後の絞りまで見えない</li>
+<li>角の数字（インデックス）はあえて入れていない。入れると角をめくった時点で結果がわかってしまうため</li>
+<li>マークの色はどの結果でも同じ赤。色で結果がわからないようにしている</li>
+</ul>
+<table><tr><th>カード</th><th>柱</th><th>真ん中</th><th>結果（仮）</th></tr>
+<tr><td>6</td><td>3つ×2列</td><td>なし</td><td>緑7</td></tr><tr><td>7</td><td>3つ×2列</td><td>上に1つ</td><td>赤7</td></tr>
+<tr><td>8</td><td>3つ×2列</td><td>上下に2つ</td><td>金7</td></tr><tr><td>9</td><td>4つ×2列</td><td>中央に1つ</td><td>虹7</td></tr></table>
+<p class="note">折れ方は平面の折り返しで再現している。紙のしなり（曲面）まで出すなら、WebGLで作り直しが必要で工数が増える。</p>
 </div>
 </section>
 
@@ -289,7 +332,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><td>① 動いたまま待機</td><td>作れる（このテストで確認）</td><td>＋1.5〜2日（再生のしくみの組み直し）</td><td>導入・待機ループ・本編に分けた映像、BGM単体</td></tr>
 <tr><td>② 一撃！連打</td><td>作れる</td><td>1〜1.5日</td><td>ボタン・ゲージの絵、効果音</td></tr>
 <tr><td>③ パック開封</td><td>基本の動きは作れる。ポケポケ並みの質感はWebGL＋素材が必要</td><td>基本3日／質感まで5〜8日</td><td>パック・カードの絵、光の質感、効果音</td></tr>
-<tr><td>④ バカラめくり</td><td>作れる</td><td>2〜3日</td><td>カードの表・裏の絵、効果音</td></tr>
+<tr><td>④ バカラめくり</td><td>作れる（360度・向き変更もこのテストで確認）</td><td>3〜4日</td><td>カードの表・裏の絵、効果音</td></tr>
 </table>
 <p class="note">どれも、結果はガチャを引いた時点でサーバーが決めている。演出の操作で結果は変わらない。</p>
 </div>
@@ -401,49 +444,92 @@ function upd(){line.style.width=(prog*100)+"%";dot.style.left=`calc(${prog*100}%
 function open(){if(opened)return;opened=true;cutting=false;dot.style.display="none";line.style.width="100%";vib([20,30,40]);$("cGuide").style.display="none";
   pack.classList.add("opened");
   setTimeout(()=>{pack.classList.add("gone");
-    cards.innerHTML=CARDS.slice().reverse().map((c,i)=>`<div class="card ${c.rare?"rare":""}" data-i="${CARDS.length-1-i}" style="transform:translateY(60%) scale(.9);opacity:0"><div class="rank">${c.r}</div><div class="art" style="background:${c.c}"></div><div class="nm">${c.n}</div><div class="sub">仮のカード（本番は景品画像）</div></div>`).join("");
+    cards.innerHTML=CARDS.slice().reverse().map((c,i)=>`<div class="card ${c.rare?"rare":""} ${i<CARDS.length-1?"down":""}" data-i="${CARDS.length-1-i}" style="transform:translateY(60%) scale(.9);opacity:0"><div class="rank">${c.r}</div><div class="art" style="background:${c.c}"></div><div class="nm">${c.n}</div><div class="sub">仮のカード（本番は景品画像）</div><div class="cb"></div></div>`).join("");
     [...cards.children].forEach((el,i)=>setTimeout(()=>{el.style.transform="translateY(0) scale(1)";el.style.opacity=1},80+i*60));
-    $("cHint").textContent="カードを左右にスワイプしてめくる";top=0;
+    $("cHint").textContent="上にスワイプしてめくる ↑";top=0;
   },450);}
-let sx=null,card=null;
-cards.addEventListener("pointerdown",e=>{const el=topCard();if(!el)return;sx=e.clientX;card=el;card.style.transition="none";cards.setPointerCapture(e.pointerId)});
-cards.addEventListener("pointermove",e=>{if(sx===null||!card)return;const dx=e.clientX-sx;card.style.transform=`translateX(${dx}px) rotate(${dx/18}deg)`});
-const fin=e=>{if(sx===null||!card)return;const dx=e.clientX-sx;card.style.transition="";
-  if(Math.abs(dx)>60){card.style.transform=`translateX(${dx>0?140:-140}%) rotate(${dx>0?25:-25}deg)`;card.style.opacity=0;const c=card;setTimeout(()=>c.remove(),450);vib(15);top++;if(!topCard()){} if(cards.children.length<=2)$("cHint").textContent=cards.children.length===2?"最後の1枚…！":"";const vis=[...cards.children].filter(x=>x.style.opacity!=="0");if(vis.length===1){setTimeout(()=>{vis[0].classList.add("lit");vib([30,50,30])},250)}}
+let sx=null,sy=null,card=null;
+cards.addEventListener("pointerdown",e=>{const el=topCard();if(!el)return;sx=e.clientX;sy=e.clientY;card=el;card.style.transition="none";cards.setPointerCapture(e.pointerId)});
+cards.addEventListener("pointermove",e=>{if(sy===null||!card)return;let dy=e.clientY-sy;const dx=e.clientX-sx;if(dy>0)dy=dy*0.25;card.style.transform=`translate(${dx*0.15}px,${dy}px) rotate(${dx/40}deg)`});
+const fin=e=>{if(sy===null||!card)return;const dy=e.clientY-sy;card.style.transition="";
+  if(dy<-60){card.style.transform="translateY(-150%) rotate(-4deg)";card.style.opacity=0;const c=card;setTimeout(()=>c.remove(),450);vib(15);
+    const vis=[...cards.children].filter(x=>x.style.opacity!=="0");const nx=vis[vis.length-1];
+    if(nx){setTimeout(()=>{nx.classList.remove("down");nx.classList.add("flipin");if(vis.length===1&&nx.classList.contains("rare")){setTimeout(()=>{nx.classList.add("lit");vib([30,50,30])},300)}},180)}
+    $("cHint").textContent=vis.length===2?"最後の1枚…！ 上にスワイプ ↑":vis.length===1?"":"上にスワイプしてめくる ↑";}
   else card.style.transform="";
-  sx=null;card=null;};
+  sx=sy=null;card=null;};
 cards.addEventListener("pointerup",fin);cards.addEventListener("pointercancel",fin);
 function topCard(){const k=[...cards.children].filter(c=>c.style.opacity!=="0");return k.length>1?k[k.length-1]:null}
 $("cReset").addEventListener("click",reset);
 reset();
 })();
 
-/* ---------- D: baccarat squeeze ---------- */
+/* ---------- D: baccarat squeeze (360°) ---------- */
 (()=>{
 const $=id=>document.getElementById(id);
-const bc=$("bc"),flap=$("flap"),front=$("bcFront"),back=bc.querySelector(".back");
-let res=0,dragging=false,sy=0,d=0,H=0,done=false;
-function faceHTML(t){const T=TIERS[t];const col=T.c==="rainbow"?"#b04fd6":T.c;
-  const seven=T.c==="rainbow"?`<div class="c7" style="background:linear-gradient(90deg,#ff4d4d,#ffb84d,#ffe84d,#4dd97a,#4db8ff,#a64dff);-webkit-background-clip:text;background-clip:text;color:transparent">7</div>`:`<div class="c7" style="color:${col}">7</div>`;
-  return `<div class="face"><div class="num" style="left:8px;top:6px;color:${col}">7</div><div class="pip" style="left:10px;top:40px;color:${col}">◆</div><div class="num" style="right:8px;bottom:6px;color:${col};transform:rotate(180deg)">7</div><div class="pip" style="right:10px;bottom:40px;color:${col};transform:rotate(180deg)">◆</div>
-  <div class="pip" style="left:44%;bottom:10px;color:${col}">◆</div>${seven}<div style="position:absolute;left:0;right:0;bottom:22%;text-align:center;font-weight:800;color:${col}">${T.n}7</div></div>`}
-function reset(){res=pickTier("dTier");done=false;d=0;bc.classList.remove("done");front.innerHTML=faceHTML(res);flap.innerHTML=faceHTML(res);render();$("dHint").innerHTML='カードの下のほうから上へゆっくりスワイプしてめくる <span class="up">↑</span>'}
-function render(){H=bc.getBoundingClientRect().height||1;const dd=Math.min(d,H*0.5);
-  back.style.clipPath=`inset(0 0 ${dd}px 0 round 10px)`;
-  if(dd<1){flap.style.display="none";return}
-  flap.style.display="block";
-  flap.style.top=(H-2*dd)+"px";flap.style.height=dd+"px";
-  const inner=flap.firstElementChild;inner.style.position="absolute";inner.style.left="0";inner.style.right="0";inner.style.top="0";inner.style.height=H+"px";
-  inner.style.transformOrigin="50% 0";inner.style.transform=`translateY(${H}px) scaleY(-1)`;
-  bc.style.transform=`translate(-50%,-50%) rotate(${Math.min(dd/H*6,3)}deg)`;
+const el=$("bc2"),back=$("back2"),flap=$("flap2"),front=$("front2");
+const LAYOUT={6:{c:3,m:[]},7:{c:3,m:[[50,33]]},8:{c:3,m:[[50,33],[50,67]]},9:{c:4,m:[[50,50]]}};
+const LBL=["緑7","赤7","金7","虹7"];
+function cardHTML(v){const L=LAYOUT[v];const ys=L.c===3?[17,50,83]:[17,38.7,61.3,83];let h='<div class="card9">';
+  ys.forEach(y=>{h+=`<div class="p" style="left:23%;top:${y}%"></div><div class="p" style="left:77%;top:${y}%"></div>`});
+  L.m.forEach(([x,y])=>{h+=`<div class="p" style="left:${x}%;top:${y}%"></div>`});return h+'<div class="tora">TORA</div></div>'}
+let tier=0,theta=0,W=1,H=1,act=null,P0=null,P=null,start=null,done=false,stage=1,doneStages=new Set();
+const ptrs=new Map();let rot0=null;
+function sizes(){W=el.offsetWidth;H=el.offsetHeight}
+function toLocal(cx,cy){const r=el.getBoundingClientRect();const ox=r.left+r.width/2,oy=r.top+r.height/2;const a=-theta*Math.PI/180;const dx=cx-ox,dy=cy-oy;return[dx*Math.cos(a)-dy*Math.sin(a)+W/2,dx*Math.sin(a)+dy*Math.cos(a)+H/2]}
+function clip(poly,g){const out=[];for(let i=0;i<poly.length;i++){const A=poly[i],B=poly[(i+1)%poly.length],ga=g(A),gb=g(B);if(ga>=0)out.push(A);if((ga>=0)!==(gb>=0)){const t=ga/(ga-gb);out.push([A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t])}}return out}
+const area=p=>{let s=0;for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];s+=a[0]*b[1]-b[0]*a[1]}return Math.abs(s)/2};
+const poly=p=>p.length?`polygon(${p.map(q=>q[0].toFixed(1)+"px "+q[1].toFixed(1)+"px").join(",")})`:"polygon(0 0,0 0,0 0)";
+let frac=0;
+function render(){
+  if(!P0||!P||Math.hypot(P[0]-P0[0],P[1]-P0[1])<1){back.style.clipPath="";flap.style.display="none";frac=0;return}
+  let nx=P0[0]-P[0],ny=P0[1]-P[1];const L=Math.hypot(nx,ny);nx/=L;ny/=L;const M=[(P0[0]+P[0])/2,(P0[1]+P[1])/2];const c=M[0]*nx+M[1]*ny;
+  const rect=[[0,0],[W,0],[W,H],[0,H]];
+  const keep=clip(rect,x=>-(x[0]*nx+x[1]*ny-c)),F=clip(rect,x=>x[0]*nx+x[1]*ny-c);
+  frac=area(F)/(W*H);
+  back.style.clipPath=poly(keep);
+  flap.style.display="block";flap.style.clipPath=poly(F);
+  const a=1-2*nx*nx,b=-2*nx*ny,d=1-2*ny*ny;
+  flap.style.transform=`matrix(${a},${b},${b},${d},${2*c*nx},${2*c*ny})`;
+  // shade: darker near the fold line
+  const ang=Math.atan2(nx,-ny)*180/Math.PI; // direction into folded side (pre-reflection coords)
+  flap.querySelector(".shade").style.background=`linear-gradient(${ang}deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.0) 100%)`;
 }
-bc.addEventListener("pointerdown",e=>{if(done)return;const r=bc.getBoundingClientRect();if(e.clientY<r.top+r.height*0.55)return;dragging=true;sy=e.clientY;bc.setPointerCapture(e.pointerId);flap.style.transition="none"});
-bc.addEventListener("pointermove",e=>{if(!dragging)return;d=Math.max(0,sy-e.clientY);render();if(d>H*0.46)reveal()});
-const up=()=>{if(!dragging)return;dragging=false;if(done)return;const s=d,t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/220);d=s*(1-k);render();if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)};
-bc.addEventListener("pointerup",up);bc.addEventListener("pointercancel",up);
-function reveal(){if(done)return;done=true;dragging=false;bc.style.transform="translate(-50%,-50%)";back.style.clipPath="";flap.style.display="none";bc.classList.add("done");vib([30,40,60]);$("dHint").textContent=`${TIERS[res].n}7！`}
+function hint(){const t={1:"① 角を少しだけめくってみよう",2:"② 横の端からちょいめくり。柱のマークは3つ？4つ？",3:"③ 絞りながらギリギリまでめくって、離すとオープン"}[stage];$("dHint").textContent=done?"":t;
+  document.querySelectorAll("#dSteps span").forEach(s=>{const k=+s.dataset.s;s.classList.toggle("on",k===stage&&!done);s.classList.toggle("ok",doneStages.has(k))})}
+function reset(){const v=$("dTier").value;tier=v==="r"?[0,0,0,1,1,1,2,2,3][Math.floor(Math.random()*9)]:+v;
+  const html=cardHTML(6+tier);front.innerHTML=html;flap.innerHTML=html+'<div class="shade"></div>';
+  done=false;P0=P=null;theta=0;el.style.transform=`translate(-50%,-50%) rotate(0deg)`;el.classList.remove("done");$("dRes").classList.remove("on");stage=1;doneStages=new Set();sizes();render();hint()}
+function snap(x,y){const band=Math.min(W,H)*0.24;const dl=x,dr=W-x,dt=y,db=H-y;const nearX=Math.min(dl,dr)<band,nearY=Math.min(dt,db)<band;
+  if(nearX&&nearY)return{p:[dl<dr?0:W,dt<db?0:H],kind:"corner"};
+  const m=Math.min(dl,dr,dt,db);if(m>band)return null;
+  if(m===dl)return{p:[0,y],kind:"side",long:true};if(m===dr)return{p:[W,y],kind:"side",long:true};if(m===dt)return{p:[x,0],kind:"side",long:false};return{p:[x,H],kind:"side",long:false}}
+let grabKind=null;
+const stg=$("dStage");
+stg.addEventListener("pointerdown",e=>{if(done)return;if(e.target.closest(".rot")||e.target.closest(".ctl"))return;
+  ptrs.set(e.pointerId,[e.clientX,e.clientY]);try{stg.setPointerCapture(e.pointerId)}catch(_){}
+  if(ptrs.size===2){P0=P=null;render();act="rot";const [a,b]=[...ptrs.values()];rot0={ang:Math.atan2(b[1]-a[1],b[0]-a[0]),th:theta};el.classList.add("free");return}
+  sizes();const [x,y]=toLocal(e.clientX,e.clientY);if(x<-14||y<-14||x>W+14||y>H+14)return;
+  const s=snap(Math.max(0,Math.min(W,x)),Math.max(0,Math.min(H,y)));if(!s)return;
+  act="peel";P0=s.p;P=s.p.slice();start=[x,y];grabKind=s;});
+stg.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,[e.clientX,e.clientY]);
+  if(act==="rot"&&ptrs.size===2){const [a,b]=[...ptrs.values()];const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);theta=rot0.th+(ang-rot0.ang)*180/Math.PI;el.style.transform=`translate(-50%,-50%) rotate(${theta}deg)`;return}
+  if(act!=="peel")return;const [x,y]=toLocal(e.clientX,e.clientY);P=[P0[0]+(x-start[0]),P0[1]+(y-start[1])];render();
+  if(frac>0.62)openCard();});
+const end=e=>{ptrs.delete(e.pointerId);
+  if(act==="rot"){if(ptrs.size<2){act=null;el.classList.remove("free")}return}
+  if(act!=="peel")return;act=null;
+  if(frac>0.42){openCard();return}
+  if(frac>0.015){if(grabKind.kind==="corner")doneStages.add(1);else doneStages.add(2);
+    stage=!doneStages.has(1)?1:!doneStages.has(2)?2:3;hint()}
+  const s=P.slice(),t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/200);P=[s[0]+(P0[0]-s[0])*k,s[1]+(P0[1]-s[1])*k];render();if(k<1)requestAnimationFrame(step);else{P0=P=null;render()}};requestAnimationFrame(step)};
+stg.addEventListener("pointerup",end);stg.addEventListener("pointercancel",end);
+function openCard(){if(done)return;done=true;act=null;doneStages.add(3);P0=P=null;render();el.classList.add("done");vib([30,40,60]);
+  const r=$("dRes");r.textContent=`${6+tier} → ${LBL[tier]}`;r.style.color=["#4ade80","#ff5a4a","#ffd34d","#e9b0ff"][tier];r.classList.add("on");hint()}
+function rotBy(d){if(done)return;theta=Math.round((theta+d)/90)*90;el.style.transform=`translate(-50%,-50%) rotate(${theta}deg)`}
+$("rotL").addEventListener("click",()=>rotBy(-90));$("rotR").addEventListener("click",()=>rotBy(90));
 $("dReset").addEventListener("click",reset);$("dTier").addEventListener("change",reset);
-addEventListener("resize",render);
+addEventListener("resize",()=>{sizes();render()});
 reset();
 })();
 </script>
