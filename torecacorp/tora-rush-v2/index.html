@@ -102,6 +102,8 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <a href="#B" data-t="B">B. 無在庫（確率）</a>
 <a href="#C" data-t="C">C. 有在庫＋自動補充</a>
 <a href="#D" data-t="D">D. ハイブリッド（追加提案）</a>
+<a href="#diff" data-t="diff">設定と変化（4案の差分）</a>
+<a href="#opt" data-t="opt" style="color:#067647;font-weight:700">ゲームメイキング最適案</a>
 </nav>
 </div></header>
 <main>
@@ -147,9 +149,87 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <ul style="font-size:12.5px">
 <li>景品の数の大半は下位（D・その他）なので、<b>RUSHの平均は1〜2ゲーム</b>。D（5,000pt）は紫7シングル1回で終わり、その他（1,000pt）はRUSHに入らない。盛り上がるのはB以上が当たったとき</li>
 <li>このため「RUSHに入る最低額」を<b>B以上（例：30,000pt以上）</b>に上げる、または最小レートのBOXで下位もRUSHに入れる、のどちらかを決めたい</li>
+<li>→ この2つを解消する組み立て方を「<a href="#opt" onclick="history.replaceState(null,'','#opt');show('opt');return false">ゲームメイキング最適案</a>」タブにまとめた（合算RUSH・RUSHストック・小役）</li>
 <li>8,000ptのように5,000の倍数でない景品は、±10%の中に収まる額がないので丸めで大きくぶれる（8,000→10,000で＋25%）。<b>景品の交換ポイントを5,000の倍数にそろえる運用</b>にすると、ブレが小さくなる</li>
 </ul>
 <p class="note">各タブの左が設定画面（stgの見た目に寄せたモック。青い枠が新しく足す部分、橙の点線が今と変わる部分）、右が動き（引いたときに何が当たり、RUSHがどう組まれ、在庫や還元率がどう動くか）。数値はその場で変えられる。</p>
+</div>
+</section>
+
+<!-- ===== 設定と変化 ===== -->
+<section class="pane" id="p-diff">
+<div class="card">
+<h2>設定と変化：どこを動かすと、何が変わるか</h2>
+<p class="note">各案のタブで数値を変えると、右の「動き」がその場で変わる。ここでは、どの入力が何に効くかと、4案の違いをまとめる。</p>
+<h3>1. 4案の入力欄の違い（差分）</h3>
+<table class="t">
+<tr><th>入力欄</th><th>A. 有在庫</th><th>B. 無在庫</th><th>C. 有在庫＋補充</th><th>D. ハイブリッド</th></tr>
+<tr><td>景品・交換ポイント</td><td>今のまま</td><td>今のまま</td><td>今のまま</td><td>今のまま</td></tr>
+<tr><td>個数</td><td>今のまま（合計＝口数）</td><td class="bad">なし</td><td>今のまま（合計＝1周の口数）</td><td class="mid">S・Aだけ</td></tr>
+<tr><td>確率（%）</td><td>なし</td><td class="mid">新規（個数の代わり）</td><td>なし</td><td class="mid">新規（全ランク。S・Aは1回あたりの確率）</td></tr>
+<tr><td>ランクの種別（個数あり／確率）</td><td>なし</td><td>なし</td><td>なし</td><td class="mid">新規</td></tr>
+<tr><td>RUSH設定（レート・ブレ・倍チャレ・上限）</td><td class="mid">新規</td><td class="mid">新規</td><td class="mid">新規</td><td class="mid">新規</td></tr>
+<tr><td>自動補充（タイミング・上限回数・ラストワン）</td><td>なし</td><td>なし</td><td class="mid">新規</td><td>なし（下位は無限）</td></tr>
+<tr><td>安全装置（1日の払い出し上限など）</td><td>不要</td><td class="mid">新規（必須）</td><td>不要</td><td>あると安心</td></tr>
+<tr><td>特典（ラストワン・キリ番）</td><td>今のまま</td><td class="bad">使えない</td><td>周ごとに使える</td><td>上位だけ使える</td></tr>
+<tr><td>ユーザー画面の残数表示</td><td>今のまま</td><td class="bad">なし（確率の表示が要る）</td><td>「第○弾 残○口」</td><td>上位の残数＋下位の確率</td></tr>
+</table>
+
+<h3>2. 入力を動かしたときに変わるもの</h3>
+<table class="t">
+<tr><th>動かす入力</th><th>管理画面の数字</th><th>引いたときの動き</th><th>ユーザーから見えるもの</th><th>案</th></tr>
+<tr><td><b>交換ポイント</b></td><td>総額・1回の期待値・還元率</td><td>その景品が当たったときの<b>RUSHの組み合わせ</b>（7の数・種類）とブレ。行の右の「RUSH（例）」がすぐ変わる</td><td>RUSHの長さ、リザルトの合計額</td><td>全案</td></tr>
+<tr><td><b>個数</b></td><td>口数・総額・設計還元率</td><td>そのランクが当たる割合（残り÷全体）。引くたびに減り、残数バーが縮む</td><td>残数・総口数</td><td>A・C・D（S・A）</td></tr>
+<tr><td><b>確率（%）</b></td><td>確率の合計（100%チェック）・期待値・期待還元率</td><td>そのランクが当たる割合。在庫は減らない。実際の還元率は引くほど期待還元率に近づくが、短期ではぶれる</td><td>提供割合の表示</td><td>B・D</td></tr>
+<tr><td><b>ポイント消費量（1回の価格）</b></td><td>還元率（期待値÷価格）</td><td>使ったptと還元率の実績</td><td>1回の価格</td><td>全案</td></tr>
+<tr><td><b>RUSHレート</b></td><td>RUSHに入る最低額（標準5,000／最小500）</td><td>同じ景品でも、最小レートなら7の数が10倍になる（RUSHが長くなる）</td><td>7の1個あたりの額</td><td>全案</td></tr>
+<tr><td><b>ブレの幅</b></td><td>なし</td><td>演出の合計と景品額の差の範囲。丸めのみ／±10%／±20%</td><td>リザルトの合計額（目安）</td><td>全案</td></tr>
+<tr><td><b>倍チャレンジ（成功・失敗ルート）</b></td><td>なし</td><td>組み合わせの中に倍チャレンジが入る割合。成功は同じ7を2つ「1つ＋×2」に置き換えるので合計は変わらない</td><td>倍チャレンジ演出の頻度</td><td>全案</td></tr>
+<tr><td><b>ゲーム数の上限</b></td><td>なし</td><td>高額の景品で白7（ダブル）が優先される度合い</td><td>RUSHの最大の長さ</td><td>全案</td></tr>
+<tr><td><b>補充のタイミング・上限回数</b></td><td>なし</td><td>売り切れたときに第2弾…と続くか、止まるか。ランクごと補充だと周の途中で確率が変わる</td><td>「第○弾」表示・売り切れの有無</td><td>C</td></tr>
+<tr><td><b>S・Aの個数（D）</b></td><td>上位の残数</td><td>上位がなくなると、その確率は「その他」に回り、期待還元率が下がる</td><td>上位の残数（残1・残0）</td><td>D</td></tr>
+</table>
+
+<h3>3. 1回引いたときの処理の流れ（案ごとの差分）</h3>
+<table class="t">
+<tr><th>段階</th><th>A. 有在庫</th><th>B. 無在庫</th><th>C. 有在庫＋補充</th><th>D. ハイブリッド</th></tr>
+<tr><td>① 景品を決める</td><td>残り在庫からランダムに1つ（Compact BOX）</td><td>確率でランク・景品を決める</td><td>Aと同じ。残りが0なら先に補充して再シャッフル</td><td>確率で決める。S・Aに当たっても在庫が0なら「その他」へ</td></tr>
+<tr><td>② 在庫</td><td>1つ減る</td><td>減らない</td><td>1つ減る</td><td>S・Aだけ減る</td></tr>
+<tr><td>③ RUSHを組む</td><td colspan="4">景品の交換ポイント → ブレの幅で目標額 → 紫7・白7と倍チャレンジで組む（4案共通）</td></tr>
+<tr><td>④ 保存</td><td colspan="4">景品・RUSHの再生リスト・演出の合計額を抽選結果と一緒に保存（4案共通）</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ===== 最適案 ===== -->
+<section class="pane" id="p-opt">
+<div class="card">
+<h2>ゲームメイキング最適案：「RUSHが短い」「ブレが大きい」を解消する</h2>
+<p style="margin:4px 0">シミュレーションで見えた2つの問題（RUSHが平均1〜2ゲームで終わる／5,000の倍数でない景品が大きくぶれる）は、<b>RUSHを景品1つごとではなく「1回の購入」ごとに組む</b>ことと、<b>端数を小役で埋める</b>ことで、景品の登録ルールを変えずに解消できる。</p>
+<table class="t" style="margin-top:8px">
+<tr><th>しかけ</th><th>中身</th><th>解消すること</th></tr>
+<tr><td><b>① 合算RUSH</b></td><td>RUSHは「1回の購入（単発・10連・100連）」に1回だけ。その購入で当たった景品の<b>交換ポイントの合計</b>でRUSHを組む。10連なら10個分がまとめて1回のRUSHになる</td><td>RUSHが短い／100連で1ゲームのRUSHが何十回も続く</td></tr>
+<tr><td><b>② RUSHストック</b></td><td>単発で合計がRUSHの最低額（例：3万pt）に届かないときは、<b>ゲージに貯めておき</b>、貯まった時点の購入でまとめてRUSHにする。ゲージは画面に出して「あと○ptでRUSH」と見せる</td><td>低額の単発で毎回1ゲームだけ／RUSHに入らない</td></tr>
+<tr><td><b>③ 小役で端数を埋める</b></td><td>紫7・白7の下に<b>小役（ベル＝1,000、チェリー＝500）</b>を置き、5,000未満の端数は最後のゲームに「＋ベル×3」の形で上乗せする。ゲーム数は増えない</td><td>5,000の倍数でない景品のブレ。合計を景品額にぴったり合わせられる（ブレ0）。ブレの幅は「演出として出したいときだけ」に使える</td></tr>
+<tr><td><b>④ ゲーム数の目安</b></td><td>合計額に応じて「3〜8ゲーム」（上限10）に収まるように、紫7・白7の出し方を調整する（低額は紫7・倍チャレンジ多め、高額は白7ダブル多め）。100万を超えるような大きい額は、最後のゲームに「上乗せ」としてまとめる</td><td>長すぎ・短すぎのばらつき</td></tr>
+</table>
+<p class="note"><b>トレードオフ：</b>RUSHの最低額を3万ptにすると、単発中心のユーザーは「RUSHが出ない購入」が増える（ストックに貯まる）。最低額を1万ptに下げる、ストックのゲージを常に見せて「あと○ptでRUSH」と期待させる、などで調整する。<br>どれも景品の当たり方（A〜Dのどの案でも）は変えず、RUSHの組み立てだけを変える。景品は購入の時点ですべて確定・付与済み。ストック中の景品も獲得済みで、RUSHは見せ方だけ。</p>
+</div>
+
+<div class="card">
+<h2>今のルールと最適案の比較（シミュレーション）</h2>
+<div class="simctl" style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:12.5px">
+ <label>購入の内訳 <select id="oMix"><option value="a">単発30%・10連50%・100連20%</option><option value="b">単発70%・10連30%</option><option value="c">10連100%</option></select></label>
+ <label>RUSHの最低額 <select id="oMin"><option value="30000" selected>30,000pt</option><option value="10000">10,000pt</option><option value="50000">50,000pt</option></select></label>
+ <label><input type="checkbox" id="oStock" checked> RUSHストック</label>
+ <label><input type="checkbox" id="oSmall" checked> 小役で端数を埋める</label>
+ <label>ブレ（最適案） <select id="oTol"><option value="0" selected>0（ぴったり）</option><option value="0.05">±5%</option><option value="0.1">±10%</option></select></label>
+ <button class="btn pri" id="oRun" type="button">1,000回の購入で比べる</button>
+</div>
+<div class="note" style="margin-top:4px">景品は「A. 有在庫」の例のBOX（設計還元率85.5%）と同じ割合で当たる前提。1回の価格4,000pt。今のルール＝景品1つごとにRUSH・5,000未満はRUSHなし・ブレ±10%。</div>
+<table class="t" style="margin-top:8px" id="oTbl"></table>
+<h3>最適案のRUSHの例（直近の購入）</h3>
+<div id="oLog"></div>
 </div>
 </section>
 
@@ -357,9 +437,77 @@ function draw(id,n){
      <div class="seqs">${R?R.g.map(x=>`<span class="k-${x.k}">${x.n}${x.k==="ds"?" +"+fmt(x.v):""}</span>`).join(""):'<span class="k-no">RUSHなし（最低額未満・通常の結果表示）</span>'}</div></div>`}).join("");
   update(id);
 }
+
+/* ---------------- 最適案 ---------------- */
+function genOpt(A,o){
+  // o: tol, small, max(10), minG(3), maxG(8)
+  const K=[{k:"pS",n:"紫7S",v:5000},{k:"pW",n:"紫7W",v:10000},{k:"wS",n:"白7S",v:50000},{k:"wW",n:"白7W",v:100000}];
+  const u=o.small?500:5000;
+  let T=A;
+  if(o.tol>0){const lo=A*(1-o.tol),hi=A*(1+o.tol);const c=[];for(let x=Math.ceil(lo/u)*u;x<=hi+1e-9;x+=u)c.push(x);if(c.length){const ws=c.map(x=>1/(1+Math.abs(x-A)/(A*0.02+u)));let t=Math.random()*ws.reduce((a,b)=>a+b,0);T=c[0];for(let i=0;i<c.length;i++){if((t-=ws[i])<=0){T=c[i];break}}}}
+  else T=Math.round(A/u)*u;
+  let big=Math.floor(T/5000)*5000,rest=T-big;
+  if(!o.small){big=Math.max(5000,Math.round(T/5000)*5000);rest=0}
+  // target games
+  const tg=Math.max(1,Math.min(o.maxG,Math.round(1.6*Math.log2(Math.max(1,big/5000))+1)));
+  const g=[];let R=big,guard=0;
+  while(R>=5000&&guard++<200&&g.length<o.max){
+    const left=Math.max(1,tg-g.length);const need=R/left;
+    let cs=K.filter(x=>x.v<=R).map(x=>({...x,w:Math.exp(-2.2*Math.abs(Math.log(x.v/need)))}));
+    if(g.length>=o.max-1){cs=[K.filter(x=>x.v<=R).reduce((a,b)=>b.v>a.v?b:a)].map(x=>({...x,w:1}))}
+    let s=Math.random()*cs.reduce((a,b)=>a+b.w,0),p=cs[cs.length-1];for(const q of cs){if((s-=q.w)<=0){p=q;break}}
+    g.push({k:p.k,n:p.n,v:p.v});R-=p.v;
+  }
+  let over=Math.floor(R/5000)*5000;rest+=R-over; // 上限を超えた分は最後のゲームに上乗せ
+  // 倍チャレ成功：同じ7が2つあれば1つ＋×2に
+  const by={};g.forEach((x,i)=>{(by[x.k]=by[x.k]||[]).push(i)});const pr=Object.values(by).filter(a=>a.length>=2);
+  if(pr.length&&Math.random()<0.35){const a=pr[0];const v=g[a[0]].v;g.splice(a[1],1);g.splice(a[0]+1,0,{k:"ds",n:"倍チャレ成功",v})}
+  // 短すぎるときは倍チャレ失敗で山場を足す（加算なし）
+  if(g.length&&g.length<o.minG&&Math.random()<0.6)g.splice(Math.floor(Math.random()*g.length)+1,0,{k:"df",n:"倍チャレ失敗",v:0});
+  let mi=-1;g.forEach((x,i)=>{if(x.k!=="ds"&&x.k!=="df"&&(g[i+1]||{}).k!=="ds"&&(mi<0||x.v>g[mi].v))mi=i});if(mi>=0&&mi<g.length-1){const [b]=g.splice(mi,1);g.push(b)}
+  if(over>0&&g.length){g[g.length-1].plus=`上乗せ${fmt(over)}`}
+  let smallTxt="";if(rest>0){const bell=Math.floor(rest/1000),ch=Math.round((rest-bell*1000)/500);smallTxt=[bell?`ベル×${bell}`:"",ch?`チェリー×${ch}`:""].filter(Boolean).join("・");
+    if(g.length)g[g.length-1].plus=(g[g.length-1].plus?g[g.length-1].plus+"・":"")+smallTxt;else g.push({k:"pS",n:"小役のみ",v:0,plus:smallTxt})}
+  const sum=g.reduce((a,b)=>a+b.v,0)+rest+over;
+  return{g,sum,diff:sum-A,rest};
+}
+function sampleBoxDist(){const rows=stockRows();const N=rows.reduce((a,r)=>a+r.cnt,0);return rows.map(r=>({...r,p:r.cnt/N}))}
+function pickDist(d){let x=Math.random();for(const r of d){if((x-=r.p)<0)return r}return d[d.length-1]}
+function runOpt(){
+  const mix={a:[[1,.3],[10,.5],[100,.2]],b:[[1,.7],[10,.3]],c:[[10,1]]}[document.getElementById("oMix").value];
+  const MIN=+document.getElementById("oMin").value,useStock=document.getElementById("oStock").checked,small=document.getElementById("oSmall").checked,tol=+document.getElementById("oTol").value;
+  const d=sampleBoxDist();const cur={o:{rate:1,tol:0.1,ps:0.3,pf:0.2,max:10}};
+  const S={c:{rush:0,games:0,ge3:0,blur:0,blurN:0,perBuy:0,maxRushPerBuy:0,none:0},o:{rush:0,games:0,ge3:0,blur:0,blurN:0,stockFire:0,none:0,capped:0}};
+  let stock=0;const log=[];
+  for(let n=0;n<1000;n++){
+    let x=Math.random(),cnt=mix[mix.length-1][0];for(const [c,p] of mix){if((x-=p)<0){cnt=c;break}}
+    const prizes=[];for(let i=0;i<cnt;i++)prizes.push(pickDist(d));
+    // 今のルール：景品ごと
+    let rb=0;prizes.forEach(r=>{if(r.pt>=5000){const R=genRush(r.pt,cur.o);S.c.rush++;rb++;S.c.games+=R.g.length;if(R.g.length>=3)S.c.ge3++;S.c.blur+=Math.abs(R.diff)/r.pt*100;S.c.blurN++}});
+    if(!rb)S.c.none++;S.c.perBuy+=rb;S.c.maxRushPerBuy=Math.max(S.c.maxRushPerBuy,rb);
+    // 最適案：購入ごとに合算
+    const tot=prizes.reduce((a,r)=>a+r.pt,0);let A=tot,fired=false,fromStock=0;
+    if(A<MIN){if(useStock){stock+=A;if(stock>=MIN){A=stock;fromStock=stock-tot;stock=0;fired=true}else A=0}else A=0}
+    else{if(useStock&&stock>0){A+=stock;fromStock=stock;stock=0}fired=true}
+    if(fired&&A>0){const R=genOpt(A,{tol,small,max:10,minG:3,maxG:8});S.o.rush++;S.o.games+=R.g.length;if(R.g.length>=3)S.o.ge3++;S.o.blur+=Math.abs(R.diff)/A*100;S.o.blurN++;if(fromStock>0)S.o.stockFire++;
+      if(log.length<8)log.push({cnt,tot,A,fromStock,R})}
+    else S.o.none++;
+  }
+  const pct=(a,b)=>b?(a/b*100).toFixed(0)+"%":"-";
+  document.getElementById("oTbl").innerHTML=`<tr><th>指標（1,000回の購入）</th><th>今のルール（景品ごと）</th><th>最適案（購入ごと＋ストック＋小役）</th></tr>
+  <tr><td>RUSHの回数</td><td>${fmt(S.c.rush)}回（1購入あたり平均${(S.c.perBuy/1000).toFixed(1)}回、最大${S.c.maxRushPerBuy}回）</td><td class="good">${fmt(S.o.rush)}回（1購入に最大1回。うちストック発動${fmt(S.o.stockFire)}回）</td></tr>
+  <tr><td>1回のRUSHの平均ゲーム数</td><td class="bad">${(S.c.games/Math.max(1,S.c.rush)).toFixed(1)}ゲーム</td><td class="good">${(S.o.games/Math.max(1,S.o.rush)).toFixed(1)}ゲーム</td></tr>
+  <tr><td>3ゲーム以上のRUSHの割合</td><td class="bad">${pct(S.c.ge3,S.c.rush)}</td><td class="good">${pct(S.o.ge3,S.o.rush)}</td></tr>
+  <tr><td>ブレの平均（演出の合計と景品額の差）</td><td class="bad">${(S.c.blur/Math.max(1,S.c.blurN)).toFixed(1)}%</td><td class="good">${(S.o.blur/Math.max(1,S.o.blurN)).toFixed(1)}%</td></tr>
+  <tr><td>RUSHが出ない購入</td><td>${pct(S.c.none,1000)}</td><td>${pct(S.o.none,1000)}${useStock?"（ストックに貯まる）":""}</td></tr>`;
+  document.getElementById("oLog").innerHTML=log.map(e=>`<div class="ent"><div class="h"><span class="pill alt">${e.cnt===1?"単発":e.cnt+"連"}</span><span>景品の合計 <b>${fmt(e.tot)}</b>pt</span>${e.fromStock>0?`<span class="pill rec">ストック＋${fmt(e.fromStock)}</span>`:""}<span>RUSHの額 <b>${fmt(e.A)}</b></span><span class="${e.R.diff===0?"note":e.R.diff>0?"good":"bad"}">演出合計 ${fmt(e.R.sum)}（${e.R.diff>0?"+":""}${fmt(e.R.diff)}）</span><span class="note">${e.R.g.length}ゲーム</span></div>
+   <div class="seqs">${e.R.g.map(x=>`<span class="k-${x.k}">${x.n}${x.k==="ds"?" +"+fmt(x.v):""}${x.plus?"＋"+x.plus:""}</span>`).join("")}</div></div>`).join("");
+}
+["oMix","oMin","oStock","oSmall","oTol"].forEach(id=>document.getElementById(id).addEventListener("change",runOpt));
+document.getElementById("oRun").addEventListener("click",runOpt);
 /* tabs */
 const built={};
-function show(t){if(!["cmp","A","B","C","D"].includes(t))t="cmp";document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("act",p.id==="p-"+t));document.querySelectorAll("#tabs a").forEach(a=>a.classList.toggle("act",a.dataset.t===t));if(t!=="cmp"&&!built[t]){build(t);built[t]=1}scrollTo({top:0})}
+function show(t){if(!["cmp","A","B","C","D","diff","opt"].includes(t))t="cmp";document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("act",p.id==="p-"+t));document.querySelectorAll("#tabs a").forEach(a=>a.classList.toggle("act",a.dataset.t===t));if(["A","B","C","D"].includes(t)&&!built[t]){build(t);built[t]=1}if(t==="opt"&&!built.opt){runOpt();built.opt=1}scrollTo({top:0})}
 document.getElementById("tabs").addEventListener("click",e=>{const a=e.target.closest("a");if(!a)return;e.preventDefault();history.replaceState(null,"","#"+a.dataset.t);show(a.dataset.t)});
 show(location.hash.slice(1));
 </script>
