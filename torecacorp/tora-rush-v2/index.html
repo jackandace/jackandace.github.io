@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>TORA-RUSH プロトv2｜管理画面の設計パターン</title>
+<style>
+:root{--bg:#fff;--fg:#1d1d1f;--mut:#6b6b70;--line:#e5e7eb;--soft:#f6f7f9;--acc:#1f5fbf;--accs:#e8f0fc;--ok:#067647;--oks:#e7f6ee;--warn:#b54708;--warns:#fdf3e7;--ng:#b42318;--ngs:#fdecea}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--fg);font:13.5px/1.65 "Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+header.top{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line)}
+header.top .in{max-width:1360px;margin:0 auto;padding:10px 16px 0}
+h1{font-size:17px;margin:0}
+.meta{font-size:12px;color:var(--mut)}
+nav.tabs{display:flex;overflow-x:auto;margin-top:6px;scrollbar-width:none}
+nav.tabs a{white-space:nowrap;padding:8px 14px;font-size:13px;color:var(--mut);text-decoration:none;border-bottom:2px solid transparent}
+nav.tabs a.act{color:var(--fg);border-bottom-color:var(--fg);font-weight:700}
+main{max-width:1360px;margin:0 auto;padding:14px 16px 60px}
+.pane{display:none}.pane.act{display:block}
+h2{font-size:16px;margin:4px 0 6px}
+h3{font-size:14px;margin:14px 0 6px}
+.note{font-size:12px;color:var(--mut)}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0}
+table.t{border-collapse:collapse;width:100%;font-size:12.5px}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.t th{color:var(--mut);font-weight:600;white-space:nowrap;background:var(--soft)}
+.good{color:var(--ok)}.bad{color:var(--ng)}.mid{color:var(--warn)}
+.pill{display:inline-block;border-radius:999px;padding:0 8px;font-size:11px;font-weight:700}
+.pill.rec{background:var(--oks);color:var(--ok)}.pill.alt{background:var(--accs);color:var(--acc)}
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(360px,1fr);gap:16px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:1fr}}
+/* ---- console mock ---- */
+.con{display:grid;grid-template-columns:150px 1fr;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+@media (max-width:700px){.con{grid-template-columns:1fr}.side{display:none}}
+.side{background:#fbfbfc;border-right:1px solid var(--line);padding:10px 0;font-size:12px;color:#444}
+.side .lg{font-weight:700;padding:0 12px 8px;font-size:12px}
+.side div.i{padding:4px 12px}.side div.i.on{background:var(--accs);color:var(--acc);font-weight:700}
+.side div.sub{padding-left:22px}
+.cm{padding:12px 16px;min-width:0}
+.bc{font-size:11px;color:var(--mut)}
+.ctitle{font-size:18px;font-weight:800;margin:2px 0 10px}
+.fld{margin:8px 0}
+.fld label{display:block;font-size:11.5px;color:var(--mut);margin-bottom:2px}
+.fld input,.fld select{font:inherit;font-size:12.5px;border:1px solid #d6d9de;border-radius:6px;padding:5px 8px;background:#fff;color:var(--fg);width:100%}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rk{border:1px solid var(--line);border-radius:8px;margin:10px 0;overflow-x:auto}
+.rk .rh{display:flex;align-items:center;gap:10px;padding:6px 10px;background:#fafafa;border-bottom:1px solid var(--line)}
+.rk .rh b{font-size:15px;min-width:52px}
+.rk .rh .ef{font-size:11.5px;color:var(--mut)}
+.rk .rh .sum{margin-left:auto;font-size:11.5px;color:var(--mut)}
+.rk table{border-collapse:collapse;width:100%;font-size:12px}
+.rk th,.rk td{padding:5px 8px;border-bottom:1px solid #f0f1f3;text-align:left;white-space:nowrap}
+.rk th{color:var(--mut);font-weight:600}
+.rk td input{font:inherit;font-size:12px;border:1px solid #d6d9de;border-radius:5px;padding:2px 6px;width:96px}
+.rk td input.s{width:70px}
+.thumb{display:inline-block;width:18px;height:24px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.newb{border:2px solid var(--acc);border-radius:8px;padding:10px 12px;margin:12px 0;background:#f8fbff;position:relative}
+.newb .tag{position:absolute;top:-10px;left:10px;background:var(--acc);color:#fff;font-size:10.5px;font-weight:700;border-radius:4px;padding:0 6px}
+.chg{outline:2px dashed var(--warn);outline-offset:2px;border-radius:6px}
+.chgtag{display:inline-block;font-size:10.5px;color:#fff;background:var(--warn);border-radius:3px;padding:0 5px;margin-left:6px;vertical-align:1px}
+.tot{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;margin-top:6px}
+.tot b{font-size:15px}
+.warnbox{background:var(--warns);color:var(--warn);border-radius:6px;padding:6px 10px;font-size:12px;margin-top:6px}
+/* ---- sim ---- */
+.sim{position:sticky;top:98px}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi div{background:var(--soft);border-radius:8px;padding:8px 10px}
+.kpi small{display:block;color:var(--mut);font-size:11px}
+.kpi b{font-size:17px}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.btn{font:inherit;font-size:12.5px;border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:6px;padding:5px 12px;cursor:pointer}
+.btn.pri{background:#1d1d1f;color:#fff;border-color:#1d1d1f}
+.bars .b{display:grid;grid-template-columns:54px 1fr 92px;gap:8px;align-items:center;font-size:12px;margin:3px 0}
+.bars .tr{height:10px;background:#eef0f3;border-radius:5px;overflow:hidden}
+.bars .fl{height:100%;border-radius:5px}
+.log{max-height:430px;overflow:auto;border-top:1px solid var(--line);margin-top:8px}
+.ent{padding:7px 2px;border-bottom:1px solid #f0f1f3}
+.ent .h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:12.5px}
+.ent .h .rkb{font-weight:800;border-radius:4px;padding:0 6px;color:#fff;font-size:11.5px}
+.ent .h .blur{font-size:11.5px}
+.seqs{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.seqs span{font-size:11px;border-radius:4px;padding:0 6px;color:#fff;white-space:nowrap}
+.seqs span.k-pS{background:#8b5cf6}.seqs span.k-pW{background:#5b21b6}.seqs span.k-wS{background:#9ca3af;color:#111}.seqs span.k-wW{background:#4b5563}
+.seqs span.k-ds{background:#d97706}.seqs span.k-df{background:transparent;color:var(--mut);border:1px dashed var(--mut)}
+.seqs span.k-no{background:transparent;color:var(--mut);border:1px solid var(--line)}
+.round{display:inline-block;background:#111;color:#fff;border-radius:4px;padding:0 6px;font-size:11px;font-weight:700}
+.flowc{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;margin:6px 0}
+.flowc span.s{border:1px solid var(--line);border-radius:6px;padding:3px 8px;background:#fff}
+.flowc span.a{color:var(--mut)}
+footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+<h1>TORA-RUSH プロトv2｜管理画面（ガチャ作成）の設計パターン</h1>
+<div class="meta">2026-11-20｜stg管理画面（オリパ編集）の今の作りをもとに、4パターンの設定画面と動きを比較できるようにしたもの｜<a href="../">V1デモ・仕様</a>／<a href="../lab/">テストモデル</a></div>
+<nav class="tabs" id="tabs">
+<a href="#cmp" data-t="cmp">比較とおすすめ</a>
+<a href="#A" data-t="A">A. 有在庫（今のまま）</a>
+<a href="#B" data-t="B">B. 無在庫（確率）</a>
+<a href="#C" data-t="C">C. 有在庫＋自動補充</a>
+<a href="#D" data-t="D">D. ハイブリッド（追加提案）</a>
+</nav>
+</div></header>
+<main>
+
+<!-- ===== 比較 ===== -->
+<section class="pane" id="p-cmp">
+<div class="card">
+<h2>今のstg管理画面（オリパ編集）の作り</h2>
+<ul class="note" style="font-size:12.5px;color:var(--fg)">
+<li>景品はランク（S・A・B・C・D・その他）ごとに、カード／状態／<b>交換ポイント</b>／<b>個数</b>／当たり演出／交換タイプ（通常・pt交換限定・配送限定）を登録する。<b>個数の合計が口数</b>になる</li>
+<li>特典（口数に入らない）：ラストワン・ファーストワン・キリ番。Sには隠しキリ番もある</li>
+<li>抽選は Compact BOX（残り在庫からランダム）。景品を編集すると残り在庫全体が再シャッフルされる。編集は非公開にしてから</li>
+<li>演出は「ガチャ演出」に動画（MP4）を登録し、ランクや景品ごとに割り当てる。ほかに消費タイプ・ポイント消費量・ガチャ条件・ボタン（1回／10連／100連／1000連／全部）・ボーナスオリパがある</li>
+</ul>
+<p class="note">RUSHは、当たった景品の<b>交換ポイント</b>を「景品の相当額」として、紫7・白7の組み合わせを自動で作る（11/20の方針）。4パターンとも、この部分は共通で、違うのは「当たる景品をどう決めるか」。</p>
+</div>
+
+<div class="card">
+<h2>4パターンの比較</h2>
+<table class="t">
+<tr><th></th><th>A. 有在庫（今のまま）</th><th>B. 無在庫（確率）</th><th>C. 有在庫＋自動補充</th><th>D. ハイブリッド</th></tr>
+<tr><th>しくみ</th><td>今のBOXと同じ。景品の個数＝口数。引くと減り、なくなったら終わり</td><td>ランクごとに<b>確率</b>を設定。在庫は減らない。当たったランクの中から景品を選ぶ</td><td>Aと同じ登録。<b>売り切れたら同じ中身を自動で入れ直す</b>（第2弾、第3弾…）</td><td>上位（S・A）は<b>個数あり</b>で残数を見せる。下位（B以下）は<b>確率</b>で無限に出す</td></tr>
+<tr><th>登録画面</th><td class="good">今のまま＋RUSH設定だけ追加</td><td class="mid">個数の代わりに確率の入力欄。期待還元率の表示が必要</td><td class="good">今のまま＋RUSH設定＋補充設定</td><td class="mid">ランクごとに「個数／確率」を切り替える</td></tr>
+<tr><th>抽選のしくみ</th><td class="good">今のCompact BOXをそのまま使う</td><td class="bad">新しく作る（確率抽選）</td><td class="good">今のものを使う＋補充処理を追加</td><td class="mid">両方を組み合わせる</td></tr>
+<tr><th>還元率の決まり方</th><td class="good">登録した中身で確定（今と同じ）</td><td class="mid">確率×額の期待値。実績は上下にぶれる</td><td class="good">1周ごとに確定（Aと同じ）</td><td class="mid">上位は確定、下位は期待値</td></tr>
+<tr><th>売り切れ</th><td class="bad">ある（追加は手作業）</td><td class="good">ない</td><td class="good">実質ない（周回）</td><td class="good">下位はない。上位はなくなると「S 残0」</td></tr>
+<tr><th>ラストワン・残数表示</th><td>今のまま使える</td><td>使えない（口数がない）</td><td>1周ごとに使える。「第3弾 残○口」</td><td>上位の残数だけ見せる</td></tr>
+<tr><th>実物の在庫</th><td>登録＝実物の数で管理しやすい</td><td class="bad">当たった分を後から仕入れる。在庫切れのカードが出るおそれ</td><td class="mid">補充のたびに実物が要る（上限回数で調整）</td><td class="mid">上位は実物で管理、下位は仕入れやすい景品で</td></tr>
+<tr><th>運営リスク</th><td class="good">小</td><td class="bad">大（短期で上振れが続くと赤字。1日の払い出し上限などが要る）</td><td class="good">小〜中</td><td class="mid">中</td></tr>
+<tr><th>表記</th><td>今と同じ</td><td class="mid">提供割合（確率）の表示が必要</td><td>「売り切れたら同じ内容で再開」と記載</td><td>上位は残数、下位は確率を表示</td></tr>
+<tr><th>開発の目安<br><span class="note">（RUSH本体とは別）</span></th><td class="good">＋0.5〜1日（RUSH設定欄）</td><td class="bad">＋4〜6日</td><td class="good">＋1.5〜2.5日</td><td class="mid">＋4〜5日</td></tr>
+<tr><th>おすすめ</th><td></td><td></td><td><span class="pill rec">初弾におすすめ</span></td><td><span class="pill alt">次弾以降の候補</span></td></tr>
+</table>
+<h3>おすすめ：初弾は C（有在庫＋自動補充）</h3>
+<ul style="font-size:12.5px">
+<li>登録画面も抽選のしくみも今のものを使えるので、<b>12月頭に間に合わせやすい</b>。運営も今のBOXと同じ感覚で作れる</li>
+<li>1周ごとの中身が決まっているので、<b>還元率が確定</b>し、返金請求のような「表記と実際の差」の論点が出にくい</li>
+<li>売り切れで止まらず、ラストワンや残数表示も周ごとに残せる。補充の上限回数を決めておけば、実物の在庫の管理もできる</li>
+<li>「売り切れない無限の箱」を強く出したい、上位賞だけ限定感を出したい、となったら D に広げる。B（完全な確率）は在庫・赤字・表記のリスクが大きいので、やるなら最後</li>
+</ul>
+<div class="flowc"><span class="s">景品が当たる（A〜Dで決め方が違う）</span><span class="a">→</span><span class="s">その景品の交換ポイント＝相当額</span><span class="a">→</span><span class="s">ブレの幅の中で目標額を決める</span><span class="a">→</span><span class="s">紫7・白7（シングル・ダブル）と倍チャレンジで組む</span><span class="a">→</span><span class="s">押せ！で1ゲームずつ再生</span></div>
+<h3>シミュレーションで見えたこと（4パターン共通）</h3>
+<ul style="font-size:12.5px">
+<li>景品の数の大半は下位（D・その他）なので、<b>RUSHの平均は1〜2ゲーム</b>。D（5,000pt）は紫7シングル1回で終わり、その他（1,000pt）はRUSHに入らない。盛り上がるのはB以上が当たったとき</li>
+<li>このため「RUSHに入る最低額」を<b>B以上（例：30,000pt以上）</b>に上げる、または最小レートのBOXで下位もRUSHに入れる、のどちらかを決めたい</li>
+<li>8,000ptのように5,000の倍数でない景品は、±10%の中に収まる額がないので丸めで大きくぶれる（8,000→10,000で＋25%）。<b>景品の交換ポイントを5,000の倍数にそろえる運用</b>にすると、ブレが小さくなる</li>
+</ul>
+<p class="note">各タブの左が設定画面（stgの見た目に寄せたモック。青い枠が新しく足す部分、橙の点線が今と変わる部分）、右が動き（引いたときに何が当たり、RUSHがどう組まれ、在庫や還元率がどう動くか）。数値はその場で変えられる。</p>
+</div>
+</section>
+
+<section class="pane" id="p-A"></section>
+<section class="pane" id="p-B"></section>
+<section class="pane" id="p-C"></section>
+<section class="pane" id="p-D"></section>
+
+<footer>パレットグループ トレカ商事カンパニー｜TORA-RUSH プロトv2（2026-11-20）｜景品・数値はすべて仮</footer>
+</main>
+
+<script>
+const fmt=v=>Math.round(v).toLocaleString();
+const RANKS=["S","A","B","C","D","その他"];
+const RCOL={S:"#c9a227",A:"#d0342c",B:"#2563eb",C:"#059669",D:"#7c3aed","その他":"#6b7280"};
+const ART=["#f59e0b","#ef4444","#3b82f6","#10b981","#8b5cf6","#9ca3af"];
+/* ---------------- RUSH combination engine (11/20 方針) ---------------- */
+function genRush(A,o){
+  const r=o.rate,tol=o.tol,ps=o.ps,pf=o.pf,MAX=o.max;
+  const K=[{k:"pS",n:"紫7S",v:5000*r,w:6},{k:"pW",n:"紫7W",v:10000*r,w:3},{k:"wS",n:"白7S",v:50000*r,w:3},{k:"wW",n:"白7W",v:100000*r,w:1.5}];
+  const u=5000*r;
+  if(A<u*(1-tol)&&A<u/2)return{g:[],sum:0,diff:-A,none:true};
+  let lo=Math.max(u,A*(1-tol)),hi=Math.max(u,A*(1+tol));
+  let c=[];for(let x=Math.ceil(lo/u)*u;x<=hi+1e-9;x+=u)c.push(x);
+  if(!c.length)c=[Math.max(u,Math.round(A/u)*u)];
+  const ws=c.map(x=>1/(1+Math.abs(x-A)/u));let t=Math.random()*ws.reduce((a,b)=>a+b,0),T=c[0];
+  for(let i=0;i<c.length;i++){if((t-=ws[i])<=0){T=c[i];break}}
+  let R=T,g=[],guard=0;
+  while(R>=u-1e-9&&guard++<300&&g.length<MAX){
+    const left=MAX-g.length;let cs=K.filter(x=>x.v<=R+1e-9).map(x=>({...x,ww:x.w}));
+    if(left<=1){const best=cs.reduce((a,b)=>b.v>a.v?b:a);cs=[{...best,ww:1}]}
+    else{const need=R/left;if(need>u)cs.forEach(q=>q.ww*=q.v>=need?4:0.25)}
+    let s=Math.random()*cs.reduce((a,b)=>a+b.ww,0),p=cs[cs.length-1];for(const q of cs){if((s-=q.ww)<=0){p=q;break}}
+    g.push({k:p.k,n:p.n,v:p.v});R-=p.v;
+  }
+  if(Math.random()<ps){const by={};g.forEach((x,i)=>{(by[x.k]=by[x.k]||[]).push(i)});const pr=Object.values(by).filter(a=>a.length>=2);
+    if(pr.length){const a=pr[Math.floor(Math.random()*pr.length)];const v=g[a[0]].v;g.splice(a[1],1);g.splice(a[0]+1,0,{k:"ds",n:"倍チャレ成功",v})}}
+  if(Math.random()<pf&&g.length&&g.length<MAX){const i=Math.floor(Math.random()*g.length);if(g[i].k!=="ds")g.splice(i+1,0,{k:"df",n:"倍チャレ失敗",v:0})}
+  let mi=-1;g.forEach((x,i)=>{if(x.k!=="ds"&&x.k!=="df"&&(g[i+1]||{}).k!=="ds"&&(mi<0||x.v>g[mi].v))mi=i});
+  if(mi>=0&&mi<g.length-1){const [b]=g.splice(mi,1);g.push(b)}
+  const sum=g.reduce((a,b)=>a+b.v,0);
+  return{g,sum,diff:sum-A};
+}
+/* ---------------- sample data ---------------- */
+const CARDS={S:[["PSA10 リザードン（例）",300000]],A:[["PSA10 ピカチュウ（例）",100000],["BOX 未開封（例）",80000]],B:[["SAR（例）",50000],["SR（例）",30000]],C:[["AR（例）",10000],["RR（例）",8000]],D:[["汎用カード（例）",5000]],"その他":[["ハズレ枠（例）",1000]]};
+function stockRows(){return[
+  {r:"S",n:CARDS.S[0][0],pt:300000,cnt:1},
+  {r:"A",n:CARDS.A[0][0],pt:100000,cnt:2},{r:"A",n:CARDS.A[1][0],pt:80000,cnt:2},
+  {r:"B",n:CARDS.B[0][0],pt:50000,cnt:6},{r:"B",n:CARDS.B[1][0],pt:30000,cnt:8},
+  {r:"C",n:CARDS.C[0][0],pt:10000,cnt:40},{r:"C",n:CARDS.C[1][0],pt:8000,cnt:40},
+  {r:"D",n:CARDS.D[0][0],pt:5000,cnt:150},
+  {r:"その他",n:CARDS["その他"][0][0],pt:1000,cnt:751}]}
+function probRows(){return[
+  {r:"S",n:CARDS.S[0][0],pt:300000,prob:0.1},
+  {r:"A",n:CARDS.A[0][0],pt:100000,prob:0.2},{r:"A",n:CARDS.A[1][0],pt:80000,prob:0.2},
+  {r:"B",n:CARDS.B[0][0],pt:50000,prob:0.6},{r:"B",n:CARDS.B[1][0],pt:30000,prob:0.8},
+  {r:"C",n:CARDS.C[0][0],pt:10000,prob:4},{r:"C",n:CARDS.C[1][0],pt:8000,prob:4},
+  {r:"D",n:CARDS.D[0][0],pt:5000,prob:15},
+  {r:"その他",n:CARDS["その他"][0][0],pt:1000,prob:75.1}]}
+function hybRows(){return[
+  {r:"S",n:CARDS.S[0][0],pt:300000,cnt:1,prob:0.1,lim:true},
+  {r:"A",n:CARDS.A[0][0],pt:100000,cnt:2,prob:0.2,lim:true},{r:"A",n:CARDS.A[1][0],pt:80000,cnt:2,prob:0.2,lim:true},
+  {r:"B",n:CARDS.B[0][0],pt:50000,prob:0.6},{r:"B",n:CARDS.B[1][0],pt:30000,prob:0.8},
+  {r:"C",n:CARDS.C[0][0],pt:10000,prob:4},{r:"C",n:CARDS.C[1][0],pt:8000,prob:4},
+  {r:"D",n:CARDS.D[0][0],pt:5000,prob:15},
+  {r:"その他",n:CARDS["その他"][0][0],pt:1000,prob:75.1}]}
+/* ---------------- pattern builder ---------------- */
+const PAT={
+ A:{title:"A. 有在庫（今の登録ルールをそのまま使う）",mode:"stock",refill:false,rows:stockRows,
+    lead:"今のオリパ編集と同じく、S〜その他に景品と個数を登録する。個数の合計が口数で、引くと減り、なくなったら終わり。RUSHは当たった景品の交換ポイントから組み合わせを作るだけなので、<b>足すのはRUSH設定の欄だけ</b>。",
+    pros:["登録画面も抽選のしくみも今のまま。開発が一番少ない","中身で還元率が確定する。ラストワン・キリ番・残数表示もそのまま使える"],
+    cons:["売り切れたら終わり。続けるには運営が手で作り直す","RUSHの盛り上がりで引かれるほど早く売り切れる"]},
+ B:{title:"B. 無在庫（確率で排出し、7の組み合わせを決める）",mode:"prob",rows:probRows,
+    lead:"個数の代わりに<b>景品ごとの確率（%）</b>を登録する。在庫は減らず、何回でも引ける。当たった景品の交換ポイントから7の組み合わせを作る。画面に<b>期待還元率</b>（確率×交換ポイント÷1回の価格）を出して、設定ミスを防ぐ。",
+    pros:["売り切れない。いつでも同じ条件で引ける","確率を変えるだけで還元率を細かく調整できる"],
+    cons:["抽選のしくみを新しく作る必要がある","実際の還元率は短期で上下にぶれる。上振れが続くと赤字になるので、1日の払い出し上限などの安全装置が要る","当たったカードの実物を後から用意する必要があり、在庫切れのカードが出るおそれ","確率（提供割合）の表示が必要。ラストワン・残数表示は使えない"]},
+ C:{title:"C. 有在庫＋自動補充（登録は今の形、ほぼ無限）",mode:"stock",refill:true,rows:stockRows,
+    lead:"登録はAと同じ（S〜その他に個数）。<b>全部売り切れたら、同じ中身を自動で入れ直して次の周（第2弾・第3弾…）を始める</b>。1周の中は今のBOXと同じ動きなので還元率は確定し、ラストワンも周ごとに出せる。補充の上限回数で実物の在庫に合わせられる。",
+    pros:["今の登録画面と抽選のしくみを使える。開発が少ない","1周ごとに還元率が確定。ラストワン・残数表示も「第3弾 残○口」として使える","上限回数を決めれば、実物の在庫も管理しやすい"],
+    cons:["補充のたびに実物の景品が要る（特に上位賞）","ランクごとに補充する方式にすると、周の途中で確率が変わるので注意（おすすめは全体の売り切れで補充）"]},
+ D:{title:"D. ハイブリッド（上位は有在庫・下位は確率）【追加提案】",mode:"hyb",rows:hybRows,
+    lead:"<b>S・Aは個数あり</b>（限定。残数を見せる）、<b>B以下は確率</b>で無限に出す。上位は1回ごとに決まった確率で当たり、在庫がなくなるとその確率は「その他」に回る。上位の限定感と、売り切れない遊びやすさを両立する。",
+    pros:["上位賞の限定感（残1・残0）を出しながら、下位は売り切れない","実物が高い上位は数で管理、下位は仕入れやすい景品で回せる"],
+    cons:["個数と確率の両方を扱うので、登録画面と抽選のしくみの作り込みが要る","上位がなくなった後の還元率の変化を表記する必要がある"]}
+};
+const state={};
+function rushBlock(id){return `<div class="newb"><span class="tag">新規：RUSH設定</span>
+ <div class="row3">
+  <div class="fld"><label>演出タイプ</label><select disabled><option>虎巻ATTACK（RUSH）</option></select></div>
+  <div class="fld"><label>RUSHレート</label><select data-k="rate"><option value="1">標準（紫7S＝5,000）</option><option value="0.1">最小（紫7S＝500）</option></select></div>
+  <div class="fld"><label>ブレの幅</label><select data-k="tol"><option value="0">丸めのみ</option><option value="0.1" selected>±10%</option><option value="0.2">±20%</option></select></div>
+  <div class="fld"><label>倍チャレンジ 成功ルート</label><select data-k="ps"><option value="0">0%</option><option value="0.3" selected>30%</option><option value="0.6">60%</option></select></div>
+  <div class="fld"><label>倍チャレンジ 失敗ルート</label><select data-k="pf"><option value="0">0%</option><option value="0.2" selected>20%</option></select></div>
+  <div class="fld"><label>ゲーム数の上限</label><select data-k="max"><option>8</option><option selected>10</option><option>15</option></select></div>
+ </div>
+ <div class="note">RUSHに入る最低額：<b data-k="minv">5,000</b>pt（これ未満の景品は通常の結果表示）｜ルール説明に「演出の合計額は目安で、上下に差が出る場合があります」を自動で表示</div>
+</div>`}
+function build(id){
+  const P=PAT[id];const st=state[id]={rows:P.rows(),opt:{rate:1,tol:0.1,ps:0.3,pf:0.2,max:10},price:4000,draws:0,spent:0,paid:0,round:1,refills:0,refillMax:0,refillMode:"all",rushN:0,rushGames:0,blurSum:0,log:[],soldOut:false,base:null};
+  st.base=st.rows.map(r=>r.cnt);
+  const el=document.getElementById("p-"+id);
+  const qtyHead=P.mode==="stock"?"<th>個数</th><th>残り</th>":P.mode==="prob"?'<th class="chg">確率（%）<span class="chgtag">個数の代わり</span></th>':"<th>個数／確率</th><th>残り</th>";
+  el.innerHTML=`<div class="card"><h2>${P.title}</h2><p style="margin:4px 0">${P.lead}</p>
+   <div class="row2" style="margin-top:6px"><div><b class="good">よいところ</b><ul style="margin:2px 0;padding-left:18px">${P.pros.map(x=>`<li>${x}</li>`).join("")}</ul></div><div><b class="bad">気をつけるところ</b><ul style="margin:2px 0;padding-left:18px">${P.cons.map(x=>`<li>${x}</li>`).join("")}</ul></div></div></div>
+  <div class="grid">
+   <div class="con"><div class="side"><div class="lg">tora-oripa console</div><div class="i">オリパ</div><div class="i sub on">一覧</div><div class="i sub">カテゴリー</div><div class="i">カードデータベース</div><div class="i">配送</div><div class="i">イベント</div><div class="i">宝箱</div><div class="i">ガチャ演出</div><div class="i" style="color:var(--acc);font-weight:700">RUSH演出（新規）</div><div class="i">設定</div></div>
+    <div class="cm" id="cm-${id}">
+     <div class="bc">オリパ ／ 一覧 ／ 編集</div><div class="ctitle">← オリパ編集</div>
+     <div class="row2"><div class="fld"><label>オリパ名</label><input value="【RUSH】虎巻ATTACK オリパ（例）"></div><div class="fld"><label>カテゴリ名</label><select><option>ポケモン</option></select></div></div>
+     <div class="row3"><div class="fld"><label>消費タイプ</label><select><option>ポイント</option></select></div><div class="fld"><label>ポイント消費量（1回の価格）</label><input type="number" data-k="price" value="4000"></div><div class="fld"><label>ガチャボタン</label><select><option>1回／10連／100連</option></select></div></div>
+     ${rushBlock(id)}
+     ${P.refill?`<div class="newb"><span class="tag">新規：自動補充</span><div class="row3">
+       <div class="fld"><label>補充のタイミング</label><select data-k="refillMode"><option value="all">全部売り切れたら同じ中身で次の周へ（おすすめ）</option><option value="rank">ランクごとに0になったら補充</option></select></div>
+       <div class="fld"><label>補充の上限回数</label><select data-k="refillMax"><option value="0">無制限</option><option value="3">3回</option><option value="10">10回</option></select></div>
+       <div class="fld"><label>ラストワン</label><select><option>周ごとに付与</option><option>最後の周だけ</option></select></div></div>
+       <div class="note">ユーザー画面の表示：「第2弾 残 ○／1,000口」。補充時に中身を再シャッフルする（今のCompact BOXの再シャッフルを使う）</div></div>`:""}
+     ${P.mode==="prob"?`<div class="newb"><span class="tag">新規：安全装置</span><div class="row3"><div class="fld"><label>1日の払い出し上限（pt）</label><input value="無制限（例：5,000,000）"></div><div class="fld"><label>S・Aの1日の当選上限</label><input value="例：S 1回／A 5回"></div><div class="fld"><label>上限に達したら</label><select><option>その日は下位ランクに振り替え</option><option>販売を止める</option></select></div></div></div>`:""}
+     <div style="margin-top:12px;font-weight:700">景品</div>
+     <div class="note">${P.mode==="stock"?"ランクごとに景品を設定。「S」〜「その他」の個数の合計が口数になる（今と同じ）":P.mode==="prob"?"ランクごとに景品と<b>確率</b>を設定。合計が100%になるようにする。口数・残数はない":"S・Aは<b>個数</b>（限定）と1回あたりの確率、B以下は<b>確率</b>のみを設定する"}</div>
+     <div id="rk-${id}"></div>
+     <div class="tot" id="tot-${id}"></div>
+     <div class="note" style="margin-top:6px">特典（ラストワン・ファーストワン・キリ番）・ボーナスオリパは今のまま${P.mode==="prob"?"（Bではラストワン・キリ番は使えない）":""}</div>
+    </div></div>
+   <div class="card sim">
+     <h3 style="margin-top:0">動き（シミュレーション）</h3>
+     <div class="kpi"><div><small>${P.mode==="stock"?"設計還元率":"期待還元率（設定値）"}</small><b id="ev-${id}">-</b></div><div><small>実際の還元率（引いた結果）</small><b id="act-${id}">-</b></div><div><small>${P.refill?"周回":"引いた回数"}</small><b id="rd-${id}">-</b></div></div>
+     <div class="btns"><button class="btn pri" data-n="1">1回引く</button><button class="btn" data-n="10">10連</button><button class="btn" data-n="100">100連</button><button class="btn" data-n="1000">1000回（早送り）</button><button class="btn" data-reset>リセット</button></div>
+     <div class="bars" id="bars-${id}"></div>
+     <div class="note" id="rs-${id}"></div>
+     <div class="log" id="log-${id}"></div>
+   </div>
+  </div>`;
+  renderRanks(id);
+  el.querySelectorAll("[data-k]").forEach(x=>x.addEventListener("change",()=>{const k=x.dataset.k;const v=x.value;
+    if(k==="price")st.price=+v||1;else if(k==="refillMode")st.refillMode=v;else if(k==="refillMax")st.refillMax=+v;else st.opt[k]=+v;
+    el.querySelector('[data-k="minv"]').textContent=fmt(5000*st.opt.rate);update(id)}));
+  el.querySelectorAll(".btns [data-n]").forEach(b=>b.addEventListener("click",()=>draw(id,+b.dataset.n)));
+  el.querySelector("[data-reset]").addEventListener("click",()=>{build(id)});
+  update(id);
+}
+function renderRanks(id){
+  const P=PAT[id],st=state[id];let h="";
+  RANKS.forEach(r=>{const rows=st.rows.map((x,i)=>({...x,i})).filter(x=>x.r===r);if(!rows.length)return;
+    const lim=rows[0].lim;
+    h+=`<div class="rk"><div class="rh"><b style="color:${RCOL[r]}">${r}</b><span class="ef">当たり演出：標準${r} 100%</span>${P.mode==="hyb"?(lim?'<span class="pill alt">個数あり（限定）</span>':'<span class="pill rec">確率（無限）</span>'):""}<span class="sum" id="rs-${id}-${r}"></span></div>
+    <table><tr><th>カード</th><th>交換ポイント</th>${P.mode==="stock"?"<th>個数</th><th>残り</th>":P.mode==="prob"?"<th>確率（%）</th>":lim?"<th>個数</th><th>1回の確率（%）</th><th>残り</th>":"<th>確率（%）</th>"}<th>RUSH（例）</th><th>交換タイプ</th></tr>
+    ${rows.map(x=>`<tr><td><span class="thumb" style="background:${ART[RANKS.indexOf(r)]}"></span>${x.n}</td><td><input type="number" data-i="${x.i}" data-f="pt" value="${x.pt}"></td>
+     ${P.mode==="stock"?`<td><input class="s" type="number" data-i="${x.i}" data-f="cnt" value="${x.cnt}"></td><td id="rem-${id}-${x.i}">${x.cnt}</td>`:P.mode==="prob"?`<td><input class="s" type="number" step="0.1" data-i="${x.i}" data-f="prob" value="${x.prob}"></td>`:lim?`<td><input class="s" type="number" data-i="${x.i}" data-f="cnt" value="${x.cnt}"></td><td><input class="s" type="number" step="0.1" data-i="${x.i}" data-f="prob" value="${x.prob}"></td><td id="rem-${id}-${x.i}">${x.cnt}</td>`:`<td><input class="s" type="number" step="0.1" data-i="${x.i}" data-f="prob" value="${x.prob}"></td>`}
+     <td class="note" id="ex-${id}-${x.i}"></td><td>通常</td></tr>`).join("")}</table></div>`});
+  const box=document.getElementById("rk-"+id);box.innerHTML=h;
+  box.querySelectorAll("input[data-i]").forEach(inp=>inp.addEventListener("change",()=>{const i=+inp.dataset.i,f=inp.dataset.f;st.rows[i][f]=+inp.value||0;if(f==="cnt"){st.base[i]=st.rows[i].cnt}update(id)}));
+}
+function exampleRush(pt,o){const u=5000*o.rate;if(pt<u)return"RUSHなし（通常表示）";const s=genRush(pt,o);const c={};s.g.forEach(x=>{if(x.k!=="ds"&&x.k!=="df")c[x.n]=(c[x.n]||0)+1});return Object.entries(c).map(([k,v])=>k+"×"+v).join("・")+(s.g.some(x=>x.k==="ds")?"＋倍チャレ":"")}
+function totals(id){const P=PAT[id],st=state[id];
+  if(P.mode==="stock"){const N=st.base.reduce((a,b)=>a+b,0);const V=st.rows.reduce((a,r,i)=>a+r.pt*st.base[i],0);return{N,ev:N?V/N:0}}
+  if(P.mode==="prob"){const p=st.rows.reduce((a,r)=>a+r.prob,0);const ev=st.rows.reduce((a,r)=>a+r.pt*r.prob/100,0);return{p,ev}}
+  const p=st.rows.reduce((a,r)=>a+r.prob,0);const ev=st.rows.reduce((a,r)=>a+r.pt*r.prob/100,0);return{p,ev}}
+function update(id){
+  const P=PAT[id],st=state[id];const T=totals(id);
+  let tot="";
+  if(P.mode==="stock")tot=`<span>景品 <b>${fmt(T.N)}</b> 枚（${fmt(T.N)}口）</span><span>総額 <b>${fmt(T.ev*T.N)}</b>pt</span><span>1回の期待値 <b>${fmt(T.ev)}</b>pt</span><span>設計還元率 <b>${(T.ev/st.price*100).toFixed(1)}%</b></span>`;
+  else tot=`<span>確率の合計 <b class="${Math.abs(T.p-100)<0.01?"good":"bad"}">${T.p.toFixed(2)}%</b></span><span>1回の期待値 <b>${fmt(T.ev)}</b>pt</span><span>期待還元率 <b>${(T.ev/st.price*100).toFixed(1)}%</b></span>${P.mode==="hyb"?'<span class="note">上位の在庫がなくなると、その確率は「その他」に回る</span>':""}`;
+  if(P.mode!=="stock"&&Math.abs(T.p-100)>=0.01)tot+=`<div class="warnbox" style="width:100%">確率の合計が100%になっていません。保存できない（モックでは足りない分を「その他」で調整して抽選）</div>`;
+  document.getElementById("tot-"+id).innerHTML=tot;
+  document.getElementById("ev-"+id).textContent=(T.ev/st.price*100).toFixed(1)+"%";
+  document.getElementById("act-"+id).textContent=st.spent?(st.paid/st.spent*100).toFixed(1)+"%":"-";
+  document.getElementById("rd-"+id).innerHTML=P.refill?`第${st.round}弾 <span class="note">（補充${st.refills}回）</span>`:fmt(st.draws)+"回";
+  st.rows.forEach((r,i)=>{const e=document.getElementById(`ex-${id}-${i}`);if(e&&!e.dataset.done){e.textContent=exampleRush(r.pt,st.opt);}const m=document.getElementById(`rem-${id}-${i}`);if(m)m.textContent=r.cnt;});
+  // bars
+  let bars="";
+  if(P.mode==="stock"||P.mode==="hyb"){RANKS.forEach(r=>{const idx=st.rows.map((x,i)=>i).filter(i=>st.rows[i].r===r&&(P.mode==="stock"||st.rows[i].lim));if(!idx.length)return;const rem=idx.reduce((a,i)=>a+st.rows[i].cnt,0),all=idx.reduce((a,i)=>a+st.base[i],0);
+    bars+=`<div class="b"><span style="color:${RCOL[r]};font-weight:800">${r}</span><div class="tr"><div class="fl" style="width:${all?rem/all*100:0}%;background:${RCOL[r]}"></div></div><span>残 ${fmt(rem)}／${fmt(all)}</span></div>`})}
+  if(P.mode==="prob"||P.mode==="hyb"){const cnt={};st.log.forEach(e=>{});
+    RANKS.forEach(r=>{if(P.mode==="hyb"&&st.rows.some(x=>x.r===r&&x.lim))return;const p=st.rows.filter(x=>x.r===r).reduce((a,x)=>a+x.prob,0);const hit=st.hits?st.hits[r]||0:0;
+      bars+=`<div class="b"><span style="color:${RCOL[r]};font-weight:800">${r}</span><div class="tr"><div class="fl" style="width:${Math.min(100,p)}%;background:${RCOL[r]}"></div></div><span>${p.toFixed(1)}%（当選${fmt(hit)}）</span></div>`})}
+  document.getElementById("bars-"+id).innerHTML=bars;
+  document.getElementById("rs-"+id).innerHTML=st.rushN?`RUSH ${fmt(st.rushN)}回：平均 ${(st.rushGames/st.rushN).toFixed(1)}ゲーム／ブレの平均 ${(st.blurSum/st.rushN).toFixed(1)}%${st.soldOut?'　<b class="bad">売り切れ（これ以上引けない）</b>':""}`:(st.soldOut?'<b class="bad">売り切れ（これ以上引けない）</b>':"");
+}
+function pickStock(st){const tot=st.rows.reduce((a,r)=>a+r.cnt,0);if(!tot)return-1;let x=Math.random()*tot;for(let i=0;i<st.rows.length;i++){if((x-=st.rows[i].cnt)<0)return i}return st.rows.length-1}
+function pickProb(st,hyb){const p=st.rows.map(r=>hyb&&r.lim&&r.cnt<=0?0:r.prob);const lost=st.rows.reduce((a,r,i)=>a+(r.prob-p[i]),0);const other=st.rows.findIndex(r=>r.r==="その他");p[other]+=lost;
+  const tot=p.reduce((a,b)=>a+b,0);let x=Math.random()*Math.max(tot,100);for(let i=0;i<p.length;i++){if((x-=p[i])<0)return i}return other}
+function draw(id,n){
+  const P=PAT[id],st=state[id];st.hits=st.hits||{};
+  const show=n<=100;const add=[];
+  for(let k=0;k<n;k++){
+    let i;
+    if(P.mode==="stock"){
+      if(st.rows.every(r=>r.cnt<=0)){
+        if(P.refill&&(st.refillMax===0||st.refills<st.refillMax)){st.rows.forEach((r,j)=>r.cnt=st.base[j]);st.round++;st.refills++;add.push({refill:st.round})}
+        else{st.soldOut=true;break}}
+      if(P.refill&&st.refillMode==="rank"){RANKS.forEach(r=>{const idx=st.rows.map((x,j)=>j).filter(j=>st.rows[j].r===r);if(idx.every(j=>st.rows[j].cnt<=0)&&(st.refillMax===0||st.refills<st.refillMax)){idx.forEach(j=>st.rows[j].cnt=st.base[j]);st.refills++;add.push({refillRank:r})}})}
+      i=pickStock(st);if(i<0){st.soldOut=true;break}st.rows[i].cnt--;
+    }else{i=pickProb(st,P.mode==="hyb");if(st.rows[i].lim)st.rows[i].cnt--;}
+    const r=st.rows[i];st.draws++;st.spent+=st.price;st.paid+=r.pt;st.hits[r.r]=(st.hits[r.r]||0)+1;
+    const rush=r.pt>=5000*st.opt.rate?genRush(r.pt,st.opt):null;
+    if(rush){st.rushN++;st.rushGames+=rush.g.length;st.blurSum+=r.pt?rush.diff/r.pt*100:0}
+    if(show||r.r==="S"||r.r==="A")add.push({r,rush,no:st.draws});
+  }
+  st.log=add.reverse().concat(st.log).slice(0,80);
+  document.getElementById("log-"+id).innerHTML=st.log.map(e=>{
+    if(e.refill)return`<div class="ent"><span class="round">第${e.refill}弾 開始</span> <span class="note">売り切れたので同じ中身で補充し、再シャッフル</span></div>`;
+    if(e.refillRank)return`<div class="ent"><span class="round">${e.refillRank} 補充</span> <span class="note">${e.refillRank}が0になったので補充（周の途中で確率が変わる）</span></div>`;
+    const r=e.r,R=e.rush;
+    return`<div class="ent"><div class="h"><span class="note">#${fmt(e.no)}</span><span class="rkb" style="background:${RCOL[r.r]}">${r.r}</span><span>${r.n}</span><b>${fmt(r.pt)}pt</b>${R?`<span class="blur ${R.diff>0?"good":R.diff<0?"bad":"note"}">演出合計 ${fmt(R.sum)}（${R.diff>0?"+":""}${fmt(R.diff)}）</span><span class="note">${R.g.length}ゲーム</span>`:""}</div>
+     <div class="seqs">${R?R.g.map(x=>`<span class="k-${x.k}">${x.n}${x.k==="ds"?" +"+fmt(x.v):""}</span>`).join(""):'<span class="k-no">RUSHなし（最低額未満・通常の結果表示）</span>'}</div></div>`}).join("");
+  update(id);
+}
+/* tabs */
+const built={};
+function show(t){if(!["cmp","A","B","C","D"].includes(t))t="cmp";document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("act",p.id==="p-"+t));document.querySelectorAll("#tabs a").forEach(a=>a.classList.toggle("act",a.dataset.t===t));if(t!=="cmp"&&!built[t]){build(t);built[t]=1}scrollTo({top:0})}
+document.getElementById("tabs").addEventListener("click",e=>{const a=e.target.closest("a");if(!a)return;e.preventDefault();history.replaceState(null,"","#"+a.dataset.t);show(a.dataset.t)});
+show(location.hash.slice(1));
+</script>
+</body>
+</html>
