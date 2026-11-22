@@ -51,8 +51,8 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 #oIdle{background:rgba(0,0,0,.6);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;font-size:13px}
 #oIdle.on{display:flex}
 #oWait{pointer-events:none}#oWait .oshi{pointer-events:auto}
-.oshi{position:absolute;left:50%;top:95.5%;transform:translate(-50%,-50%);width:74px;height:74px;border-radius:50%;cursor:pointer;z-index:9}
-.oshi .cap{position:absolute;inset:9px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff8a7a,#e0352b 55%,#8e140d);box-shadow:0 6px 0 #5b0c07,0 8px 14px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font:900 17px/1 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 2px 0 #6d0f09;animation:bob .55s ease-in-out infinite}
+.oshi{position:absolute;left:50%;top:92.5%;transform:translate(-50%,-50%);width:104px;height:104px;border-radius:50%;cursor:pointer;z-index:9}
+.oshi .cap{position:absolute;inset:9px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff8a7a,#e0352b 55%,#8e140d);box-shadow:0 6px 0 #5b0c07,0 8px 14px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font:900 24px/1 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 2px 0 #6d0f09;animation:bob .55s ease-in-out infinite}
 .oshi .rim{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,220,120,.95);box-shadow:0 0 16px rgba(255,190,60,.9);animation:rim 1s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(3px)}}@keyframes rim{50%{transform:scale(1.08);opacity:.6}}
 .oshi.hit .cap{transform:translateY(5px);animation:none}
@@ -93,7 +93,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORA-RUSH ゲーム性確定MTG｜2案のプロト・管理画面の変更・工数見積もり依頼</h1>
-<div class="meta">2026-11-22｜<span class="tag t1">案1</span> 当初案（紫7・白7の額で組む）と <span class="tag t2">案2</span> 入江さん案（ランク＝連チャン数）を、同じ「上は映像・下は3D筐体」の方式で遊べるようにしたもの｜<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a>／<a href="/torecacorp/tora-rush-v1/">V1</a></div>
+<div class="meta"><b style="color:#b42318">更新 11/22 18:10版</b>（本番映像No.09・リール3本同時停止・効果音/BGM）｜<span class="tag t1">案1</span> 当初案（紫7・白7の額で組む）と <span class="tag t2">案2</span> 入江さん案（ランク＝連チャン数）を、同じ「上は映像・下は3D筐体」の方式で遊べるようにしたもの｜<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a>／<a href="/torecacorp/tora-rush-v1/">V1</a></div>
 <nav id="tabs"><a href="#cmp" data-t="cmp">2案の比較と決めること</a><a href="#p1" data-t="p1">案1を遊ぶ</a><a href="#p2" data-t="p2">案2を遊ぶ</a><a href="#admin" data-t="admin">管理画面の変更</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -349,7 +349,14 @@ requestAnimationFrame(loop);
 /* =============== sound =============== */
 const SE=["bgm","tempai","reellock_t1","reellock_t2","s777","devilrush","rainbow05","punch","jingle","voltageup","puchun","v_attack","v_madamada","v_miseteyaru","v_result","v_shinzui_rev","v_tempai"];
 let AC=null,buf={},live={},soundOn=true;
-function audioUnlock(){try{if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();SE.forEach(n=>fetch(`se/${n}.mp3`).then(r=>r.arrayBuffer()).then(a=>AC.decodeAudioData(a)).then(b=>buf[n]=b).catch(()=>{}))}if(AC.state==="suspended")AC.resume()}catch(_){}}
+// 音はページを開いた時点で全部読み込む（STARTを押してから読み込むと、最初のプチュンなどが間に合わず鳴らなかった）
+function audioInit(){if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();
+  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(_){} // iPhoneのマナーモードでも鳴らす
+  SE.forEach(n=>fetch(`se/${n}.mp3`).then(r=>r.arrayBuffer()).then(a=>new Promise((ok,ng)=>AC.decodeAudioData(a,ok,ng))).then(b=>buf[n]=b).catch(()=>{}))}catch(_){}}
+function audioUnlock(){audioInit();try{if(AC&&AC.state!=="running")AC.resume()}catch(_){}}
+const SE_CORE=["puchun","v_miseteyaru","punch","reellock_t1","reellock_t2","s777","devilrush","v_attack"];
+const seReady=()=>!AC||SE_CORE.every(n=>buf[n]);
+audioInit();
 function sfx(n,vol=1){if(!soundOn||!AC||!buf[n])return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=vol;s.buffer=buf[n];s.connect(g).connect(AC.destination);s.start();(live[n]=live[n]||[]).push(s);s.onended=()=>{live[n]=(live[n]||[]).filter(x=>x!==s)}}
 function stopSfx(n){(live[n]||[]).forEach(s=>{try{s.stop()}catch(_){}});live[n]=[]}
 function stopAll(){Object.keys(live).forEach(stopSfx)}
@@ -399,11 +406,12 @@ function idle(keepPlan){running=false;stopAll();$("res").classList.remove("on");
   $("oIdle").classList.add("on");const can=ready&&plan;$("startBtn").style.display=can?"inline-block":"none";
   $("idleMsg").innerHTML=!ready?"3Dモデルを読み込み中…":plan?plan.idleText:(activeTab==="p1"?"右の「1回引く」などで景品を決めてください":"右の「1回引く」などで結果を決めてください");
   $("hud").textContent="待機中";if(plan)plan.total=0;hudR();seq=[];idx=-1;renderPlan()}
-$("startBtn").addEventListener("click",()=>{if(!ready||!plan)return;$("oIdle").classList.remove("on");$("res").classList.remove("on");
+$("startBtn").addEventListener("click",async()=>{if(!ready||!plan)return;audioUnlock();
+  if(!seReady()){$("idleMsg").innerHTML="音を読み込み中…";for(let k=0;k<40&&!seReady();k++)await new Promise(r=>setTimeout(r,100))}$("oIdle").classList.remove("on");$("res").classList.remove("on");
   if(!plan.steps.length){plan.total=0;finish();return}
   audioUnlock();seq=plan.steps.map(s=>({...s}));plan.total=0;hudR();running=true;cur=0;prep(els[0],0);prep(els[1],1);const u=els[1].play();if(u&&u.then)u.then(()=>els[1].pause()).catch(()=>{});setLight("dark");startAt(0)});
 $("oshi").addEventListener("pointerdown",()=>{if(!running||!step||step.k!=="wait")return;const o=$("oshi");o.classList.add("hit");setTimeout(()=>o.classList.remove("hit"),140);try{navigator.vibrate&&navigator.vibrate(25)}catch(_){}
-  const f=document.createElement("div");f.className="flash";$("stage").appendChild(f);setTimeout(()=>f.remove(),320);setLight("on");sfx("punch",.8);[0,1,2].forEach(spin);$("oWait").classList.remove("on");next()});
+  const f=document.createElement("div");f.className="flash";$("stage").appendChild(f);setTimeout(()=>f.remove(),320);audioUnlock();setLight("on");sfx("punch",1);[0,1,2].forEach(spin);$("oWait").classList.remove("on");next()});
 $("skip").addEventListener("click",()=>{if(!running)return;els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel});if(plan)plan.total=plan.fullTotal||0;finish()});
 $("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();else{audioUnlock();if(running)bgm(true)}$("snd").textContent=soundOn?"音 ON":"音 OFF"});
 /* move stage between tabs */
@@ -435,7 +443,7 @@ function makePlan1(prizes,label){
   let A,target;
   if(opt){A=prizeSum;target="購入ごとの合計"}else{const best=prizes.reduce((a,b)=>b.pt>a.pt?b:a);A=best.pt;target=prizes.length>1?"一番高い景品（景品ごとにRUSH。ここでは1つだけ再生）":"当たった景品"}
   const MIN=5000;const c=A>=MIN?compose(A,opt,useCh):{g:[],rest:0,sum:0,T:0};
-  const steps=[];if(c.g.length)steps.push({k:"play",f:"op",l:"OP",sfx:[["devilrush",0,.7],["v_attack",6800]]});
+  const steps=[];if(c.g.length)steps.push({k:"play",f:"freeze",l:"プチュン（フリーズ）",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",sfx:[["devilrush",0,.7],["v_attack",6800]]});
   let n=0,last=null;
   c.g.forEach((x,i)=>{
     if(x.k==="ds"||x.k==="df"){steps.push({k:"wait",f:"loop",l:`倍チャレ 待機`,banner:"倍チャレンジ！",keepLight:true});steps.push({k:"chall",f:"loop",ok:x.k==="ds",add:x.v,target:last?last.t:0,l:x.k==="ds"?"倍チャレ 成功":"倍チャレ 失敗"});return}
