@@ -93,7 +93,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORA-RUSH ゲーム性確定MTG｜2案のプロト・管理画面の変更・工数見積もり依頼</h1>
-<div class="meta"><b style="color:#b42318">更新 11/23 9:00版</b>（案1＝1回のRUSHで1つの景品・音の位置を修正・端数の初期設定を11/20決定に戻す）｜<span class="tag t1">案1</span> 当初案（紫7・白7の額で組む）と <span class="tag t2">案2</span> 入江さん案（ランク＝連チャン数）を、同じ「上は映像・下は3D筐体」の方式で遊べるようにしたもの｜<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a>／<a href="/torecacorp/tora-rush-v1/">V1</a></div>
+<div class="meta"><b style="color:#b42318">更新 11/23 9:10版</b>（案1：景品をS〜C賞から選んで試せる・倍チャレはプロトから外す）｜<span class="tag t1">案1</span> 当初案（紫7・白7の額で組む）と <span class="tag t2">案2</span> 入江さん案（ランク＝連チャン数）を、同じ「上は映像・下は3D筐体」の方式で遊べるようにしたもの｜<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a>／<a href="/torecacorp/tora-rush-v1/">V1</a></div>
 <nav id="tabs"><a href="#p1" data-t="p1">▶ 案1 当初案を遊ぶ</a><a href="#p2" data-t="p2">▶ 案2 入江さん案を遊ぶ</a><a href="#cmp" data-t="cmp">2案の比較と決めること</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -107,13 +107,13 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><th>ひと言で</th><td>当たった景品の<b>交換ポイント（額）</b>を、紫7・白7（シングル・ダブル）の組み合わせに分けて、押せ！ごとに1つずつ揃える</td><td>当たった<b>ランク</b>で連チャン数が決まる。虎拳フリーズ → 1連ごとに緑→赤→金→虹、最大4連（景品×5）</td></tr>
 <tr><th>何が決め手か</th><td>景品の額（交換ポイント）</td><td>ランク（S〜C・その他）</td></tr>
 <tr><th>画面に出る数字</th><td>7ごとの額（例：白7ダブル 100,000）、合計額</td><td>連チャン数、獲得個数（景品×N）。額は出さない</td></tr>
-<tr><th>ブレ（演出の合計と景品額の差）</th><td class="mid">出る（11/20決定）→ 説明の表記が必須。小役で端数を埋めれば0にできるが、これはこちらからの提案で未合意</td><td class="good">起きない（額を出さないため）</td></tr>
+<tr><th>ブレ（演出の合計と景品額の差）</th><td class="mid">出る（7の4種だけで組むため、コイン数と少しずれる）→ 説明の表記が必須。小役を足せば0にできるが、これはこちらからの提案で未合意</td><td class="good">起きない（額を出さないため）</td></tr>
 <tr><th>RUSHの長さ</th><td>景品の額しだい（1回のRUSH＝1つの景品）。低額の景品は1〜2ゲームと短い</td><td>ランクしだい。S＝4連・A＝3連・B＝2連・C＝1連</td></tr>
 <tr><th>BOXの作り方</th><td>今のまま（景品と交換ポイントを登録）。交換ポイントは5,000の倍数が望ましい</td><td>ランクごとの個数で連チャンの確率を作る（例：31口＝その他16・C8・B4・A2・S1）。景品は「同じ景品×N」</td></tr>
 <tr><th>抽選のしくみ</th><td class="good">今のまま</td><td class="good">今のまま（4連まで）。20連・30連に伸ばすなら改修が必要</td></tr>
 <tr><th>確率の表記</th><td>通常のBOXと同じ</td><td class="mid">「継続率50%」は31口では成り立たない（33〜47%）。<b>32口（S2口）なら全段階50%</b>。BOXが減ると確率が変わる点も注意</td></tr>
 <tr><th>売り切れ</th><td>BOXの口数しだい</td><td class="mid">31口と小さいのですぐ売り切れる → <b>自動補充（プロトv2のC案）がほぼ必須</b></td></tr>
-<tr><th>必要な素材</th><td>上の映像（色4種）＋<b>リール帯に紫7・白7</b>＋ダブル・倍チャレンジの演出</td><td>上の映像（色4種）＋リール帯（紫7のみで可）。<b>今ある素材でほぼ足りる</b></td></tr>
+<tr><th>必要な素材</th><td>上の映像（色4種）＋<b>リール帯に紫7・白7</b>＋ダブルの演出（倍チャレンジは別の映像・音が必要）</td><td>上の映像（色4種）＋リール帯（紫7のみで可）。<b>今ある素材でほぼ足りる</b></td></tr>
 <tr><th>開発の重さ（相対）</th><td class="mid">重い（組み合わせ生成・ブレ・倍チャレ・RUSH設定の管理画面）</td><td class="good">軽い（ランク→連数の対応と演出のみ）</td></tr>
 <tr><th>伸ばしやすさ</th><td>倍チャレ・小役・レートなどで遊びを足せる</td><td>連数・継続率・色の範囲・BOX昇格などで遊びを足せる（次弾で改修）</td></tr>
 </table>
@@ -123,12 +123,17 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <ol style="font-size:13px;margin:0;padding-left:20px">
 <li><b>初弾はどちらの案でいくか</b>（両方作る／片方だけ／案2で出して案1の要素を次弾に入れる）</li>
 <li><b>案2の場合</b>：31口のままか、32口（継続率50%が正しくなる）にするか。自動補充を入れるか。初弾は4連までか、20連・30連まで伸ばすか（改修ありなら工数増）</li>
-<li><b>案1の場合</b>：1回のRUSH＝1つの景品で確定。倍チャレンジを初弾に入れるか</li>
-<li><b>案1の場合（こちらからの提案・未合意）</b>：小役（ベル1,000・チェリー500）を足して端数を埋め、ブレをなくすか。11/20の決定は「4種の7のみ・ブレあり・説明表記必須」</li>
+<li><b>案1の場合</b>：1回のRUSH＝1つの景品（登録した景品の交換コイン数に届くまで7を連鎖）。倍チャレンジを初弾に入れるか（入れるなら映像・音の追加依頼が必要）</li>
+<li><b>案1の場合（こちらからの提案・未合意）</b>：小役（ベル1,000・チェリー500）を足して端数を埋め、ブレをなくすか。元の方針は「4種の7のみ・ブレあり・説明表記必須」</li>
 <li><b>映像チームへの依頼内容</b>：上の映像パーツ（上だけで書き出し）、リール帯の絵柄（案1なら白7）、効果音・BGM</li>
 <li><b>工数見積もりの依頼先と期限</b>（このページの「工数見積もり依頼」タブを共有する）</li>
 </ol>
 <p class="note" style="margin-top:8px">おすすめ：初弾は<b>案2（32口・自動補充あり・4連まで）</b>。抽選のしくみを変えず、今ある素材で出せる。案1の「額で組む」「倍チャレンジ」は、次弾で案2の連チャンの中の演出（例：連チャン中の上乗せ）として足すのが安全。</p>
+</div>
+<div class="card">
+<h2>倍チャレンジのイメージ（案1・次の素材待ち）</h2>
+<p style="margin:2px 0">RUSH → 継続に失敗 → リザルトが一度出る → プチュン「まだまだ」 → 最終チャレンジの押せ！ → 7が揃うたびに7が倍に増殖。</p>
+<p class="note">別の映像と音が必要なため、今のプロトには入れていません。入れる場合は映像チームに「継続失敗→リザルト→プチュン復活→最終チャレンジ→7増殖」のパーツと音を依頼します。</p>
 </div>
 <div class="card">
 <h2>リールの動きと効果音（11/23 更新）</h2>
@@ -139,8 +144,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><td>ガタガタ（揃う前）</td><td>02_RealLock_Type1／Type2.wav（交互）</td></tr>
 <tr><td>ガシャーン（揃い）</td><td>03_777.wav。金のときは＋７テンパイ音よくやった.mp3、虹のときは＋05_RainbowDevil.wav</td></tr>
 <tr><td>案2 2連目以降の導入</td><td>01_7_Tempai.wav</td></tr>
-<tr><td>倍チャレ 待機（「倍チャレンジ！」表示）</td><td>01_7_Tempai.wav（BGMはそのまま）</td></tr>
-<tr><td>倍チャレ 成功／失敗</td><td>08_VoltageUp.wav／まだまだ.mp3</td></tr>
+<tr><td>倍チャレンジ</td><td class="mid">今回は入れない（別の映像・音が必要）</td></tr>
 <tr><td>継続の拳突き上げ（各ゲームで7が揃ったあと）</td><td>04_DevilRush+Pipipipi-n.wav</td></tr>
 <tr><td>TOTAL画面</td><td>07_Jingle.wav → 「TOTAL」の文字が出る瞬間にリザルトうりゃあ！.mp3（BGMはここで止める）。結果のポップアップは音なし</td></tr>
 
@@ -158,20 +162,21 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <div class="card" style="margin-top:0">
 <h2><span class="tag t1">案1</span> 当初案：景品の額を紫7・白7の組み合わせで見せる</h2>
 <ul style="margin:0;padding-left:18px;font-size:12.5px">
-<li>紫7シングル＝5,000／紫7ダブル＝10,000／白7シングル＝50,000／白7ダブル＝100,000（標準レート）</li>
-<li><b>1回のRUSH＝1つの景品</b>。先に景品（例：18,000pt）を決める → その交換ポイントに届くように7の連鎖・倍チャレ・小役を組む → 押せ！で1つずつ揃える。上の映像の色は 紫S＝緑・紫W＝赤・白S＝金・白W＝虹 で示唆</li>
-<li>倍チャレンジ：押せ！で成功（直前の7が×2）か失敗。ブレ（演出の合計と景品のポイントの差）は出てよく、結果画面に説明を出す（11/20決定）。小役（ベル・チェリー）で端数を埋めてブレをなくす形は<b>こちらからの提案で未合意</b>（「端数の扱い」で切り替えて比較できます）</li>
+<li>流れ：<b>S・A・B・C賞などに登録した景品の交換コイン数（相場の価値）＝ポイント数</b> → そのポイントに届くように7を連鎖させる（若干のブレあり） → 押せ！で1つずつ揃える</li>
+<li>7の額：紫7シングル＝5,000／紫7ダブル＝10,000／白7シングル＝50,000／白7ダブル＝100,000。上の映像の色は 紫S＝緑・紫W＝赤・白S＝金・白W＝虹</li>
+<li>倍チャレンジは別の映像・音が必要なため、このプロトには入れていません（流れは「2案の比較と決めること」タブに記載）</li>
 </ul>
-<div class="ctl" style="margin-top:8px">
-<label>端数の扱い <select id="p1Mode"><option value="base" selected>11/20決定：4種の7のみ・ブレあり（説明表記必須）</option><option value="opt">【こちら提案・未合意】小役で端数を埋めて景品と一致</option></select></label>
-<label>倍チャレンジ <select id="p1Ch"><option value="1" selected>あり</option><option value="0">なし</option></select></label>
+<div class="ctl" style="margin-top:8px"><b style="font-size:12.5px">景品を選んで試す</b><span class="note">（景品名・コイン数は仮の例）</span></div>
+<div class="ctl" id="p1Prizes"></div>
+<div class="ctl">
+<button class="btn" id="p1Draw1" type="button">ランダムに引く（当たる割合どおり）</button>
+<span class="note">コイン数を指定</span><input type="number" id="p1Amt" value="18000" step="1000"><button class="btn" id="p1Fix" type="button">この数で</button>
 </div>
 <div class="ctl">
-<button class="btn pri" id="p1Draw1" type="button">RUSHを引く</button>
-<span class="note">または景品のポイントを指定</span><input type="number" id="p1Amt" value="18000" step="1000"><button class="btn" id="p1Fix" type="button">この額で</button>
+<label>7の組み方 <select id="p1Mode"><option value="base" selected>7の4種だけで組む（コイン数と少しずれることがある＝ブレ。結果に説明を出す）</option><option value="opt">【こちらの提案・未合意】ベル・チェリーの小役を足して、コイン数とぴったり合わせる</option></select></label>
 </div>
-<div class="drawbox" id="p1Box">引くと、ここに当たった景品と組み合わせが出ます。そのあと左の画面の START で遊べます。5,000pt未満の景品はRUSHなし（通常演出）。</div>
-<p class="note">「RUSHを引く」は例のBOXのうち5,000pt以上の景品（S 30万〜D 5,000）から当たる割合で選ぶ。リール帯の白7は、受領した紫7を色替えして仮に足したもの。</p>
+<div class="drawbox" id="p1Box">景品を選ぶと、ここに7の組み合わせが出ます。そのあと左の画面の START で遊べます。5,000コイン未満の景品はRUSHなし（通常演出）。</div>
+<p class="note">リール帯の白7は、受領した紫7を色替えして仮に足したもの。</p>
 </div>
 </div>
 </div>
@@ -227,7 +232,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><td>オリパ編集：景品の登録（S〜その他・個数・交換ポイント）</td><td>あり</td><td><span class="pill no">変更なし</span><br><span class="note">交換ポイントは5,000の倍数推奨</span></td><td><span class="pill no">変更なし</span><br><span class="note">ランクごとに「同じ景品×N」を登録する運用</span></td><td><span class="pill mod">改修</span><br><span class="note">個数をランクで持たず、連数に応じて付与</span></td></tr>
 <tr><td>オリパ編集：演出タイプ（通常／RUSH）</td><td>なし</td><td><span class="pill add">追加</span></td><td><span class="pill add">追加</span></td><td><span class="pill add">追加</span></td></tr>
 <tr><td>オリパ編集：残数表示オフ</td><td>あり</td><td><span class="pill no">変更なし</span></td><td><span class="pill no">変更なし（オフで運用）</span></td><td><span class="pill no">変更なし</span></td></tr>
-<tr><td>オリパ編集：RUSH設定</td><td>なし</td><td><span class="pill add">追加</span> レート・ブレ幅・端数の扱い（小役は提案・未合意）・倍チャレの割合・ゲーム上限・RUSH対象の最低額</td><td><span class="pill add">追加</span> ランク→連数の対応（S＝4連…）と色の順番</td><td><span class="pill add">追加</span> 継続率・最大連数・連数→色の範囲・BOX昇格の設定</td></tr>
+<tr><td>オリパ編集：RUSH設定</td><td>なし</td><td><span class="pill add">追加</span> レート・ブレ幅・端数の扱い（小役は提案・未合意）・ゲーム上限・倍チャレの割合（素材がそろってから）・RUSH対象の最低額</td><td><span class="pill add">追加</span> ランク→連数の対応（S＝4連…）と色の順番</td><td><span class="pill add">追加</span> 継続率・最大連数・連数→色の範囲・BOX昇格の設定</td></tr>
 <tr><td>オリパ編集：自動補充</td><td>なし</td><td><span class="pill no">任意</span></td><td><span class="pill new">追加（ほぼ必須）</span> 売り切れたら同じ中身で次の周</td><td><span class="pill no">不要（在庫を持たない場合）</span></td></tr>
 <tr><td>7の額マスタ（紫7・白7のシングル・ダブル）</td><td>なし</td><td><span class="pill add">新規</span></td><td><span class="pill no">不要</span></td><td><span class="pill no">不要</span></td></tr>
 <tr><td>RUSH素材（映像パーツ・リール帯・3Dモデル・効果音・BGM）と演出セット</td><td>「ガチャ演出」にMP4を登録</td><td><span class="pill add">新規</span></td><td><span class="pill add">新規</span></td><td><span class="pill add">新規</span>（色ごとのバリエーション追加）</td></tr>
@@ -243,9 +248,9 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <b><span class="tag t1">案1</span> RUSH設定</b>
 <div class="mock"><div class="row"><label>演出タイプ</label><span class="f">RUSH（虎巻ATTACK・案1）</span><label>演出セット</label><span class="f">虎巻ATTACK 通常</span></div>
 <div class="newb"><span class="nt">新規：RUSH設定</span>
-<div class="row"><label>RUSHレート</label><span class="f">標準（紫7S＝5,000）</span><label>端数の扱い</label><span class="f">ブレあり（11/20決定）／小役で埋める（提案）</span></div>
+<div class="row"><label>RUSHレート</label><span class="f">標準（紫7S＝5,000）</span><label>端数の扱い</label><span class="f">7の4種だけ（ブレあり）／小役で合わせる（提案）</span></div>
 <div class="row"><label>RUSH対象の最低額</label><span class="f">5,000pt</span><label>ブレの幅</label><span class="f">±10%</span></div>
-<div class="row"><label>倍チャレ 成功／失敗</label><span class="f">30%／20%</span><label>ゲーム数の上限</label><span class="f">10</span></div>
+<div class="row"><label>ゲーム数の上限</label><span class="f">10</span><label>倍チャレ（素材待ち）</label><span class="f">—</span></div>
 <div class="note">保存時：交換ポイントが5,000の倍数でない景品に注意を出す（小役なしの場合）</div></div>
 <div class="newb"><span class="nt">新規：7の額マスタ（全体設定）</span>
 <div class="row"><label>紫7 シングル／ダブル</label><span class="f">5,000</span><span class="f">10,000</span></div>
@@ -424,7 +429,7 @@ $("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();el
 function mountStage(t){const slot=$("slot-"+t);if(slot&&$("stage").parentElement!==slot){slot.appendChild($("stage"));setTimeout(resize,30)}}
 /* =============== 案1 =============== */
 const SYMS={pS:{n:"紫7シングル",v:5000,clip:"green",t:0,d:false},pW:{n:"紫7ダブル",v:10000,clip:"red",t:0,d:true},wS:{n:"白7シングル",v:50000,clip:"gold",t:W7,d:false},wW:{n:"白7ダブル",v:100000,clip:"rainbow",t:W7,d:true}};
-const BOXD=[["S","PSA10 リザードン（例）",300000,1],["A","PSA10 ピカチュウ（例）",100000,2],["A","BOX 未開封（例）",80000,2],["B","SAR（例）",50000,6],["B","SR（例）",30000,8],["C","AR（例）",10000,40],["C","RR（例）",8000,40],["D","汎用カード（例）",5000,150],["その他","ハズレ枠（例）",1000,751]];
+const BOXD=[["S","マリオピカチュウ PSA10（例）",300000,1],["A","ビクティニ PSA10（例）",120000,2],["A","リーリエ SR PSA10（例）",80000,2],["B","ピカチュウ SAR PSA10（例）",50000,6],["B","リザードン SAR（例）",30000,8],["C","ミュウ AR（例）",18000,40],["C","ゲンガー SR（例）",10000,40],["D","汎用 RR（例）",5000,150],["その他","ハズレ枠（例）",1000,751]];
 const BN=BOXD.reduce((a,x)=>a+x[3],0);
 function pickPrize(){let x=Math.random()*BN;for(const p of BOXD){if((x-=p[3])<0)return{r:p[0],n:p[1],pt:p[2]}}}
 function pickW(cs){let s=Math.random()*cs.reduce((a,b)=>a+b.w,0);for(const c of cs){if((s-=c.w)<=0)return c}return cs[cs.length-1]}
@@ -445,7 +450,7 @@ function compose(A,opt,useCh){ // returns {g:[{k,v}], rest, sum}
 function smallTxt(rest){const b=Math.floor(rest/1000),c=Math.round((rest-b*1000)/500);return[b?`ベル×${b}`:"",c?`チェリー×${c}`:""].filter(Boolean).join("・")}
 // 1回のRUSH＝1つの景品。先に景品（交換ポイント）を決め、その額に届くように7の連鎖・倍チャレ・小役を組む
 function makePlan1(prize,label){
-  const opt=$("p1Mode").value==="opt",useCh=$("p1Ch").value==="1";
+  const opt=$("p1Mode").value==="opt",useCh=false; // 倍チャレは別素材が必要なため現時点では入れない
   const A=prize.pt,MIN=5000;const c=A>=MIN?compose(A,opt,useCh):{g:[],rest:0,sum:0,T:0};
   const steps=[];if(c.g.length)steps.push({k:"play",f:"freeze",l:"プチュン（フリーズ）",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",bgm:true,vsfx:[["v_attack",1.97]]});
   let n=0,last=null;
@@ -470,16 +475,18 @@ function makePlan1(prize,label){
       ${ds?`<div class="rw"><span>倍チャレンジ成功</span><span>×${ds}</span></div>`:""}${df?`<div class="rw"><span>倍チャレンジ失敗</span><span>×${df}</span></div>`:""}
       ${opt&&c.rest?`<div class="rw"><span>小役（端数）</span><span>${smallTxt(c.rest)}</span></div>`:""}${c.over?`<div class="rw"><span>上乗せ</span><span>${fmt(c.over)}</span></div>`:""}
       <div style="margin-top:10px;font-weight:800">獲得景品</div><div class="rw" style="font-size:15px"><span>${prize.r} ${prize.n}</span><b>${fmt(A)}pt</b></div>
-      <div style="margin-top:6px;font-size:11.5px;opacity:.85">${diff===0?"演出の合計＝景品のポイント":`演出の合計と景品のポイントの差：${diff>0?"+":""}${fmt(diff)}（${(diff/A*100).toFixed(1)}%）`}${opt?"":"<br>※RUSHの合計額は演出上の目安で、景品のポイントと上下することがあります。獲得景品は上の景品となります。"}</div>`};
+      <div style="margin-top:6px;font-size:11.5px;opacity:.85">${diff===0?"演出の合計＝景品のコイン数":`演出の合計と景品のコイン数の差：${diff>0?"+":""}${fmt(diff)}（${(diff/A*100).toFixed(1)}%）`}${opt?"":"<br>※RUSHの合計額は演出上の目安で、景品のコイン数と上下することがあります。獲得景品は上の景品となります。"}</div>`};
   const seqTxt=c.g.map(x=>`<span class="chip k-${x.k}">${x.k==="ds"?"倍チャレ成功 +"+fmt(x.v):x.k==="df"?"倍チャレ失敗":SYMS[x.k].n+" "+fmt(x.v)}${x.over?" ＋上乗せ"+fmt(x.over):""}</span>`).join("");
   $("p1Box").innerHTML=`<b>${label}</b>：${prize.r} ${prize.n} <b>${fmt(A)}pt</b><br>→ 演出の合計 <b>${fmt(c.sum)}</b>（${diff===0?"景品と一致":(diff>0?"+":"")+fmt(diff)}）${opt&&c.rest?"・小役 "+smallTxt(c.rest):""}<div class="chips">${seqTxt||'<span class="note">RUSHなし（通常演出）</span>'}</div>`;
   idle(true);
 }
 const RUSHBOX=BOXD.filter(p=>p[2]>=5000),RN=RUSHBOX.reduce((a,x)=>a+x[3],0);
 function pickRush(){let x=Math.random()*RN;for(const p of RUSHBOX){if((x-=p[3])<0)return{r:p[0],n:p[1],pt:p[2]}}}
-$("p1Draw1").addEventListener("click",()=>makePlan1(pickRush(),"RUSHに当選"));
-$("p1Fix").addEventListener("click",()=>{const v=Math.max(0,+$("p1Amt").value||0);makePlan1({r:"指定",n:"指定した景品",pt:v},"景品を指定")});
-["p1Mode","p1Ch"].forEach(id=>$(id).addEventListener("change",()=>{plan=null;$("p1Box").textContent="設定を変えました。もう一度引いてください。";idle()}));
+$("p1Prizes").innerHTML=RUSHBOX.map((p,i)=>`<button class="btn${i===0?" pri":""}" type="button" data-i="${i}"><b>${p[0]}賞</b> ${p[1].replace("（例）","")} <span class="note">${fmt(p[2])}</span></button>`).join("");
+$("p1Prizes").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const p=RUSHBOX[+b.dataset.i];$("p1Prizes").querySelectorAll("button").forEach(x=>x.classList.toggle("pri",x===b));makePlan1({r:p[0]+"賞",n:p[1],pt:p[2]},"景品を選択")});
+$("p1Draw1").addEventListener("click",()=>{const p=pickRush();p.r+="賞";makePlan1(p,"ランダムに引いた結果")});
+$("p1Fix").addEventListener("click",()=>{const v=Math.max(0,+$("p1Amt").value||0);makePlan1({r:"指定",n:"指定したコイン数の景品",pt:v},"コイン数を指定")});
+["p1Mode"].forEach(id=>$(id).addEventListener("change",()=>{plan=null;$("p1Box").textContent="設定を変えました。もう一度引いてください。";idle()}));
 /* =============== 案2 =============== */
 const BOX2={31:[["その他",16,0],["C",8,1],["B",4,2],["A",2,3],["S",1,4]],32:[["その他",16,0],["C",8,1],["B",4,2],["A",2,3],["S",2,4]]};
 const ORDER=["green","red","gold","rainbow"];
@@ -527,8 +534,8 @@ const WBS=[
 ["C-9","共通","テスト","stg確認、実機テスト（iPhone・Android・LINE/Xのアプリ内ブラウザ）、修正","2〜3"],
 ["A-1","案1","7の額マスタ・RUSH設定（管理画面）","紫7・白7のシングル・ダブル、小役の額（採用時）、レート、ブレ幅、倍チャレの割合、ゲーム上限、最低額、端数の扱い","1.5〜2"],
 ["A-2","案1","組み合わせ生成ロジック","景品額（または購入の合計）→ 目標額（ブレ・丸め）→ 紫7・白7の組み合わせ、ゲーム数の調整、上乗せ・小役（採用時）","2〜3"],
-["A-3","案1","倍チャレンジ","組み合わせへの倍チャレ（成功・失敗）の差し込み、押せ！→成功・失敗の演出","1〜1.5"],
-["A-5","案1","リザルト（案1）","7の内訳、倍チャレ、小役、合計額、獲得景品、ブレの説明","1"],
+["A-3","案1","倍チャレンジ（素材がそろってから）","継続失敗→リザルト→プチュン復活「まだまだ」→最終チャレンジの押せ！→7が揃うたびに7が倍に増殖。別の映像・音が必要","1.5〜2"],
+["A-5","案1","リザルト（案1）","7の内訳、小役（採用時）、合計額、獲得景品、ブレの説明","1"],
 ["A-6","案1","リール帯の出し分け（紫7・白7・ダブル）","リール配列に合わせた停止位置、ダブルライン（2列揃い）の表示","1〜1.5"],
 ["B-1","案2","虎拳設定（管理画面）","ランク→連数・色の順番の設定、BOX構成からフリーズ確率・継続率を自動計算して表示","1〜1.5"],
 ["B-2","案2","虎拳フリーズ・連チャン演出","ランクから連数に変換して再生リストを作る、フリーズなし／ありの見せ方、1連ごとの色","1〜1.5"],
