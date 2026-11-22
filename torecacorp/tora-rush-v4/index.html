@@ -93,7 +93,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORA-RUSH ゲーム性確定MTG｜2案のプロト・管理画面の変更・工数見積もり依頼</h1>
-<div class="meta"><b style="color:#b42318">更新 11/23版</b>（案1＝1回のRUSHで1つの景品・音の位置を修正・端数の初期設定を11/20決定に戻す）｜<span class="tag t1">案1</span> 当初案（紫7・白7の額で組む）と <span class="tag t2">案2</span> 入江さん案（ランク＝連チャン数）を、同じ「上は映像・下は3D筐体」の方式で遊べるようにしたもの｜<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a>／<a href="/torecacorp/tora-rush-v1/">V1</a></div>
+<div class="meta"><b style="color:#b42318">更新 11/23 8:40版</b>（案1＝1回のRUSHで1つの景品・音の位置を修正・端数の初期設定を11/20決定に戻す）｜<span class="tag t1">案1</span> 当初案（紫7・白7の額で組む）と <span class="tag t2">案2</span> 入江さん案（ランク＝連チャン数）を、同じ「上は映像・下は3D筐体」の方式で遊べるようにしたもの｜<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a>／<a href="/torecacorp/tora-rush-v1/">V1</a></div>
 <nav id="tabs"><a href="#p1" data-t="p1">▶ 案1 当初案を遊ぶ</a><a href="#p2" data-t="p2">▶ 案2 入江さん案を遊ぶ</a><a href="#cmp" data-t="cmp">2案の比較と決めること</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -134,13 +134,14 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <h2>リールの動きと効果音（11/23 更新）</h2>
 <p style="margin:2px 0 6px">ゆうぽんさんの指摘を反映：<b>回転を速く</b>（毎秒1.5回転→3.6回転）／<b>揃う前にガタガタ</b>（7の少し手前で3本が震える・約1秒）／<b>揃うときは3本同時にガシャーン</b>（強めの跳ね返り＋画面の揺れ）／<b>外れるときも一気に外れる</b>（倍チャレ失敗は3本同時に止まり、右だけ1コマずれる）。</p>
 <table class="t"><tr><th>タイミング</th><th>音素材（Drive「音声」フォルダ）</th></tr>
-<tr><td>冒頭（案1・案2共通）</td><td>Puchun_Rev2_261117.wav → 見せてやる、虎拳の神髄を.mp3 → （OPの虎拳ATTACKで）虎拳アタック.mp3</td></tr>
+<tr><td>冒頭（案1・案2共通）</td><td>Puchun_Rev2_261117.wav → 見せてやる、虎拳の神髄を.mp3 → （OPの虎拳ATTACKで）虎拳アタック.mp3。OPの「Go to the TORAMI BATTLE!!」は約6.8秒→約2.2秒に短縮</td></tr>
 <tr><td>押せ！</td><td>06_Punch_Kazekiri.wav</td></tr>
 <tr><td>ガタガタ（揃う前）</td><td>02_RealLock_Type1／Type2.wav（交互）</td></tr>
 <tr><td>ガシャーン（揃い）</td><td>03_777.wav。金のときは＋７テンパイ音よくやった.mp3、虹のときは＋05_RainbowDevil.wav</td></tr>
 <tr><td>案2 2連目以降の導入</td><td>01_7_Tempai.wav</td></tr>
 <tr><td>倍チャレ 成功／失敗</td><td>08_VoltageUp.wav／まだまだ.mp3</td></tr>
-<tr><td>TOTAL画面（案1・案2共通）</td><td>04_DevilRush+Pipipipi-n.wav（11/23 冒頭から移動）</td></tr>
+<tr><td>継続の拳突き上げ（各ゲームで7が揃ったあと）</td><td>04_DevilRush+Pipipipi-n.wav</td></tr>
+<tr><td>TOTAL画面</td><td>なし（必要なら別の音を依頼）</td></tr>
 <tr><td>リザルト</td><td>07_Jingle.wav → リザルトうりゃあ！.mp3</td></tr>
 <tr><td>BGM</td><td>Bonus Battle Loop.wav（1ゲーム目の導入から結果まで繰り返し）</td></tr>
 </table>
@@ -387,6 +388,7 @@ function next(){if(!running)return;
 els.forEach(el=>el.addEventListener("ended",()=>{if(running&&el===els[cur]&&step&&(step.k==="play"||step.k==="win"))next()}));
 function timeline(){if(!running||!step||step.k!=="win")return;const el=els[cur];if(!el.classList.contains("show"))return;
   const vt=el.currentTime,C=CLIP[step.clip];
+  if(!step.fist&&vt>=3.1){step.fist=true;sfx("devilrush",.8)} // 継続の拳突き上げ（7のあとに虎美が拳を上げる場面）
   if(!step.stops[0]&&vt>=C.flash-1.0){step.stops[0]=true;shakeAll(step.target);sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
   if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");
     if(step.clip==="rainbow")sfx("rainbow05",.9);else if(step.clip==="gold")setTimeout(()=>sfx("v_tempai"),500)}}
@@ -440,7 +442,7 @@ function smallTxt(rest){const b=Math.floor(rest/1000),c=Math.round((rest-b*1000)
 function makePlan1(prize,label){
   const opt=$("p1Mode").value==="opt",useCh=$("p1Ch").value==="1";
   const A=prize.pt,MIN=5000;const c=A>=MIN?compose(A,opt,useCh):{g:[],rest:0,sum:0,T:0};
-  const steps=[];if(c.g.length)steps.push({k:"play",f:"freeze",l:"プチュン（フリーズ）",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",sfx:[["v_attack",6800]]});
+  const steps=[];if(c.g.length)steps.push({k:"play",f:"freeze",l:"プチュン（フリーズ）",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",sfx:[["v_attack",2250]]});
   let n=0,last=null;
   c.g.forEach((x,i)=>{
     if(x.k==="ds"||x.k==="df"){steps.push({k:"wait",f:"loop",l:`倍チャレ 待機`,banner:"倍チャレンジ！",keepLight:true});steps.push({k:"chall",f:"loop",ok:x.k==="ds",add:x.v,target:last?last.t:0,l:x.k==="ds"?"倍チャレ 成功":"倍チャレ 失敗"});return}
@@ -452,7 +454,7 @@ function makePlan1(prize,label){
     steps.push({k:"win",f:CLIP[s.clip].f,clip:s.clip,target:s.t,add:x.v+(lastG?(x.over||0)+(opt?c.rest:0):0),say:`${s.d?"DOUBLE!! ":""}${s.n.replace("シングル","")}<small>+${fmt(x.v)}</small>${extra}`,l:`${n}ゲーム目 ${s.n}`});
   });
   // TOTAL画面：04_DevilRush+Pipipipi-n を割り当て（ゆうぽんさん指示 11/23）
-  if(c.g.length){const lastS=c.g.filter(x=>SYMS[x.k]).slice(-1)[0];steps.push({k:"play",f:SYMS[lastS.k].clip==="rainbow"?"total":"total_green",l:"TOTAL",sfx:[["devilrush",0,.8]]})}
+  if(c.g.length){const lastS=c.g.filter(x=>SYMS[x.k]).slice(-1)[0];steps.push({k:"play",f:SYMS[lastS.k].clip==="rainbow"?"total":"total_green",l:"TOTAL"})}
   const cnt={};c.g.forEach(x=>{if(SYMS[x.k])cnt[x.k]=(cnt[x.k]||0)+1});
   const ds=c.g.filter(x=>x.k==="ds").length,df=c.g.filter(x=>x.k==="df").length;
   const diff=c.sum-A;
@@ -485,9 +487,9 @@ function probTable(){const v=$("p2Box").value;if(v==="ext"){$("p2Prob").innerHTM
 function makePlan2(ren,rank,label){
   const ext=$("p2Box").value==="ext";const cols=[];for(let k=1;k<=ren;k++)cols.push(ext?colorExt(k):ORDER[Math.min(3,k-1)]);
   const playN=Math.min(ren,10);const steps=[];
-  if(ren>0){steps.push({k:"play",f:"freeze",l:"虎拳フリーズ！",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",sfx:[["v_attack",6800]]});
+  if(ren>0){steps.push({k:"play",f:"freeze",l:"虎拳フリーズ！",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",sfx:[["v_attack",2250]]});
     for(let k=1;k<=playN;k++){const c=cols[k-1];steps.push({k:"play",f:"lead",l:`${k}連目 導入`,bgm:k===1,sfx:k>1?[["tempai",0,.8]]:[]},{k:"wait",f:"loop",l:`${k}連目 押せ！`},{k:"win",f:CLIP[c].f,clip:c,target:0,add:1,say:`${k}連目<small>${COLN[c]}</small>`,l:`${k}連目 ${COLN[c]}`})}
-    steps.push({k:"play",f:cols[playN-1]==="rainbow"?"total":"total_green",l:"TOTAL",sfx:[["devilrush",0,.8]]})}
+    steps.push({k:"play",f:cols[playN-1]==="rainbow"?"total":"total_green",l:"TOTAL"})}
   const cls={green:"c-g",red:"c-r",gold:"c-k",rainbow:"c-n"};
   plan={steps,total:0,fullTotal:ren,hud:()=>ren?`${plan.total}連`:"",
     idleText:`<b>${label}</b><br>${ren?`虎拳フリーズ！ ${ren}連チャン（${rank}${rank&&rank!=="—"?"賞":""}）${ren>10?"<br>※最初の10連を再生":""}`:"フリーズなし（その他）"}<br><span style="font-size:11px;opacity:.8">STARTで再生</span>`,
