@@ -142,9 +142,9 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><td>倍チャレ 成功／失敗</td><td>08_VoltageUp.wav／まだまだ.mp3</td></tr>
 <tr><td>案2 TOTAL</td><td>虎拳の神髄_クリアなホールリバーブ_余韻3秒.mp3</td></tr>
 <tr><td>リザルト</td><td>07_Jingle.wav → リザルトうりゃあ！.mp3</td></tr>
-<tr><td>BGM</td><td class="mid">Bonus Battle Loop.wav（23MB）は未組み込み。Driveの連携で落とせる上限（10MB）を超えるため</td></tr>
+<tr><td>BGM</td><td>Bonus Battle Loop.wav（1ゲーム目の導入から結果まで繰り返し）</td></tr>
 </table>
-<p class="note">未使用：02_ReelLock_Rev2.wav、06_RainbowDevil.wav（05と同じ内容）。上の映像の音（旧サンプル）は消音にしています。画面右上の「音 ON／OFF」で切り替え。</p>
+<p class="note">未使用：02_ReelLock_Rev2.wav、06_RainbowDevil.wav（05と同じ内容）。上の映像は本番映像 No.09（11/22受領・1080×1920）の上半分をパーツに切り出したもの（フリーズ／OP／導入／待機ループ／緑・赤・金・虹の本編／TOTAL 緑・虹）。映像に入っている音は消し、効果音とBGMを別で鳴らしています。画面右上の「音 ON／OFF」で切り替え。</p>
 </div>
 </section>
 
@@ -292,7 +292,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 </div>
 </section>
 
-<footer>パレットグループ トレカ商事カンパニー｜TORA-RUSH ゲーム性確定MTG資料（2026-11-22）｜3Dモデル・映像は受領素材を検証用に縮小して使用。白7は仮の色替え</footer>
+<footer>パレットグループ トレカ商事カンパニー｜TORA-RUSH ゲーム性確定MTG資料（2026-11-22）｜3Dモデル・本番映像No.09・音素材は受領素材を検証用に縮小して使用。白7は仮の色替え</footer>
 </main>
 
 <script type="module">
@@ -347,14 +347,15 @@ function loop(t){const dt=Math.min(0.05,(t-lastT)/1000);lastT=t;
   requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 /* =============== sound =============== */
-const SE=["tempai","reellock_t1","reellock_t2","s777","devilrush","rainbow05","punch","jingle","voltageup","puchun","v_attack","v_madamada","v_miseteyaru","v_result","v_shinzui_rev","v_tempai"];
+const SE=["bgm","tempai","reellock_t1","reellock_t2","s777","devilrush","rainbow05","punch","jingle","voltageup","puchun","v_attack","v_madamada","v_miseteyaru","v_result","v_shinzui_rev","v_tempai"];
 let AC=null,buf={},live={},soundOn=true;
 function audioUnlock(){try{if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();SE.forEach(n=>fetch(`se/${n}.mp3`).then(r=>r.arrayBuffer()).then(a=>AC.decodeAudioData(a)).then(b=>buf[n]=b).catch(()=>{}))}if(AC.state==="suspended")AC.resume()}catch(_){}}
 function sfx(n,vol=1){if(!soundOn||!AC||!buf[n])return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=vol;s.buffer=buf[n];s.connect(g).connect(AC.destination);s.start();(live[n]=live[n]||[]).push(s);s.onended=()=>{live[n]=(live[n]||[]).filter(x=>x!==s)}}
 function stopSfx(n){(live[n]||[]).forEach(s=>{try{s.stop()}catch(_){}});live[n]=[]}
 function stopAll(){Object.keys(live).forEach(stopSfx)}
+function bgm(on){stopSfx("bgm");if(!on||!soundOn||!AC||!buf.bgm)return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=.38;s.buffer=buf.bgm;s.loop=true;s.connect(g).connect(AC.destination);s.start();live.bgm=[s]}
 /* =============== player =============== */
-const CLIP={green:{f:"win_green",flash:3.53},red:{f:"win_red",flash:3.53},gold:{f:"win_gold",flash:3.57},rainbow:{f:"win_rainbow",flash:3.53}};
+const CLIP={green:{f:"win_green",flash:1.70},red:{f:"win_red",flash:1.73},gold:{f:"win_gold",flash:1.70},rainbow:{f:"win_rainbow",flash:1.70}}; // 本番映像 No.09（11/22受領）から切り出し
 const COLN={green:"緑",red:"赤",gold:"金",rainbow:"虹"};
 const els=[$("va"),$("vb")];let cur=0,seq=[],idx=-1,running=false,step=null,plan=null,activeTab="p1";
 function callout(html){const c=$("callout");c.innerHTML=html;c.classList.remove("on");void c.offsetWidth;c.classList.add("on")}
@@ -364,6 +365,7 @@ function renderPlan(){const box=$("plan-"+activeTab);if(!box)return;box.innerHTM
 function startAt(i){idx=i;step=seq[i];renderPlan();
   $("hud").textContent=step.l||"";$("oWait").classList.toggle("on",step.k==="wait");banner(step.k==="wait"&&step.banner?step.banner:"");
   if(step.k==="wait"&&!step.keepLight)setLight("dark");
+  if(step.bgm)bgm(true);
   if(step.sfx)step.sfx.forEach(([n,d,v])=>setTimeout(()=>{if(running)sfx(n,v)},d||0));
   if(step.k==="chall"){runChall(step);return}
   const el=els[cur],other=els[1-cur];
@@ -379,7 +381,7 @@ function next(){if(!running)return;
 els.forEach(el=>el.addEventListener("ended",()=>{if(running&&el===els[cur]&&step&&(step.k==="play"||step.k==="win"))next()}));
 function timeline(){if(!running||!step||step.k!=="win")return;const el=els[cur];if(!el.classList.contains("show"))return;
   const vt=el.currentTime,C=CLIP[step.clip];
-  if(!step.stops[0]&&vt>=C.flash-1.3){step.stops[0]=true;shakeAll(step.target);sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
+  if(!step.stops[0]&&vt>=C.flash-1.0){step.stops[0]=true;shakeAll(step.target);sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
   if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");
     if(step.clip==="rainbow")sfx("rainbow05",.9);else if(step.clip==="gold")setTimeout(()=>sfx("v_tempai"),500)}}
 function onStop(i){if(!running||!step)return;
@@ -403,7 +405,7 @@ $("startBtn").addEventListener("click",()=>{if(!ready||!plan)return;$("oIdle").c
 $("oshi").addEventListener("pointerdown",()=>{if(!running||!step||step.k!=="wait")return;const o=$("oshi");o.classList.add("hit");setTimeout(()=>o.classList.remove("hit"),140);try{navigator.vibrate&&navigator.vibrate(25)}catch(_){}
   const f=document.createElement("div");f.className="flash";$("stage").appendChild(f);setTimeout(()=>f.remove(),320);setLight("on");sfx("punch",.8);[0,1,2].forEach(spin);$("oWait").classList.remove("on");next()});
 $("skip").addEventListener("click",()=>{if(!running)return;els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel});if(plan)plan.total=plan.fullTotal||0;finish()});
-$("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();else audioUnlock();$("snd").textContent=soundOn?"音 ON":"音 OFF"});
+$("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();else{audioUnlock();if(running)bgm(true)}$("snd").textContent=soundOn?"音 ON":"音 OFF"});
 /* move stage between tabs */
 function mountStage(t){const slot=$("slot-"+t);if(slot&&$("stage").parentElement!==slot){slot.appendChild($("stage"));setTimeout(resize,30)}}
 /* =============== 案1 =============== */
@@ -433,16 +435,17 @@ function makePlan1(prizes,label){
   let A,target;
   if(opt){A=prizeSum;target="購入ごとの合計"}else{const best=prizes.reduce((a,b)=>b.pt>a.pt?b:a);A=best.pt;target=prizes.length>1?"一番高い景品（景品ごとにRUSH。ここでは1つだけ再生）":"当たった景品"}
   const MIN=5000;const c=A>=MIN?compose(A,opt,useCh):{g:[],rest:0,sum:0,T:0};
-  const steps=[];if(c.g.length)steps.push({k:"play",f:"op",l:"OP",sfx:[["v_attack",300],["devilrush",2600,.7]]});
+  const steps=[];if(c.g.length)steps.push({k:"play",f:"op",l:"OP",sfx:[["devilrush",0,.7],["v_attack",6800]]});
   let n=0,last=null;
   c.g.forEach((x,i)=>{
     if(x.k==="ds"||x.k==="df"){steps.push({k:"wait",f:"loop",l:`倍チャレ 待機`,banner:"倍チャレンジ！",keepLight:true});steps.push({k:"chall",f:"loop",ok:x.k==="ds",add:x.v,target:last?last.t:0,l:x.k==="ds"?"倍チャレ 成功":"倍チャレ 失敗"});return}
     const s=SYMS[x.k];n++;last=s;
-    steps.push({k:"play",f:"lead",l:`${n}ゲーム目 導入`});
+    steps.push({k:"play",f:"lead",l:`${n}ゲーム目 導入`,bgm:n===1});
     steps.push({k:"wait",f:"loop",l:`${n}ゲーム目 押せ！`});
     const extra=(i===c.g.length-1&&(x.over||(opt&&c.rest)))?`<small>${x.over?"上乗せ+"+fmt(x.over)+" ":""}${opt&&c.rest?smallTxt(c.rest):""}</small>`:"";
     steps.push({k:"win",f:CLIP[s.clip].f,clip:s.clip,target:s.t,add:x.v+(i===c.g.length-1?(x.over||0)+(opt?c.rest:0):0),say:`${s.d?"DOUBLE!! ":""}${s.n.replace("シングル","")}<small>+${fmt(x.v)}</small>${extra}`,l:`${n}ゲーム目 ${s.n}`});
   });
+  if(c.g.length){const lastS=c.g.filter(x=>SYMS[x.k]).slice(-1)[0];steps.push({k:"play",f:SYMS[lastS.k].clip==="rainbow"?"total":"total_green",l:"TOTAL",sfx:[["v_shinzui_rev",200]]})}
   const cnt={};c.g.forEach(x=>{if(SYMS[x.k])cnt[x.k]=(cnt[x.k]||0)+1});
   const ds=c.g.filter(x=>x.k==="ds").length,df=c.g.filter(x=>x.k==="df").length;
   const diff=c.sum-A;
@@ -475,9 +478,9 @@ function probTable(){const v=$("p2Box").value;if(v==="ext"){$("p2Prob").innerHTM
 function makePlan2(ren,rank,label){
   const ext=$("p2Box").value==="ext";const cols=[];for(let k=1;k<=ren;k++)cols.push(ext?colorExt(k):ORDER[Math.min(3,k-1)]);
   const playN=Math.min(ren,10);const steps=[];
-  if(ren>0){steps.push({k:"play",f:"op",l:"虎拳フリーズ！",sfx:[["puchun",0,.9],["v_miseteyaru",900]]});
-    for(let k=1;k<=playN;k++){const c=cols[k-1];steps.push({k:"play",f:"lead",l:`${k}連目 導入`,sfx:k>1?[["tempai",0,.8]]:[]},{k:"wait",f:"loop",l:`${k}連目 押せ！`},{k:"win",f:CLIP[c].f,clip:c,target:0,add:1,say:`${k}連目<small>${COLN[c]}</small>`,l:`${k}連目 ${COLN[c]}`})}
-    if(!ext&&ren===4)steps.push({k:"play",f:"total",l:"TOTAL",sfx:[["v_shinzui_rev",200]]})}
+  if(ren>0){steps.push({k:"play",f:"freeze",l:"虎拳フリーズ！",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",sfx:[["devilrush",0,.7],["v_attack",6800]]});
+    for(let k=1;k<=playN;k++){const c=cols[k-1];steps.push({k:"play",f:"lead",l:`${k}連目 導入`,bgm:k===1,sfx:k>1?[["tempai",0,.8]]:[]},{k:"wait",f:"loop",l:`${k}連目 押せ！`},{k:"win",f:CLIP[c].f,clip:c,target:0,add:1,say:`${k}連目<small>${COLN[c]}</small>`,l:`${k}連目 ${COLN[c]}`})}
+    steps.push({k:"play",f:cols[playN-1]==="rainbow"?"total":"total_green",l:"TOTAL",sfx:[["v_shinzui_rev",200]]})}
   const cls={green:"c-g",red:"c-r",gold:"c-k",rainbow:"c-n"};
   plan={steps,total:0,fullTotal:ren,hud:()=>ren?`${plan.total}連`:"",
     idleText:`<b>${label}</b><br>${ren?`虎拳フリーズ！ ${ren}連チャン（${rank}${rank&&rank!=="—"?"賞":""}）${ren>10?"<br>※最初の10連を再生":""}`:"フリーズなし（その他）"}<br><span style="font-size:11px;opacity:.8">STARTで再生</span>`,
