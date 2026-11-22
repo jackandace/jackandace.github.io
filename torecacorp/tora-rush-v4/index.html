@@ -93,7 +93,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORA-RUSH ゲーム性確定MTG｜2案のプロト・管理画面の変更・工数見積もり依頼</h1>
-<div class="meta"><b style="color:#b42318">更新 11/23 8:55版</b>（案1＝1回のRUSHで1つの景品・音の位置を修正・端数の初期設定を11/20決定に戻す）｜<span class="tag t1">案1</span> 当初案（紫7・白7の額で組む）と <span class="tag t2">案2</span> 入江さん案（ランク＝連チャン数）を、同じ「上は映像・下は3D筐体」の方式で遊べるようにしたもの｜<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a>／<a href="/torecacorp/tora-rush-v1/">V1</a></div>
+<div class="meta"><b style="color:#b42318">更新 11/23 8:45修正版</b>（案1＝1回のRUSHで1つの景品・音の位置を修正・端数の初期設定を11/20決定に戻す）｜<span class="tag t1">案1</span> 当初案（紫7・白7の額で組む）と <span class="tag t2">案2</span> 入江さん案（ランク＝連チャン数）を、同じ「上は映像・下は3D筐体」の方式で遊べるようにしたもの｜<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a>／<a href="/torecacorp/tora-rush-v1/">V1</a></div>
 <nav id="tabs"><a href="#p1" data-t="p1">▶ 案1 当初案を遊ぶ</a><a href="#p2" data-t="p2">▶ 案2 入江さん案を遊ぶ</a><a href="#cmp" data-t="cmp">2案の比較と決めること</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -362,7 +362,7 @@ function sfx(n,vol=1){if(!soundOn||!AC||!buf[n])return;const s=AC.createBufferSo
 function stopSfx(n){(live[n]||[]).forEach(s=>{try{s.stop()}catch(_){}});live[n]=[]}
 function stopAll(){Object.keys(live).forEach(stopSfx)}
 let bgmWant=false;
-function bgm(on){bgmWant=on;stopSfx("bgm");if(!on||!soundOn||!AC||!buf.bgm)return; // 読み込み前なら、読み込み完了時に鳴らすconst s=AC.createBufferSource(),g=AC.createGain();g.gain.value=.38;s.buffer=buf.bgm;s.loop=true;s.connect(g).connect(AC.destination);s.start();live.bgm=[s]}
+function bgm(on){bgmWant=on;stopSfx("bgm");/* 読み込み前なら、読み込み完了時に鳴らす */if(!on||!soundOn||!AC||!buf.bgm)return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=.38;s.buffer=buf.bgm;s.loop=true;s.connect(g).connect(AC.destination);s.start();live.bgm=[s]}
 /* =============== player =============== */
 const CLIP={green:{f:"win_green",flash:1.70},red:{f:"win_red",flash:1.73},gold:{f:"win_gold",flash:1.70},rainbow:{f:"win_rainbow",flash:1.70}}; // 本番映像 No.09（11/22受領）から切り出し
 const COLN={green:"緑",red:"赤",gold:"金",rainbow:"虹"};
