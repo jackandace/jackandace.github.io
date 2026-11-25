@@ -51,6 +51,11 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 #oIdle{background:rgba(0,0,0,.6);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;font-size:13px}
 #oIdle.on{display:flex}
 #oWait{pointer-events:none}#oWait .oshi{pointer-events:auto}
+.ctlbar{position:absolute;z-index:10;display:flex;flex-direction:column;gap:6px}
+.ctlbar.l{left:8px;bottom:10px}.ctlbar.r{right:8px;bottom:10px}
+.cb{font:800 11.5px/1 "Hiragino Sans",sans-serif;color:#fff;background:rgba(20,14,36,.82);border:1.5px solid rgba(255,215,120,.75);border-radius:8px;padding:7px 9px;min-width:64px;cursor:pointer;letter-spacing:.03em}
+.cb.on{background:linear-gradient(#ffd36b,#e8a10b);color:#2a1600;border-color:#fff}
+.cb:disabled{opacity:.4;cursor:default}
 .oshi{position:absolute;left:50%;top:92.5%;transform:translate(-50%,-50%);width:104px;height:104px;border-radius:50%;cursor:pointer;z-index:9}
 .oshi .cap{position:absolute;inset:9px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff8a7a,#e0352b 55%,#8e140d);box-shadow:0 6px 0 #5b0c07,0 8px 14px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font:900 24px/1 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 2px 0 #6d0f09;animation:bob .55s ease-in-out infinite}
 .oshi .rim{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,220,120,.95);box-shadow:0 0 16px rgba(255,190,60,.9);animation:rim 1s ease-in-out infinite}
@@ -92,8 +97,8 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 </head>
 <body>
 <header><div class="in">
-<h1>TORAMI RUSH 確定仕様とプロト v5｜当初案ベース・レート選択・シナリオ・代替景品</h1>
-<div class="meta"><b style="color:#b42318">11/25版</b>（入江さん・ゆうぽんさんとのやりとりで確定した内容を反映）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
+<h1>TORAMI RUSH 確定仕様とプロト v5｜当初案ベース・レート選択・シナリオ・代替景品・チャージ限定</h1>
+<div class="meta"><b style="color:#b42318">11/25 15時版</b>（AUTO・一撃・スピード、課金チャージ限定RUSH、注意書き・実績還元率公開を追加）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
 <nav id="tabs"><a href="#play" data-t="play">▶ プロトで遊ぶ</a><a href="#spec" data-t="spec">確定仕様とロジック</a><a href="#howto" data-t="howto">遊び方画面（ユーザー向け）</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -106,6 +111,8 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <div class="card" style="margin-top:0">
 <h2>1回引いて、最終スコアまで7を連鎖させる</h2>
 <p class="note" style="margin:0 0 6px">レートを選んで1回引く → 中身（単発〜1000連）の当選PTの合計＝<b>SCORE</b> → 7が揃うたびに当選PTと累計SCOREを表示しながらSCOREぴったりまで上乗せ → SCOREの範囲で<b>景品を1個</b>に決定 →「発送」か「交換（SCORE分の交換コイン）」を選ぶ</p>
+<div class="ctl"><b style="font-size:12.5px">ガチャ</b><span id="gachaBtns"><button class="btn pri" type="button" data-g="normal">通常RUSH</button> <button class="btn" type="button" data-g="charge">課金チャージ限定RUSH（GOLD）</button></span></div>
+<div class="ctl" id="wakuBox" style="display:none;background:#fff8e6;border:1px solid #f3d38b;border-radius:8px;padding:6px 10px">挑戦枠 <b id="wakuN" style="font-size:16px">0</b> 回<button class="btn" id="chargeBtn" type="button">10,000円チャージする（デモ）→ 挑戦枠＋1</button><span class="note">チャージした人だけが遊べるRUSH。購入は0コインで、挑戦枠を1回使う</span></div>
 <div class="ctl"><b style="font-size:12.5px">レート</b><span id="rateBtns"></span></div>
 <div class="ctl"><label>シナリオ <select id="scnSel"></select></label></div>
 <div class="ctl">
@@ -131,6 +138,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
   <div class="hud"><span id="hud">読み込み中</span><b id="hudR"></b><span><button type="button" id="snd">音 ON</button> <button type="button" id="skip">スキップ</button></span></div>
   <div class="banner" id="banner"></div>
   <div class="callout" id="callout"></div>
+  <div class="ctlbar l"><button class="cb" type="button" id="autoBtn">AUTO</button><button class="cb" type="button" id="oneBtn">一撃</button></div><div class="ctlbar r"><button class="cb" type="button" id="spdBtn">スピード ×1</button></div>
   <div class="ov" id="oWait"><div class="oshi" id="oshi"><div class="rim"></div><div class="cap">押せ！</div></div></div>
   <div class="ov on" id="oIdle"><div id="idleMsg">3Dモデルを読み込み中…</div><button class="btn" type="button" id="startBtn" style="margin-top:12px;background:none;color:#fff;border:2px solid #fff;border-radius:999px;padding:8px 28px;font-weight:800;display:none">START</button></div>
   <div class="res" id="res"></div>
@@ -153,6 +161,10 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><td>景品登録</td><td>BOXには<b>通常どおり実物の景品を登録</b>する（有在庫）。景品切れで「何も当たらない」を防ぐため、<b>代替景品</b>（全体設定のマスタ）で吸収する</td></tr>
 <tr><td>在庫切れ</td><td>その範囲の登録景品が切れていれば代替景品、代替景品も切れていれば1つ下の範囲へ。在庫が少なくなったら管理画面で知らせる</td></tr>
 <tr><td>継続率の表記</td><td><b>平均継続率</b>を計算して表記する（算出方法は下記）。ガチャごと・レートごとに遊び方画面へ出す</td></tr>
+<tr><td>操作ボタン</td><td><b>AUTO</b>（押せ！を自動で押す）／<b>一撃</b>（残りのゲームを飛ばしてTOTALへ）／<b>スピード</b>（×1・×1.5・×2の3段階）。どれも見せ方だけで、結果は変わらない</td></tr>
+<tr><td>課金チャージ限定RUSH</td><td>チャージした人だけが遊べるRUSH（GOLD）。チャージ時に<b>挑戦枠</b>を付与し、挑戦枠1回で引く（購入は0コイン）。BOX・7の額は通常RUSHと別に設定</td></tr>
+<tr><td>注意書き・遊び方</td><td>遊び方画面に、7の価値・平均継続率・BOXの中身・操作ボタンの説明・注意事項（結果は購入時に決まる、演出で結果は変わらない、交換コイン数は市場価格ではない など）を出す</td></tr>
+<tr><td>実績還元率公開</td><td>ゲームごと・購入額ごとに、購入回数と実績還元率（獲得景品の交換コイン数の合計 ÷ 使ったコインの合計）を直近1週間などで集計して公開する</td></tr>
 <tr><td>倍チャレンジ</td><td>今回は入れない（別の映像・音が必要）。流れ：RUSH → 継続失敗 → リザルト → プチュン「まだまだ」→ 最終チャレンジの押せ！→ 7が揃うたびに7が倍に増殖</td></tr>
 <tr><td>最大倍率・最大ゲーム数</td><td>個別には決めない。最大ゲーム数はシナリオごとの長さで決まり、超える分は上乗せで見せる。最大倍率は「BOXの最高PT ÷ 購入額」から自動計算して表示</td></tr>
 </table>
@@ -237,6 +249,13 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <table class="t" id="valTable"></table>
 <div class="ctl"><button class="btn" id="recalc" type="button">平均継続率を計算し直す</button><span class="note" id="calcMsg"></span></div>
 </div>
+<div class="card">
+<h2>実績還元率公開ページ（イメージ）</h2>
+<p class="note" style="margin:0 0 6px">本番は実際の購入データを直近1週間で集計して公開する。ここではBOXの口数から試算した値を入れている（デモ値）。</p>
+<div class="ctl"><label>集計期間 <select><option>直近1週間</option><option>直近1か月</option><option>全期間</option></select></label></div>
+<table class="t" id="retTable"></table>
+<p class="note" style="margin-top:6px">※実績還元率＝集計期間内の購入で獲得した景品の交換コイン数の合計 ÷ 購入に使ったコインの合計。交換コイン数は当社所定の数値で、景品の市場価格や換金価値を示すものではありません。将来の結果や個々の購入での獲得を保証するものではありません。数値は定期的に更新します。</p>
+</div>
 </div>
 </div>
 </section>
@@ -253,6 +272,10 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><td>代替景品マスタ（全体設定）</td><td><span class="pill new">新規</span></td><td>SCOREの範囲ごとの代替景品（名前・画像・相当額＝範囲の下限・在庫）と、在庫が少ないときの通知のしきい値。全ガチャ共通で、ガチャごとの設定は不要</td></tr>
 <tr><td>シナリオマスタ（全体設定）</td><td><span class="pill new">新規</span></td><td>10種のシナリオ（名前・ゲーム数の範囲・序盤／終盤の7の出やすさ・上乗せの配分）。初期値はシステムで用意し、必要なら編集</td></tr>
 <tr><td>RUSH演出素材</td><td><span class="pill new">新規</span></td><td>映像パーツ・リール帯・3Dモデル・効果音・BGMの登録</td></tr>
+<tr><td>オリパ編集：ガチャ種別</td><td><span class="pill add">追加</span></td><td>通常／課金チャージ限定。チャージ限定は購入0コイン・挑戦枠で引く</td></tr>
+<tr><td>チャージ限定：挑戦枠の設定</td><td><span class="pill new">新規</span></td><td>付与条件（例：チャージ1万円ごとに1回）、有効期限、1人あたりの上限、対象ガチャ。ユーザーごとの挑戦枠の残数・付与／消費の履歴</td></tr>
+<tr><td>実績還元率公開</td><td><span class="pill new">新規</span></td><td>購入データから、ゲーム×購入額ごとの購入回数・実績還元率を定期的に集計（例：20分ごと）。公開ページと集計期間（直近1週間など）</td></tr>
+<tr><td>注意書き・遊び方の編集</td><td><span class="pill add">追加</span></td><td>ガチャごとの注意事項・遊び方の文言を編集（7の価値・平均継続率・BOXの中身は自動で差し込む）</td></tr>
 <tr><td>当選履歴・発送管理</td><td><span class="pill mod">改修</span></td><td>RUSHの当選は「SCORE・中身の内訳・払い出した景品（登録景品か代替景品か）・発送／交換」を記録する</td></tr>
 <tr><td>遊び方・注意書き</td><td><span class="pill add">追加</span></td><td>遊び方画面（7の額・平均継続率をレートごとに自動表示）と、算出方法の注記</td></tr>
 </table>
@@ -382,7 +405,7 @@ function bgm(on){bgmWant=on;stopSfx("bgm");/* 読み込み前なら、読み込�
 /* =============== player =============== */
 const CLIP={green:{f:"win_green",flash:1.70},red:{f:"win_red",flash:1.73},gold:{f:"win_gold",flash:1.70},rainbow:{f:"win_rainbow",flash:1.70}}; // 本番映像 No.09（11/22受領）から切り出し
 const COLN={green:"緑",red:"赤",gold:"金",rainbow:"虹"};
-const els=[$("va"),$("vb")];let cur=0,seq=[],idx=-1,running=false,step=null,plan=null,activeTab="play";
+const els=[$("va"),$("vb")];let SPD=1,AUTO=false,JUMP=false;let cur=0,seq=[],idx=-1,running=false,step=null,plan=null,activeTab="play";
 function callout(html){const c=$("callout");c.innerHTML=html;c.classList.remove("on");void c.offsetWidth;c.classList.add("on")}
 function banner(t){const b=$("banner");if(t){b.textContent=t;b.classList.add("on")}else b.classList.remove("on")}
 function prep(el,i){while(i<seq.length&&(!seq[i].f||seq[i].k==="chall"))i++;if(i>=seq.length){el.removeAttribute("src");return}el.loop=seq[i].k==="wait"||seq[i].k==="chall";el.src=`v/${seq[i].f}.mp4`;el.load()}
@@ -391,14 +414,15 @@ function startAt(i){idx=i;step=seq[i];renderPlan();
   $("hud").textContent=step.l||"";$("oWait").classList.toggle("on",step.k==="wait");banner(step.k==="wait"&&step.banner?step.banner:"");
   if(step.k==="wait"&&!step.keepLight)setLight("dark");
   if(step.bgm)bgm(true);if(step.bgmOff)bgm(false);
-  if(step.sfx)step.sfx.forEach(([n,d,v])=>setTimeout(()=>{if(running)sfx(n,v)},d||0));
+  if(step.sfx)step.sfx.forEach(([n,d,v])=>setTimeout(()=>{if(running)sfx(n,v)},(d||0)/SPD));
+  if(step.k==="wait"&&AUTO)setTimeout(()=>{if(running&&step&&step.k==="wait"&&AUTO)tap()},700/SPD);
   if(step.k==="chall"){runChall(step);return}
   const el=els[cur],other=els[1-cur];
   if(step.k==="win"){step.stops=[false,false,false]}
-  const p=el.play();const vis=()=>{el.classList.add("show");other.classList.remove("show");other.pause();prep(other,i+1)};
+  el.playbackRate=SPD;const p=el.play();const vis=()=>{el.classList.add("show");other.classList.remove("show");other.pause();prep(other,i+1)};
   if(p&&p.then)p.then(vis).catch(()=>{$("hud").textContent="再生できませんでした。STARTを押し直してください";idle()});else vis();
 }
-function next(){if(!running)return;
+function next(){if(!running||JUMP)return;
   const nx=seq[idx+1];
   if(!nx){finish();return}
   if(nx.k==="chall"){idx++;startAt(idx);return} // chall keeps current video (loop)
@@ -423,7 +447,7 @@ function runChall(s){banner("");$("oWait").classList.remove("on");setLight("on")
     if(s.ok){slamAll(s.target);sfx("s777")}else{slamAll([s.target,s.target,norm(s.target-PITCH)])}},2250)}
 function hudR(){$("hudR").textContent=plan&&plan.hud?plan.hud():""}
 function finish(){running=false;bgm(false);$("oWait").classList.remove("on");banner("");setLight("on");$("res").innerHTML=plan.result()+`<button class="closebtn" type="button" id="again">もう一度見る</button>`;$("res").classList.add("on");$("again").addEventListener("click",()=>{idle(true)});$("hud").textContent="リザルト";idx=-1;renderPlan()}
-function idle(keepPlan){running=false;stopAll();$("res").classList.remove("on");banner("");els.forEach(e=>{e.pause();e.classList.remove("show")});$("oWait").classList.remove("on");
+function idle(keepPlan){running=false;JUMP=false;stopAll();$("res").classList.remove("on");banner("");els.forEach(e=>{e.pause();e.classList.remove("show")});$("oWait").classList.remove("on");
   if(ready){setLight("dark");reels.forEach(r=>{r.state="idle";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel})}
   $("oIdle").classList.add("on");const can=ready&&plan;$("startBtn").style.display=can?"inline-block":"none";
   $("idleMsg").innerHTML=!ready?"3Dモデルを読み込み中…":plan?plan.idleText:"右の「このレートで1回引く」で結果を決めてください";
@@ -432,21 +456,35 @@ $("startBtn").addEventListener("click",async()=>{if(!ready||!plan)return;audioUn
   if(!seReady()){$("idleMsg").innerHTML="音を読み込み中…";for(let k=0;k<40&&!seReady();k++)await new Promise(r=>setTimeout(r,100))}$("oIdle").classList.remove("on");$("res").classList.remove("on");
   if(!plan.steps.length){plan.total=0;finish();return}
   audioUnlock();seq=plan.steps.map(s=>({...s,vsfx:s.vsfx&&s.vsfx.map(x=>[...x])}));plan.total=0;hudR();running=true;cur=0;prep(els[0],0);prep(els[1],1);const u=els[1].play();if(u&&u.then)u.then(()=>els[1].pause()).catch(()=>{});setLight("dark");startAt(0)});
-$("oshi").addEventListener("pointerdown",()=>{if(!running||!step||step.k!=="wait")return;const o=$("oshi");o.classList.add("hit");setTimeout(()=>o.classList.remove("hit"),140);try{navigator.vibrate&&navigator.vibrate(25)}catch(_){}
-  const f=document.createElement("div");f.className="flash";$("stage").appendChild(f);setTimeout(()=>f.remove(),320);audioUnlock();setLight("on");sfx("punch",1);[0,1,2].forEach(spin);$("oWait").classList.remove("on");next()});
+function tap(){if(!running||JUMP||!step||step.k!=="wait")return;const o=$("oshi");o.classList.add("hit");setTimeout(()=>o.classList.remove("hit"),140);try{navigator.vibrate&&navigator.vibrate(25)}catch(_){}
+$("oshi").addEventListener("pointerdown",tap);
+  const f=document.createElement("div");f.className="flash";$("stage").appendChild(f);setTimeout(()=>f.remove(),320);audioUnlock();setLight("on");sfx("punch",1);[0,1,2].forEach(spin);$("oWait").classList.remove("on");next()}
 $("skip").addEventListener("click",()=>{if(!running)return;els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel});if(plan)plan.total=plan.fullTotal||0;finish()});
 $("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();else{audioUnlock();if(running)bgm(true)}$("snd").textContent=soundOn?"音 ON":"音 OFF"});
+/* AUTO・一撃・スピード */
+$("autoBtn").addEventListener("click",()=>{AUTO=!AUTO;$("autoBtn").classList.toggle("on",AUTO);if(AUTO&&running&&step&&step.k==="wait")tap()});
+$("spdBtn").addEventListener("click",()=>{SPD=SPD===1?1.5:SPD===1.5?2:1;$("spdBtn").textContent="スピード ×"+SPD;$("spdBtn").classList.toggle("on",SPD>1);els.forEach(e=>e.playbackRate=SPD)});
+function ichigeki(){if(!running||!plan||JUMP)return;const ti=seq.findIndex(x=>x.l==="TOTAL");if(ti<0||idx>=ti)return;
+  els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=plan.lastTarget||0;r.g.rotation.x=r.ang;r.mat.map=tex.reel});
+  stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");flicker();plan.total=plan.fullTotal||0;hudR();
+  callout(`一撃！<small>SCORE ${fmt(plan.total)}</small>`);$("oWait").classList.remove("on");banner("");
+  JUMP=true;cur=1-cur;prep(els[cur],ti);setTimeout(()=>{JUMP=false;if(running)startAt(ti)},900)}
+$("oneBtn").addEventListener("click",ichigeki);
 /* move stage between tabs */
 function mountStage(t){const slot=$("slot-"+t);if(slot&&$("stage").parentElement!==slot){slot.appendChild($("stage"));setTimeout(resize,30)}}
 
 /* =============== ガチャ設定（例） =============== */
-const UNIT=500; // 1口の価格（コイン）
-const RATES=[{r:500,n:1,l:"単発"},{r:5000,n:10,l:"10連"},{r:50000,n:100,l:"100連"},{r:500000,n:1000,l:"1000連"}];
-// 7の額：ガチャごと・レートごと（初期値はレートに比例）
-const VALS={};RATES.forEach(x=>VALS[x.r]={pS:x.r*0.1,pW:x.r*0.2,wS:x.r*1,wW:x.r*2,min:x.r});
-// BOXの登録景品（例）：[ランク, 景品名, PT(交換コイン数), 口数, 在庫]
-const BOX=[["S","マリオピカチュウ PSA10",3000000,1,1],["A","ビクティニ PSA10",1000000,2,2],["A","リーリエ SR PSA10",500000,4,4],["B","ピカチュウ SAR PSA10",100000,20,20],["B","リザードン SAR",50000,40,40],["C","ミュウ AR",20000,150,150],["C","ゲンガー SR",10000,300,300],["D","汎用 RR",1000,3000,3000],["その他","交換コイン",200,92966,Infinity]];
-const CUM=[];BOX.reduce((a,b,i)=>(CUM[i]=a+b[3]),0);const TOTAL=CUM[CUM.length-1];
+// ガチャ（例）：通常RUSHと、課金チャージ限定RUSH（挑戦枠）
+const GACHAS={
+ normal:{name:"TORAMI RUSH",unit:500,rates:[{r:500,n:1,l:"単発"},{r:5000,n:10,l:"10連"},{r:50000,n:100,l:"100連"},{r:500000,n:1000,l:"1000連"}],
+  box:[["S","マリオピカチュウ PSA10",3000000,1,1],["A","ビクティニ PSA10",1000000,2,2],["A","リーリエ SR PSA10",500000,4,4],["B","ピカチュウ SAR PSA10",100000,20,20],["B","リザードン SAR",50000,40,40],["C","ミュウ AR",20000,150,150],["C","ゲンガー SR",10000,300,300],["D","汎用 RR",1000,3000,3000],["その他","交換コイン",200,92966,Infinity]]},
+ charge:{name:"TORAMI RUSH GOLD（チャージ限定）",unit:0,charge:true,rates:[{r:5000,n:10,l:"挑戦枠1回"}],
+  box:[["S","マリオピカチュウ PSA10",3000000,1,1],["A","ビクティニ PSA10",1000000,2,2],["A","リーリエ SR PSA10",500000,4,4],["B","ピカチュウ SAR PSA10",100000,60,60],["B","リザードン SAR",50000,120,120],["C","ミュウ AR",20000,600,600],["C","ゲンガー SR",10000,900,900],["D","汎用 RR",1000,3000,3000],["その他","交換コイン",200,5000,Infinity]]}};
+let GK="normal",UNIT,RATES,VALS,BOX,CUM,TOTAL;
+Object.values(GACHAS).forEach(g=>{g.vals={};g.rates.forEach(x=>g.vals[x.r]={pS:x.r*0.1,pW:x.r*0.2,wS:x.r*1,wW:x.r*2,min:x.r})});
+function useGacha(k){GK=k;const g=GACHAS[k];UNIT=g.unit;RATES=g.rates;VALS=g.vals;BOX=g.box;CUM=[];BOX.reduce((a,b,i)=>(CUM[i]=a+b[3]),0);TOTAL=CUM[CUM.length-1]}
+useGacha("normal");
+let WAKU=0; // チャージ限定の挑戦枠（デモ）
 function drawOne(){const x=Math.random()*TOTAL;let lo=0,hi=CUM.length-1;while(lo<hi){const m=(lo+hi)>>1;if(CUM[m]>x)hi=m;else lo=m+1}return lo}
 // 代替景品マスタ（全体設定）：範囲の下限＝相当額
 const TIERS=[10000,20000,30000,50000,70000,100000,150000,200000,300000,500000,700000,1000000,1500000,2000000,3000000].map(v=>({v,stock:v>=1000000?1:v>=300000?3:v>=100000?10:30}));
@@ -491,19 +529,24 @@ function payout(score){
   return{kind:"coin"}}
 /* =============== プロトの操作 =============== */
 let rate=5000,last=null;
-$("rateBtns").innerHTML=RATES.map(x=>`<button class="btn" type="button" data-r="${x.r}">${fmt(x.r)}（${x.l}）</button>`).join(" ");
+function renderRates(){$("rateBtns").innerHTML=RATES.map(x=>`<button class="btn" type="button" data-r="${x.r}">${GACHAS[GK].charge?x.l+"（中身10連・0コイン）":fmt(x.r)+"（"+x.l+"）"}</button>`).join(" ")}
+renderRates();
 function paintRate(){$("rateBtns").querySelectorAll("button").forEach(b=>b.classList.toggle("pri",+b.dataset.r===rate))}
 $("rateBtns").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;rate=+b.dataset.r;paintRate();plan=null;$("drawOut").textContent="レートを変えました。もう一度引いてください。";idle()});
 paintRate();
+function renderWaku(){$("wakuBox").style.display=GACHAS[GK].charge?"flex":"none";$("wakuN").textContent=WAKU}
+$("gachaBtns").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;useGacha(b.dataset.g);$("gachaBtns").querySelectorAll("button").forEach(x=>x.classList.toggle("pri",x===b));rate=RATES[GK==="charge"?0:1].r;renderRates();paintRate();renderWaku();renderStock();plan=null;last=null;$("drawOut").textContent=GK==="charge"?"チャージ限定RUSH：チャージでもらえる挑戦枠で遊ぶRUSHです（購入は0コイン）。":"通常RUSHに切り替えました。";idle();howRate=RATES[0].r;renderVals();calcAll()});
+$("chargeBtn").addEventListener("click",()=>{WAKU++;renderWaku();$("drawOut").textContent="10,000円チャージ（デモ）で挑戦枠が1回分増えました。"});
+renderWaku();
 $("scnSel").innerHTML=`<option value="-1">おまかせ（出やすさの設定どおり）</option>`+SCN.map((s,i)=>`<option value="${i}">${i+1}. ${s.n}（${s.g[0]}〜${s.g[1]}ゲーム）</option>`).join("");
-function doDraw(forceS,fixed,quiet){const R=RATES.find(x=>x.r===rate);const hits={};let score=0;
+function doDraw(forceS,fixed,quiet){const R=RATES.find(x=>x.r===rate);if(GACHAS[GK].charge&&!quiet&&fixed==null){if(WAKU<=0){$("drawOut").innerHTML="挑戦枠がありません。チャージすると挑戦枠がもらえます（デモ）。";return}WAKU--;renderWaku()}const hits={};let score=0;
   if(fixed!=null){score=fixed}else{for(let i=0;i<R.n;i++){let k=drawOne();if(forceS&&i===0)k=0;hits[k]=(hits[k]||0)+1;score+=BOX[k][2]}}
   const si=+$("scnSel").value<0?pickScn():+$("scnSel").value;
   const c=compose(score,VALS[rate],si);const po=payout(score);
   last={R,hits,score,c,po,fixed:fixed!=null};build(last)}
 $("drawBtn").addEventListener("click",()=>doDraw(false));
-$("drawS").addEventListener("click",()=>doDraw(true));
-$("drawRush").addEventListener("click",()=>{for(let k=0;k<20000;k++){doDraw(false);if(last.c)break}});
+$("drawS").addEventListener("click",()=>doDraw(true,null,true));
+$("drawRush").addEventListener("click",()=>{for(let k=0;k<20000;k++){doDraw(false,null,true);if(last&&last.c)break}});
 $("scoreBtn").addEventListener("click",()=>doDraw(false,Math.max(0,+$("scoreIn").value||0)));
 $("scnSel").addEventListener("change",()=>{if(last&&last.c){last.c=compose(last.score,VALS[rate],+$("scnSel").value<0?pickScn():+$("scnSel").value);build(last)}});
 function hitsTxt(h){return Object.keys(h).map(Number).sort((a,b)=>a-b).map(k=>`${BOX[k][0]==="その他"?"はずれ（200コイン）":BOX[k][0]+"賞 "+BOX[k][1]}×${h[k]}`).join("、")}
@@ -516,7 +559,7 @@ function build(L){const {R,hits,score,c,po}=L;
       steps.push({k:"win",f:CLIP[s.clip].f,clip:s.clip,target:s.t,add:g.v+g.up,say:`${s.d?"DOUBLE!! ":""}${s.n.replace("シングル","")} +${fmt(g.v)}${g.up?`<small>上乗せ +${fmt(g.up)}</small>`:""}`,l:`${i+1}G ${s.n}${g.up?"＋上乗せ":""}`})});
     steps.push({k:"play",f:c.games[c.games.length-1].k==="wW"?"total":"total_green",l:"TOTAL",bgmOff:true,vsfx:[["jingle",0.0],["v_result",0.82]]})}
   const cnt={};if(c)c.games.forEach(g=>cnt[g.k]=(cnt[g.k]||0)+1);const ups=c?c.games.reduce((a,g)=>a+g.up,0):0;
-  plan={steps,total:0,fullTotal:score,hud:()=>`SCORE ${fmt(plan.total)}`,
+  plan={steps,total:0,fullTotal:score,lastTarget:c?SYM[c.games[c.games.length-1].k].t:0,hud:()=>`SCORE ${fmt(plan.total)}`,
     idleText:`<b>レート ${fmt(R.r)}（${R.l}）</b><br>SCORE ${fmt(score)}<br>${c?`${SCN[c.si].n}・${c.games.length}ゲーム`:"RUSHなし（最低SCORE未満）"}<br><span style="font-size:11px;opacity:.8">STARTで再生</span>`,
     result:()=>`<div style="text-align:center;opacity:.8">TORAMI RUSH 結果</div><div class="big">SCORE ${fmt(score)}</div>
       ${["pS","pW","wS","wW"].filter(k=>cnt[k]).map(k=>`<div class="rw"><span>${SYM[k].n}</span><span>×${cnt[k]}</span></div>`).join("")}
@@ -542,13 +585,13 @@ $("scnTable").innerHTML=`<tr><th>#</th><th>シナリオ</th><th>ゲーム数</th
  "白7が多めに出て長く続く","前半は紫7シングル中心、後半に白7・白7ダブル","序盤に紫7ダブル・白7ダブルが続く","紫7シングル中心で少しずつ積む","1〜2ゲームで白7ダブル","最後のゲームまで普通に進み、最後に大きく上乗せ","紫7から白7へ少しずつ移る","前半は紫7、後半は白7","紫7と白7が1ゲームごとに入れ替わる","1〜3ゲームで決着"].map((d,i)=>`<tr><td>${i+1}</td><td><b>${SCN[i].n}</b></td><td>${SCN[i].g[0]}〜${SCN[i].g[1]}</td><td>${d}</td><td>${["均等","終盤に寄せる","序盤に寄せる","均等","1ゲーム目に寄せる","最後に全部","後ろほど大きく","後半に寄せる","均等","前ほど大きく"][i]}</td><td class="n">${SCNW[i]}%</td></tr>`).join("");
 /* =============== 遊び方・平均継続率 =============== */
 const STAT={};let howRate=5000;
-function simulate(r){const R=RATES.find(x=>x.r===r);const M=R.n>=1000?300:R.n>=100?1500:4000;let rush=0,games=0;
-  for(let m=0;m<M;m++){let s=0;for(let i=0;i<R.n;i++)s+=BOX[drawOne()][2];const c=compose(s,VALS[r],pickScn());if(c){rush++;games+=c.games.length}}
-  return{rush:rush/M,avgG:rush?games/rush:0,cont:games?1-rush/games:0}}
-function calcAll(){RATES.forEach(x=>STAT[x.r]=simulate(x.r));renderHow();$("calcMsg").textContent="計算しました（BOXの口数とシナリオの出やすさで試算）"}
-const maxMul=()=>Math.max(...BOX.map(b=>b[2]))/UNIT;
+function simulate(r){const R=RATES.find(x=>x.r===r);const M=R.n>=1000?300:R.n>=100?1500:4000;let rush=0,games=0,sum=0;
+  for(let m=0;m<M;m++){let s=0;for(let i=0;i<R.n;i++)s+=BOX[drawOne()][2];sum+=s;const c=compose(s,VALS[r],pickScn());if(c){rush++;games+=c.games.length}}
+  return{rush:rush/M,avgG:rush?games/rush:0,cont:games?1-rush/games:0,ret:r?sum/M/r:0,ev:sum/M}}
+function calcAll(){RATES.forEach(x=>STAT[x.r]=simulate(x.r));renderHow();renderRet();$("calcMsg").textContent="計算しました（BOXの口数とシナリオの出やすさで試算）"}
+const maxMul=()=>UNIT?Math.max(...BOX.map(b=>b[2]))/UNIT:0;
 function renderHow(){const V=VALS[howRate],st=STAT[howRate]||{},R=RATES.find(x=>x.r===howRate);
-  $("howCard").innerHTML=`<div style="text-align:center;font-weight:900;font-size:17px;letter-spacing:.05em">TORAMI RUSH の遊び方</div>
+  $("howCard").innerHTML=`<div style="text-align:center;font-weight:900;font-size:17px;letter-spacing:.05em">${GACHAS[GK].name} の遊び方</div>${GACHAS[GK].charge?`<div style="text-align:center;font-size:11.5px;color:#ffd36b;margin-top:4px">チャージ限定：チャージでもらえる挑戦枠で遊べます（購入は0コイン）</div>`:""}
   <p style="font-size:12px;opacity:.85;margin:6px 0 10px">レートを選んで1回引くと、当たった景品のPTの合計（SCORE）まで7が連鎖します。7が揃うたびに当選PTと累計SCOREが増えていきます。</p>
   <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${RATES.map(x=>`<button type="button" data-hr="${x.r}" style="flex:1;border:1px solid ${x.r===howRate?"#ffd36b":"#4a3f66"};background:${x.r===howRate?"#ffd36b":"transparent"};color:${x.r===howRate?"#111":"#fff"};border-radius:6px;padding:4px;font:inherit;font-size:12px;cursor:pointer">${fmt(x.r)}<br><span style="font-size:10.5px">${x.l}</span></button>`).join("")}</div>
   <div style="font-weight:800;margin-bottom:4px">7の価値（レート ${fmt(R.r)}）</div>
@@ -557,11 +600,20 @@ function renderHow(){const V=VALS[howRate],st=STAT[howRate]||{},R=RATES.find(x=>
    <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">平均継続率</div><div style="font-size:20px;font-weight:900;color:#ffd36b">${st.cont!=null?(st.cont*100).toFixed(1)+"%":"…"}</div></div>
    <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">RUSH突入率</div><div style="font-size:20px;font-weight:900">${st.rush!=null?(st.rush*100).toFixed(1)+"%":"…"}</div></div>
    <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">平均ゲーム数</div><div style="font-size:20px;font-weight:900">${st.avgG!=null?st.avgG.toFixed(1):"…"}</div></div></div>
-  <div style="font-size:12px;line-height:1.8">・SCOREが ${fmt(V.min)} 以上でRUSH突入<br>・景品はSCOREに応じて<b>1個</b>（${man(TIERS[0].v)}〜${man(TIERS[TIERS.length-1].v)}の範囲ごとの景品）。<b>発送</b>か<b>交換（SCORE分の交換コイン）</b>を選べます<br>・SCOREが${man(TIERS[0].v)}未満のときは交換コイン（SCORE分）を付与<br>・最大倍率 ×${fmt(maxMul())}（1口${fmt(UNIT)}コインあたり）</div>
+  <div style="font-size:12px;line-height:1.8">・SCOREが ${fmt(V.min)} 以上でRUSH突入<br>・景品はSCOREに応じて<b>1個</b>（${man(TIERS[0].v)}〜${man(TIERS[TIERS.length-1].v)}の範囲ごとの景品）。<b>発送</b>か<b>交換（SCORE分の交換コイン）</b>を選べます<br>・SCOREが${man(TIERS[0].v)}未満のときは交換コイン（SCORE分）を付与${UNIT?`<br>・最大倍率 ×${fmt(maxMul())}（1口${fmt(UNIT)}コインあたり）`:""}<br>・<b>AUTO</b>：押せ！を自動で押します　<b>一撃</b>：残りのゲームを飛ばしてTOTALへ　<b>スピード</b>：×1／×1.5／×2</div>
   <div style="font-weight:800;margin:10px 0 4px">BOXの中身（1口あたり）</div>
   <table style="width:100%;font-size:11.5px;border-collapse:collapse">${BOX.map(b=>`<tr style="border-bottom:1px solid #2d2442"><td style="padding:3px 0">${b[0]}${b[0]==="その他"?"":"賞"}</td><td>${b[0]==="その他"?"交換コイン":b[1]}</td><td style="text-align:right">${fmt(b[2])}PT</td><td style="text-align:right">${fmt(b[3])}口</td><td style="text-align:right">${(b[3]/TOTAL*100).toFixed(b[3]/TOTAL<.001?4:2)}%</td></tr>`).join("")}</table>
+  <div style="font-weight:800;margin:12px 0 4px">ご注意</div>
+  <ul style="font-size:11px;opacity:.85;margin:0;padding-left:16px;line-height:1.7">
+  <li>結果（SCOREと獲得景品）は購入した時点で決まります。RUSHの演出・押せ！・AUTO・一撃・スピードによって結果は変わりません</li>
+  <li>RUSHの7の並びや上乗せは、決まったSCOREを見せるための演出です</li>
+  <li>景品はSCOREに応じた範囲の景品を1つお渡しします。在庫の状況により、同じ範囲の相当景品になることがあります</li>
+  <li>交換を選んだ場合は、SCOREと同じ数の交換コインを付与します。交換コイン数は当社が定める数値で、景品の市場価格を示すものではありません</li>
+  ${GACHAS[GK].charge?"<li>挑戦枠はチャージ時に付与されます。付与の条件・有効期限は別途表示します</li>":""}
+  <li>実績還元率は「実績還元率公開」ページで確認できます</li></ul>
   <p style="font-size:10.5px;opacity:.7;margin:8px 0 0">※平均継続率・RUSH突入率・平均ゲーム数は、BOX構成と演出シナリオから算出した平均値です。各ゲームは独立した抽選ではありません。演出はSCOREに応じて決まります。</p>`}
 $("howCard").addEventListener("click",e=>{const b=e.target.closest("[data-hr]");if(!b)return;howRate=+b.dataset.hr;renderHow()});
+function renderRet(){$("retTable").innerHTML=`<tr><th>${GACHAS[GK].name}</th><th class="n">購入回数</th><th class="n">実績還元率</th></tr>`+RATES.map(x=>{const st=STAT[x.r]||{};return`<tr><td>${GACHAS[GK].charge?x.l+"（チャージ限定）":fmt(x.r)+" coin"}</td><td class="n">（本番は集計値）</td><td class="n">${GACHAS[GK].charge?"平均SCORE "+fmt(st.ev||0):st.ret!=null?(st.ret*100).toFixed(1)+"%":"…"}</td></tr>`}).join("")}
 function renderVals(){$("valTable").innerHTML=`<tr><th>レート</th><th>中身</th><th>紫7S</th><th>紫7W</th><th>白7S</th><th>白7W</th><th>最低SCORE</th></tr>`+RATES.map(x=>`<tr><td>${fmt(x.r)}</td><td>${x.l}</td>${["pS","pW","wS","wW","min"].map(k=>`<td><input type="number" min="1" value="${VALS[x.r][k]}" data-vr="${x.r}" data-vk="${k}" style="width:88px"></td>`).join("")}</tr>`).join("")}
 $("valTable").addEventListener("change",e=>{const x=e.target;if(!x.dataset.vr)return;VALS[+x.dataset.vr][x.dataset.vk]=Math.max(1,+x.value);calcAll()});
 $("recalc").addEventListener("click",calcAll);
@@ -588,6 +640,10 @@ const WBS=[
 ["F-8","管理画面","平均継続率などの自動計算","BOX・7の額・シナリオから平均継続率・RUSH突入率・平均ゲーム数・最大倍率を試算して表示（保存時）","1〜1.5"],
 ["F-9","画面","遊び方画面","レートで7の額・平均継続率が切り替わる遊び方、BOXの中身、算出方法の注記","1〜1.5"],
 ["F-10","管理画面","当選履歴・発送管理の改修","SCORE・中身の内訳・払い出した景品（登録／代替）・発送／交換を記録","1〜1.5"],
+["F-11","演出","AUTO・一撃・スピード","AUTO（押せ！の自動化）、一撃（残りを飛ばしてTOTALへ）、スピード3段階（映像・リール・効果音の速さ）","1〜1.5"],
+["F-12","抽選","課金チャージ限定RUSH","チャージ時の挑戦枠の付与（条件・期限・上限）、挑戦枠での0コイン購入、残数表示、付与／消費の履歴","2〜3"],
+["F-13","画面","実績還元率の集計と公開ページ","ゲーム×購入額ごとの購入回数・実績還元率の定期集計（バッチ）と公開ページ、集計期間の切り替え","1.5〜2"],
+["F-14","管理画面","注意書き・遊び方の編集","ガチャごとの注意事項・遊び方の文言編集（数値は自動差し込み）","0.5〜1"],
 ["C-6","管理画面","RUSH演出素材","映像パーツ・リール帯・3Dモデル・効果音・BGMの登録","1.5〜2"],
 ["C-7","共通","素材の組み込み・最適化","受領素材の変換（GLB化・テクスチャ圧縮・映像の書き出し）、CDN配信","1〜1.5"],
 ["C-8","共通","テスト","stg確認、実機テスト（iPhone・Android・LINE/Xのアプリ内ブラウザ）、払い出し・在庫切れのテスト","2.5〜3.5"],
@@ -613,6 +669,7 @@ ${url}
 ・1つのガチャでレートを選んで1回引く（内部で単発〜1000連）→ 当選PTの合計（SCORE）まで7の連鎖で上乗せして見せる
 ・景品はSCOREの範囲で1個。発送か交換（SCORE分の交換コイン）を選ぶ。在庫切れは代替景品マスタで吸収
 ・7の額はガチャ×レートごとに設定、7の出方はシナリオ管理（10種）、平均継続率を自動計算して遊び方に表示
+・AUTO・一撃・スピード3段階の操作ボタン、課金チャージ限定RUSH（挑戦枠）、実績還元率公開ページ
 ・演出（上は映像・下は3D筐体）はプロトで検証済み
 
 ■ お願いしたいこと
