@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>TORAMI RUSH 確定仕様とプロト v5</title>
+<style>
+:root{--bg:#fff;--fg:#1d1d1f;--mut:#6b6b70;--line:#e5e7eb;--soft:#f6f7f9;--ok:#067647;--oks:#e7f6ee;--warn:#b54708;--warns:#fdf3e7;--ng:#b42318;--ngs:#fdecea;--acc:#1f5fbf;--accs:#e8f0fc;--p1:#6d28d9;--p2:#c2410c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--fg);font:13.5px/1.7 "Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
+header .in{max-width:1240px;margin:0 auto;padding:10px 16px 0}
+h1{font-size:17px;margin:0}.meta{font-size:12px;color:var(--mut)}
+nav{display:flex;overflow-x:auto;margin-top:6px;scrollbar-width:none}
+nav a{white-space:nowrap;padding:8px 14px;font-size:13px;color:var(--mut);text-decoration:none;border-bottom:2px solid transparent}
+nav a.act{color:var(--fg);border-bottom-color:var(--fg);font-weight:700}
+main{max-width:1240px;margin:0 auto;padding:14px 16px 60px}
+.pane{display:none}.pane.act{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0}
+h2{font-size:16px;margin:2px 0 8px}h3{font-size:14px;margin:14px 0 6px}
+.note{font-size:12px;color:var(--mut)}
+table.t{border-collapse:collapse;width:100%;font-size:12.5px}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.t th{color:var(--mut);font-weight:600;background:var(--soft)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.good{color:var(--ok)}.bad{color:var(--ng)}.mid{color:var(--warn)}
+.tag{display:inline-block;border-radius:4px;padding:0 6px;font-size:11px;font-weight:700;color:#fff;vertical-align:1px}
+.t1{background:var(--p1)}.t2{background:var(--p2)}.tc{background:#374151}.tx{background:#9ca3af}
+.pill{display:inline-block;border-radius:999px;padding:0 8px;font-size:11px;font-weight:700}
+.pill.add{background:var(--accs);color:var(--acc)}.pill.mod{background:var(--warns);color:var(--warn)}.pill.no{background:var(--soft);color:var(--mut)}.pill.new{background:var(--oks);color:var(--ok)}
+.grid{display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:18px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.btn{font:inherit;font-size:12.5px;border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:6px;padding:5px 12px;cursor:pointer}
+.btn.pri{background:#1d1d1f;color:#fff;border-color:#1d1d1f}
+.btn:disabled{opacity:.5;cursor:default}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:12.5px;margin:6px 0}
+.ctl select,.ctl input{font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:3px 6px;background:#fff}
+.ctl input{width:110px}
+/* stage */
+.stage{position:relative;width:100%;aspect-ratio:9/16;background:#000;border-radius:18px;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.top{position:absolute;left:0;top:0;width:100%;height:62.5%;overflow:hidden;background:#000}
+.top video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.top video.show{opacity:1}
+#gl{position:absolute;left:0;top:62.5%;width:100%;height:37.5%;display:block;background:#05030a}
+.hud{position:absolute;top:8px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#fff;text-shadow:0 1px 2px #000;z-index:8;pointer-events:none;gap:6px}
+.hud b{font-size:13px}
+.hud button{pointer-events:auto;border:1px solid rgba(255,255,255,.7);background:rgba(0,0,0,.35);color:#fff;border-radius:4px;font:inherit;font-size:11px;padding:1px 9px;cursor:pointer}
+.stage.quake{animation:quake .32s linear}@keyframes quake{0%,100%{transform:none}15%{transform:translate(-5px,3px)}30%{transform:translate(5px,-4px)}45%{transform:translate(-4px,-2px)}60%{transform:translate(3px,4px)}80%{transform:translate(-2px,1px)}}
+.ov{position:absolute;inset:0;display:none;z-index:7}.ov.on{display:block}
+#oIdle{background:rgba(0,0,0,.6);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;font-size:13px}
+#oIdle.on{display:flex}
+#oWait{pointer-events:none}#oWait .oshi{pointer-events:auto}
+.oshi{position:absolute;left:50%;top:92.5%;transform:translate(-50%,-50%);width:104px;height:104px;border-radius:50%;cursor:pointer;z-index:9}
+.oshi .cap{position:absolute;inset:9px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff8a7a,#e0352b 55%,#8e140d);box-shadow:0 6px 0 #5b0c07,0 8px 14px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font:900 24px/1 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 2px 0 #6d0f09;animation:bob .55s ease-in-out infinite}
+.oshi .rim{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,220,120,.95);box-shadow:0 0 16px rgba(255,190,60,.9);animation:rim 1s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(3px)}}@keyframes rim{50%{transform:scale(1.08);opacity:.6}}
+.oshi.hit .cap{transform:translateY(5px);animation:none}
+.callout{position:absolute;left:0;right:0;top:44%;text-align:center;font:900 30px/1.15 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 0 8px #ff6a00,0 3px 0 #6d0f09,0 0 22px rgba(255,120,0,.8);pointer-events:none;z-index:8;opacity:0}
+.callout small{display:block;font-size:17px;margin-top:4px}
+.callout.on{animation:co 1.4s ease-out forwards}
+@keyframes co{0%{opacity:0;transform:scale(.4)}15%{opacity:1;transform:scale(1.08)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+.banner{position:absolute;left:0;right:0;top:30%;text-align:center;font:900 28px/1.2 "Hiragino Sans",sans-serif;color:#ffe27a;text-shadow:0 0 10px #ff3d00,0 3px 0 #5a1a00;z-index:8;pointer-events:none;display:none}
+.banner.on{display:block;animation:pulse .7s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.flash{position:absolute;left:0;top:58%;width:100%;height:42%;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(255,255,230,.9),rgba(255,190,60,.6) 35%,rgba(255,80,0,0) 70%);animation:fl .3s ease-out forwards;z-index:7}
+@keyframes fl{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+.res{position:absolute;left:5%;right:5%;top:8%;max-height:84%;overflow:auto;background:rgba(10,8,20,.9);border:1px solid rgba(255,215,120,.6);border-radius:12px;padding:14px;color:#fff;z-index:9;display:none;font-size:12.5px}
+.res.on{display:block;animation:up .35s ease-out}@keyframes up{from{transform:translateY(12px);opacity:0}}
+.res .big{font-size:24px;font-weight:900;text-align:center}
+.res .rw{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.12);padding:3px 0}
+.res .closebtn{width:100%;margin-top:10px;border:1px solid rgba(255,255,255,.6);background:none;color:#fff;border-radius:8px;padding:6px;font:inherit;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.chip{font-size:11px;border-radius:4px;padding:1px 7px;color:#fff;font-weight:700}
+.k-pS{background:#8b5cf6}.k-pW{background:#5b21b6}.k-wS{background:#9ca3af;color:#111!important}.k-wW{background:#4b5563}.k-ds{background:#d97706}.k-df{background:transparent;color:#999!important;border:1px dashed #999}
+.c-g{background:#2e9e44}.c-r{background:#e0352b}.c-k{background:#c99a12}.c-n{background:linear-gradient(90deg,#ff4d4d,#ffb84d,#4dd97a,#4db8ff,#a64dff)}
+.plan{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.plan span{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;background:#fff}
+.plan span.cur{border-color:#111;font-weight:800}
+.slot{min-height:40px}
+.drawbox{border:1px dashed var(--line);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:12.5px;background:#fff}
+.mock{border:1px solid #d6d9de;border-radius:8px;background:#fff;padding:10px 12px;margin:8px 0;font-size:12px}
+.mock .mh{font-weight:800;margin-bottom:6px}
+.mock .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:4px 0}
+.mock label{color:var(--mut);font-size:11.5px}
+.mock .f{border:1px solid #d6d9de;border-radius:5px;padding:2px 8px;background:#fff;min-width:90px;display:inline-block}
+.newb{border:2px solid var(--acc);border-radius:8px;padding:8px 10px;margin:8px 0;background:#f8fbff;position:relative}
+.newb .nt{position:absolute;top:-10px;left:10px;background:var(--acc);color:#fff;font-size:10.5px;font-weight:700;border-radius:4px;padding:0 6px}
+.copybox{white-space:pre-wrap;font-size:12px;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:10px;max-height:420px;overflow:auto}
+footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+<header><div class="in">
+<h1>TORAMI RUSH 確定仕様とプロト v5｜当初案ベース・レート選択・シナリオ・代替景品</h1>
+<div class="meta"><b style="color:#b42318">11/25版</b>（入江さん・ゆうぽんさんとのやりとりで確定した内容を反映）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
+<nav id="tabs"><a href="#play" data-t="play">▶ プロトで遊ぶ</a><a href="#spec" data-t="spec">確定仕様とロジック</a><a href="#howto" data-t="howto">遊び方画面（ユーザー向け）</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
+</div></header>
+<main>
+
+<!-- ======== プロト ======== -->
+<section class="pane" id="p-play">
+<div class="grid">
+<div><div class="slot" id="slot-play"></div><div class="plan" id="plan-play"></div></div>
+<div>
+<div class="card" style="margin-top:0">
+<h2>1回引いて、最終スコアまで7を連鎖させる</h2>
+<p class="note" style="margin:0 0 6px">レートを選んで1回引く → 中身（単発〜1000連）の当選PTの合計＝<b>SCORE</b> → 7が揃うたびに当選PTと累計SCOREを表示しながらSCOREぴったりまで上乗せ → SCOREの範囲で<b>景品を1個</b>に決定 →「発送」か「交換（SCORE分の交換コイン）」を選ぶ</p>
+<div class="ctl"><b style="font-size:12.5px">レート</b><span id="rateBtns"></span></div>
+<div class="ctl"><label>シナリオ <select id="scnSel"></select></label></div>
+<div class="ctl">
+<button class="btn pri" id="drawBtn" type="button">このレートで1回引く</button>
+<button class="btn" id="drawRush" type="button">RUSHになるまで引く（テスト用）</button>
+<button class="btn" id="drawS" type="button">S賞が入る結果を見る（テスト用）</button>
+<span class="note">SCOREを指定</span><input type="number" id="scoreIn" value="180000" step="1000"><button class="btn" id="scoreBtn" type="button">このSCOREで</button>
+</div>
+<div class="drawbox" id="drawOut">引くと、ここに中身・SCORE・7の組み立て・払い出す景品が出ます。そのあと左の画面の START で遊べます。</div>
+<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700">在庫切れのテスト（景品・代替景品の在庫を変える）</summary>
+<p class="note">在庫を0にすると、その景品が出なくなり、代替景品 → 1つ下の範囲 の順で吸収されます。</p>
+<div id="stockBox"></div>
+</details>
+</div>
+</div>
+</div>
+</section>
+
+<div id="stageHome" style="display:none">
+<div class="stage" id="stage">
+  <div class="top"><video id="va" playsinline webkit-playsinline muted preload="auto"></video><video id="vb" playsinline webkit-playsinline muted preload="auto"></video></div>
+  <canvas id="gl"></canvas>
+  <div class="hud"><span id="hud">読み込み中</span><b id="hudR"></b><span><button type="button" id="snd">音 ON</button> <button type="button" id="skip">スキップ</button></span></div>
+  <div class="banner" id="banner"></div>
+  <div class="callout" id="callout"></div>
+  <div class="ov" id="oWait"><div class="oshi" id="oshi"><div class="rim"></div><div class="cap">押せ！</div></div></div>
+  <div class="ov on" id="oIdle"><div id="idleMsg">3Dモデルを読み込み中…</div><button class="btn" type="button" id="startBtn" style="margin-top:12px;background:none;color:#fff;border:2px solid #fff;border-radius:999px;padding:8px 28px;font-weight:800;display:none">START</button></div>
+  <div class="res" id="res"></div>
+</div>
+</div>
+
+
+<!-- ======== 確定仕様 ======== -->
+<section class="pane" id="p-spec">
+<div class="card">
+<h2>確定した仕様（11/25）</h2>
+<table class="t">
+<tr><th style="width:170px">項目</th><th>内容</th></tr>
+<tr><td>ゲーム性</td><td><b>当初案</b>（7の連鎖で額を見せる）。入江さん案（ランク＝連チャン数）は採用しない</td></tr>
+<tr><td>引き方</td><td>1つのガチャでレートを選んで<b>1回だけ</b>引く。レートに応じて内部で単発／10連／100連／1000連を実行し、当選した景品の交換コイン数（PT）の合計を<b>SCORE</b>とする</td></tr>
+<tr><td>RUSH</td><td>SCOREが「RUSH突入の最低SCORE」以上ならRUSH。7が揃うたびに<b>そのゲームの当選PT</b>と<b>累計SCORE</b>を表示し、SCOREぴったりまで上乗せする（上乗せ特化ゾーンの見せ方）。最低SCORE未満は通常の結果表示</td></tr>
+<tr><td>7の額</td><td><b>ガチャごと・レートごと</b>に設定（紫7シングル／紫7ダブル／白7シングル／白7ダブル）。遊び方画面では、レートを切り替えると7の額と平均継続率が切り替わる</td></tr>
+<tr><td>7の出方</td><td><b>シナリオ管理</b>。10種類のシナリオ（白7多め・後半爆発など）をあらかじめ用意し、ガチャごとに出やすさ（%）を設定する</td></tr>
+<tr><td>受け取り</td><td>SCOREの範囲で<b>景品を1個</b>に決める（景品の額は範囲の下限にそろえる）。ユーザーは<b>発送</b>か<b>交換</b>を選ぶ。交換はSCOREと同じ額の交換コインで返す。SCOREが一番下の範囲（1万）未満なら、交換コイン（SCORE分）を自動で返す</td></tr>
+<tr><td>景品登録</td><td>BOXには<b>通常どおり実物の景品を登録</b>する（有在庫）。景品切れで「何も当たらない」を防ぐため、<b>代替景品</b>（全体設定のマスタ）で吸収する</td></tr>
+<tr><td>在庫切れ</td><td>その範囲の登録景品が切れていれば代替景品、代替景品も切れていれば1つ下の範囲へ。在庫が少なくなったら管理画面で知らせる</td></tr>
+<tr><td>継続率の表記</td><td><b>平均継続率</b>を計算して表記する（算出方法は下記）。ガチャごと・レートごとに遊び方画面へ出す</td></tr>
+<tr><td>倍チャレンジ</td><td>今回は入れない（別の映像・音が必要）。流れ：RUSH → 継続失敗 → リザルト → プチュン「まだまだ」→ 最終チャレンジの押せ！→ 7が揃うたびに7が倍に増殖</td></tr>
+<tr><td>最大倍率・最大ゲーム数</td><td>個別には決めない。最大ゲーム数はシナリオごとの長さで決まり、超える分は上乗せで見せる。最大倍率は「BOXの最高PT ÷ 購入額」から自動計算して表示</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>ロジックの説明</h2>
+<h3>1. 抽選とSCORE</h3>
+<ol style="margin:0;padding-left:20px;font-size:12.5px">
+<li>ユーザーがレートを選んで1回引く（例：1口500コインのガチャで、レート5,000＝内部で10連）</li>
+<li>BOXの口数（確率）どおりに中身の回数分を抽選する。当選した景品の交換コイン数の合計がSCORE</li>
+<li>抽選結果と演出（下の組み立て結果）はサーバーで決めて保存し、画面はそれを再生するだけ（端末で結果は変わらない）</li>
+</ol>
+<h3>2. 演出の組み立て（シナリオ）</h3>
+<ol style="margin:0;padding-left:20px;font-size:12.5px">
+<li>シナリオを出やすさ（%）で1つ選ぶ。シナリオごとにゲーム数の範囲と、序盤・終盤でどの7が出やすいかが決まっている</li>
+<li>ゲーム数を範囲内で決める（SCOREが小さいときは、紫7シングルの額で割った数までに減らす）</li>
+<li>1ゲームずつ7を選ぶ。残りのゲームで最低でも紫7シングルが出せるだけの額を残す</li>
+<li>7の合計でSCOREに届かない分は<b>上乗せ</b>として、シナリオの配分（例：後半爆発なら終盤に寄せる）で各ゲームに足す。最後のゲームで端数まで足し、<b>演出の合計＝SCORE（ブレなし）</b></li>
+</ol>
+<h3>3. 景品の決め方（払い出し）</h3>
+<ol style="margin:0;padding-left:20px;font-size:12.5px">
+<li>代替景品マスタの範囲（1万・2万・3万・5万・7万・10万・15万・20万・30万・50万・70万・100万・150万・200万・300万）から、<b>SCORE以下で一番大きい範囲</b>を選ぶ</li>
+<li>BOXに登録した景品のうち、その範囲に入り（PTが範囲の下限以上・次の範囲未満）、SCORE以下で在庫がある景品があれば、PTが一番高いものを1個</li>
+<li>なければ、その範囲の<b>代替景品</b>（範囲の下限と同じ額の相当景品）</li>
+<li>代替景品も在庫切れなら、1つ下の範囲で 2→3 をくり返す</li>
+<li>1万未満、またはどの範囲にも景品がなければ、交換コイン（SCORE分）を自動で付与</li>
+<li>ユーザーが「交換」を選んだ場合は、決まった景品ではなく<b>SCOREと同じ額の交換コイン</b>を付与</li>
+</ol>
+<h3>4. 平均継続率の算出</h3>
+<p style="font-size:12.5px;margin:0">ガチャごと・レートごとに、BOXの口数とシナリオの出やすさで RUSH を数千回試算し、<b>平均継続率 ＝ 1 −（RUSHの回数 ÷ RUSHの総ゲーム数）</b>で求める。あわせて RUSH突入率・平均ゲーム数も出す。BOXやシナリオ・7の額を変えたら自動で計算し直す。表記には「BOX構成と演出シナリオから算出した平均値です。各ゲームは独立した抽選ではありません」と添える。</p>
+</div>
+
+<div class="card">
+<h2>シナリオ（10種・たたき台）</h2>
+<table class="t" id="scnTable"></table>
+</div>
+
+<div class="card">
+<h2>要確認（残り）</h2>
+<ul style="font-size:12.5px;margin:0;padding-left:18px">
+<li><b>抽選で当たった口と、払い出す景品の在庫の関係</b>：10連の中身で当たった景品（例：C賞×3）は発送しないため、BOXの残口は抽選で減らし、景品の在庫は実際に払い出した1個だけ減らす想定。これで良いか</li>
+<li><b>平均継続率の表記</b>：表記の文言（上の注記）で法的に問題ないかは、弁護士への確認を推奨（独立抽選ではないため）</li>
+<li><b>低レートで高額景品が当たったときの見せ方</b>：単発（7の額 50〜1,000）でS賞300万が当たると、7の合計は数千で残りのほとんどが上乗せになる。7の額の初期値を上げるか、大きな上乗せ用の演出（別素材）を用意するか</li>
+<li><b>7の額の初期値</b>：プロトでは レート×0.1（紫7シングル）／×0.2（紫7ダブル）／×1（白7シングル）／×2（白7ダブル）、RUSH突入の最低SCORE＝購入額にしている。ガチャごとに変更可</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>素材（ゆうぽんさん見積もり 11/25）</h2>
+<p style="font-size:12.5px;margin:0">紫7ダブル揃い演出・白7揃い演出・白7ダブル揃い演出・リール修正・白7モデル・音4種（紫ダブル・白・白ダブル・虹ラッシュ）　<b>15万円＋税／約1週間</b>。倍チャレンジの素材は含まない。</p>
+<p class="note">このプロトの映像は本番映像No.09（緑・赤・金・虹）を仮に 紫S＝緑／紫W＝赤／白S＝金／白W＝虹 に割り当てたもの。白7は紫7の色替え。</p>
+</div>
+
+<div class="card">
+<h2>リールの動きと効果音</h2>
+<p style="margin:2px 0 6px;font-size:12.5px">回転を速く（毎秒3.6回転）／揃う前に約1秒ガタガタ／3本同時にガシャーン（跳ね返り＋画面の揺れ）</p>
+<table class="t">
+<tr><th>タイミング</th><th>音素材（Drive「音声」フォルダ）</th></tr>
+<tr><td>冒頭</td><td>Puchun_Rev2 → 見せてやる、虎拳の神髄を → OPの虎拳ATTACKのタイトルに合わせて「虎拳アタック」</td></tr>
+<tr><td>BGM</td><td>Bonus Battle Loop（OPのバトルスタートからTOTALの手前まで）</td></tr>
+<tr><td>押せ！</td><td>06_Punch_Kazekiri</td></tr>
+<tr><td>ガタガタ／ガシャーン</td><td>02_RealLock_Type1・Type2／03_777（金は＋よくやった、虹は＋05_RainbowDevil）</td></tr>
+<tr><td>継続の拳突き上げ</td><td>04_DevilRush+Pipipipi-n</td></tr>
+<tr><td>TOTAL</td><td>07_Jingle → 「TOTAL」の文字に合わせて「リザルトうりゃあ！」</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ======== 遊び方 ======== -->
+<section class="pane" id="p-howto">
+<div class="grid">
+<div>
+<div class="card" style="margin-top:0;background:#0d0a18;color:#fff;border-color:#2d2442" id="howCard"></div>
+</div>
+<div>
+<div class="card" style="margin-top:0">
+<h2>遊び方画面（ユーザー向け）のイメージ</h2>
+<p style="font-size:12.5px;margin:0">左はユーザーが見る遊び方の画面です。レートを切り替えると、<b>7の額</b>と<b>平均継続率・RUSH突入率・平均ゲーム数</b>がその場で切り替わります。数字は下の「7の額（このガチャの設定）」とBOXの口数・シナリオの出やすさから計算しています。</p>
+<h3>7の額（このガチャの設定）</h3>
+<p class="note">管理画面で設定する表。ここで書き換えると、遊び方画面・プロトの両方に反映されます。</p>
+<table class="t" id="valTable"></table>
+<div class="ctl"><button class="btn" id="recalc" type="button">平均継続率を計算し直す</button><span class="note" id="calcMsg"></span></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ======== 管理画面 ======== -->
+<section class="pane" id="p-admin">
+<div class="card">
+<h2>管理画面：何を足すか</h2>
+<table class="t">
+<tr><th>画面</th><th>区分</th><th>内容</th></tr>
+<tr><td>オリパ編集：景品登録（S〜その他・PT・口数・在庫）</td><td><span class="pill no">変更なし</span></td><td>今のまま実物の景品を登録する（有在庫）</td></tr>
+<tr><td>オリパ編集：演出タイプ</td><td><span class="pill add">追加</span></td><td>通常／TORAMI RUSH を選ぶ。RUSHを選ぶと下の「RUSH設定」が出る</td></tr>
+<tr><td>オリパ編集：RUSH設定</td><td><span class="pill new">新規</span></td><td>レート一覧（1回で引く回数）、7の額（レート×4種の表）、RUSH突入の最低SCORE、シナリオの出やすさ（%）、平均継続率・RUSH突入率・平均ゲーム数・最大倍率の自動計算表示</td></tr>
+<tr><td>代替景品マスタ（全体設定）</td><td><span class="pill new">新規</span></td><td>SCOREの範囲ごとの代替景品（名前・画像・相当額＝範囲の下限・在庫）と、在庫が少ないときの通知のしきい値。全ガチャ共通で、ガチャごとの設定は不要</td></tr>
+<tr><td>シナリオマスタ（全体設定）</td><td><span class="pill new">新規</span></td><td>10種のシナリオ（名前・ゲーム数の範囲・序盤／終盤の7の出やすさ・上乗せの配分）。初期値はシステムで用意し、必要なら編集</td></tr>
+<tr><td>RUSH演出素材</td><td><span class="pill new">新規</span></td><td>映像パーツ・リール帯・3Dモデル・効果音・BGMの登録</td></tr>
+<tr><td>当選履歴・発送管理</td><td><span class="pill mod">改修</span></td><td>RUSHの当選は「SCORE・中身の内訳・払い出した景品（登録景品か代替景品か）・発送／交換」を記録する</td></tr>
+<tr><td>遊び方・注意書き</td><td><span class="pill add">追加</span></td><td>遊び方画面（7の額・平均継続率をレートごとに自動表示）と、算出方法の注記</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>画面のイメージ</h2>
+<div class="grid" style="grid-template-columns:1fr 1fr">
+<div>
+<b>オリパ編集 ＞ RUSH設定</b>
+<div class="mock">
+<div class="row"><label>演出タイプ</label><span class="f">TORAMI RUSH</span><label>演出セット</label><span class="f">虎巻ATTACK 通常</span></div>
+<div class="newb"><span class="nt">新規：レートと7の額</span>
+<table class="t" style="font-size:11.5px"><tr><th>レート</th><th>中身</th><th>紫7S</th><th>紫7W</th><th>白7S</th><th>白7W</th><th>最低SCORE</th></tr>
+<tr><td>500</td><td>単発</td><td>50</td><td>100</td><td>500</td><td>1,000</td><td>500</td></tr>
+<tr><td>5,000</td><td>10連</td><td>500</td><td>1,000</td><td>5,000</td><td>10,000</td><td>5,000</td></tr>
+<tr><td>50,000</td><td>100連</td><td>5,000</td><td>10,000</td><td>50,000</td><td>100,000</td><td>50,000</td></tr>
+<tr><td>500,000</td><td>1000連</td><td>50,000</td><td>100,000</td><td>500,000</td><td>1,000,000</td><td>500,000</td></tr></table>
+<div class="note">初期値はレートに比例して自動入力。ガチャごとに書き換え可</div></div>
+<div class="newb"><span class="nt">新規：シナリオの出やすさ</span>
+<div class="row"><span class="f">白7多め 10%</span><span class="f">後半爆発 10%</span><span class="f">序盤ダブル連発 10%</span><span class="f">…（10種）</span></div></div>
+<div class="newb"><span class="nt">自動計算（保存時）</span>
+<div class="row"><label>平均継続率</label><span class="f">レートごとに表示</span><label>最大倍率</label><span class="f">×6,000（単発）</span></div></div>
+</div>
+</div>
+<div>
+<b>全体設定 ＞ 代替景品マスタ</b>
+<div class="mock">
+<table class="t" style="font-size:11.5px"><tr><th>範囲（SCORE）</th><th>代替景品</th><th>在庫</th><th>通知</th></tr>
+<tr><td>1万〜</td><td>PSA10 相当景品（1万）</td><td>50</td><td>10以下</td></tr>
+<tr><td>5万〜</td><td>PSA10 相当景品（5万）</td><td>20</td><td>5以下</td></tr>
+<tr><td>10万〜</td><td>PSA10 相当景品（10万）</td><td>10</td><td>3以下</td></tr>
+<tr><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+<tr><td>300万〜</td><td>PSA10 相当景品（300万）</td><td>1</td><td>1以下</td></tr></table>
+<div class="note">範囲の段は全ガチャ共通。段の追加・削除もここだけで行い、各ガチャには自動で反映</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ======== 工数 ======== -->
+<section class="pane" id="p-est">
+<div class="card">
+<h2>工数見積もり依頼</h2>
+<p style="margin:2px 0">確定仕様（当初案ベース）にもとづく項目です。項目ごとに工数（人日）を見積もってください。「参考」はこちらの仮置きです。</p>
+<div class="ctl"><button class="btn" id="copyCsv" type="button">表をコピー（スプレッドシートに貼れる形式）</button><span class="note" id="copyMsg"></span></div>
+<table class="t" id="wbs"></table>
+<div style="margin-top:8px;font-size:13px" id="wbsTot"></div>
+</div>
+<div class="card">
+<h2>依頼文（Slackに貼る用）</h2>
+<div class="ctl"><button class="btn pri" id="copyReq" type="button">依頼文をコピー</button><span class="note" id="copyMsg2"></span></div>
+<div class="copybox" id="reqText"></div>
+</div>
+</section>
+
+<footer>パレットグループ トレカ商事カンパニー｜TORAMI RUSH 確定仕様とプロト v5（2026-11-25）｜景品名・PT・口数・在庫は仮の例。3Dモデル・本番映像No.09・音素材は受領素材を検証用に縮小して使用。白7は仮の色替え</footer>
+</main>
+
+<script type="module">
+import * as THREE from './lib/three.module.js';
+import {OBJLoader} from './lib/OBJLoader.js';
+const $=id=>document.getElementById(id);
+const fmt=v=>Math.round(v).toLocaleString();
+/* =============== 3D =============== */
+const canvas=$("gl");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"high-performance"});
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x05030a);
+const camera=new THREE.PerspectiveCamera(24,1.5,10,3000);camera.position.set(0,2,345);camera.lookAt(0,2,0);
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;const tf=2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));camera.position.z=Math.max(196/camera.aspect/tf,146/tf);camera.updateProjectionMatrix()}
+addEventListener("resize",resize);
+const tl=new THREE.TextureLoader();const loadTex=f=>new Promise((res,rej)=>tl.load("model/"+f,t=>{t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;res(t)},undefined,rej));
+const PIV={y:-18.206274,z:-28.074114},PITCH=Math.PI*2/21,REELX=[-55,0,55],W7=141.2*Math.PI/180;
+let tex={},machineMat,reels=[],ready=false;
+async function init3d(){
+  const [dark,on,bright,reel,blur]=await Promise.all(["slot_dark.jpg","slot_on.jpg","slot_bright.jpg","reel.jpg","reel_blur.jpg"].map(loadTex));
+  tex={dark,on,bright,reel,blur};
+  const L=new OBJLoader();const [m,r]=await Promise.all([L.loadAsync("model/Slot_Machine.obj"),L.loadAsync("model/Reel.obj")]);
+  machineMat=new THREE.MeshBasicMaterial({map:dark});m.traverse(o=>{if(o.isMesh)o.material=machineMat});scene.add(m);
+  REELX.forEach(x=>{const g=new THREE.Group();g.position.set(x,PIV.y,PIV.z);const mat=new THREE.MeshBasicMaterial({map:reel});const c=r.clone();c.traverse(o=>{if(o.isMesh)o.material=mat});c.position.set(0,-PIV.y,-PIV.z);g.add(c);scene.add(g);reels.push({g,mat,ang:0,w:0,state:"idle"})});
+  resize();ready=true;idle();
+}
+init3d().catch(e=>{$("idleMsg").textContent="3Dの読み込みに失敗しました："+e.message});
+let lightSeq=null;
+function setLight(k){if(!machineMat)return;machineMat.map=tex[k];machineMat.needsUpdate=true}
+function flicker(){const t0=performance.now();lightSeq=t=>{const e=t-t0;if(e>900){setLight("bright");lightSeq=null;return}setLight(Math.floor(e/110)%2?"on":"bright")}}
+const MAXW=Math.PI*2*3.6; // 速い回転（ゆうぽんさん指摘）
+const norm=a=>{a%=Math.PI*2;return a<0?a+Math.PI*2:a};
+function spin(i){const r=reels[i];r.ang=norm(r.ang);r.state="accel"}
+// ガタガタ：止まる直前に7の手前でリールを震わせる
+function shakeAll(target){const t0=performance.now();reels.forEach((r,i)=>{r.base=target-PITCH*(0.42+0.08*i);r.ang=r.base;r.w=0;r.state="shake";r.sh0=t0})}
+// ガシャーン：3本同時に一気に止める（強めのオーバーシュート）
+function slamAll(targets){const t0=performance.now();reels.forEach((r,i)=>{const tg=Array.isArray(targets)?targets[i]:targets;let D=((tg-r.ang)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;if(r.state!=="shake")D=norm(tg-r.ang)+Math.PI*2;r.stop={a0:r.ang,D,t0,dur:150,slam:true};r.state="stopping"});
+  const st=$("stage");st.classList.remove("quake");void st.offsetWidth;st.classList.add("quake")}
+function requestStop(i,target,dur){const r=reels[i];if(r.state==="idle"||r.state==="stopping"||r.state==="stopped")return;const w=Math.max(r.w,MAXW*0.6);let D=norm(target-r.ang);while(D<w*dur*0.55)D+=Math.PI*2;r.stop={a0:r.ang,D,t0:performance.now(),dur:dur*1000};r.state="stopping"}
+const easeOutBack=p=>{const c1=1.15,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
+const easeSlam=p=>{const c1=2.6,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
+let lastT=performance.now();
+function loop(t){const dt=Math.min(0.05,(t-lastT)/1000);lastT=t;
+  if(ready){reels.forEach((r,i)=>{
+    if(r.state==="accel"){r.w=Math.min(MAXW,r.w+MAXW*dt/0.25);if(r.w>=MAXW)r.state="spin";r.ang+=r.w*dt}
+    else if(r.state==="spin"){r.ang+=r.w*dt}
+    else if(r.state==="shake"){const e=(t-r.sh0)/1000;r.ang=r.base+Math.sin(e*62+i*1.7)*0.045+Math.sin(e*23+i)*0.025}
+    else if(r.state==="stopping"){const s=r.stop;const p=Math.min(1,(t-s.t0)/s.dur);r.ang=s.a0+s.D*(s.slam?easeSlam(p):easeOutBack(p));r.w=MAXW*(1-p);if(p>=1){r.state="stopped";r.w=0;r.ang=norm(r.ang);onStop(i)}}
+    r.g.rotation.x=r.ang;
+    const fast=r.state==="spin"||(r.state==="accel"&&r.w>MAXW*0.5)||(r.state==="stopping"&&!r.stop.slam&&r.w>MAXW*0.55);const m=fast?tex.blur:tex.reel;if(r.mat.map!==m){r.mat.map=m;r.mat.needsUpdate=true}});
+    if(lightSeq)lightSeq(t);timeline();renderer.render(scene,camera)}
+  requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+/* =============== sound =============== */
+const SE=["bgm","tempai","reellock_t1","reellock_t2","s777","devilrush","rainbow05","punch","jingle","voltageup","puchun","v_attack","v_madamada","v_miseteyaru","v_result","v_shinzui_rev","v_tempai"];
+let AC=null,buf={},live={},soundOn=true;
+// 音はページを開いた時点で全部読み込む（STARTを押してから読み込むと、最初のプチュンなどが間に合わず鳴らなかった）
+function audioInit(){if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();
+  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(_){} // iPhoneのマナーモードでも鳴らす
+  SE.forEach(n=>fetch(`se/${n}.mp3`).then(r=>r.arrayBuffer()).then(a=>new Promise((ok,ng)=>AC.decodeAudioData(a,ok,ng))).then(b=>{buf[n]=b;if(n==="bgm"&&bgmWant&&running)bgm(true)}).catch(()=>{}))}catch(_){}}
+function audioUnlock(){audioInit();try{if(AC&&AC.state!=="running")AC.resume()}catch(_){}}
+const SE_CORE=["puchun","v_miseteyaru","punch","reellock_t1","reellock_t2","s777","devilrush","v_attack"];
+const seReady=()=>!AC||SE_CORE.every(n=>buf[n]);
+audioInit();
+function sfx(n,vol=1){if(!soundOn||!AC||!buf[n])return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=vol;s.buffer=buf[n];s.connect(g).connect(AC.destination);s.start();(live[n]=live[n]||[]).push(s);s.onended=()=>{live[n]=(live[n]||[]).filter(x=>x!==s)}}
+function stopSfx(n){(live[n]||[]).forEach(s=>{try{s.stop()}catch(_){}});live[n]=[]}
+function stopAll(){Object.keys(live).forEach(stopSfx)}
+let bgmWant=false;
+function bgm(on){bgmWant=on;stopSfx("bgm");/* 読み込み前なら、読み込み完了時に鳴らす */if(!on||!soundOn||!AC||!buf.bgm)return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=.38;s.buffer=buf.bgm;s.loop=true;s.connect(g).connect(AC.destination);s.start();live.bgm=[s]}
+/* =============== player =============== */
+const CLIP={green:{f:"win_green",flash:1.70},red:{f:"win_red",flash:1.73},gold:{f:"win_gold",flash:1.70},rainbow:{f:"win_rainbow",flash:1.70}}; // 本番映像 No.09（11/22受領）から切り出し
+const COLN={green:"緑",red:"赤",gold:"金",rainbow:"虹"};
+const els=[$("va"),$("vb")];let cur=0,seq=[],idx=-1,running=false,step=null,plan=null,activeTab="play";
+function callout(html){const c=$("callout");c.innerHTML=html;c.classList.remove("on");void c.offsetWidth;c.classList.add("on")}
+function banner(t){const b=$("banner");if(t){b.textContent=t;b.classList.add("on")}else b.classList.remove("on")}
+function prep(el,i){while(i<seq.length&&(!seq[i].f||seq[i].k==="chall"))i++;if(i>=seq.length){el.removeAttribute("src");return}el.loop=seq[i].k==="wait"||seq[i].k==="chall";el.src=`v/${seq[i].f}.mp4`;el.load()}
+function renderPlan(){const box=$("plan-"+activeTab);if(!box)return;box.innerHTML=(seq.length?seq:[]).map((s,i)=>s.l?`<span class="${i===idx?"cur":""}">${s.l}</span>`:"").join("")}
+function startAt(i){idx=i;step=seq[i];renderPlan();
+  $("hud").textContent=step.l||"";$("oWait").classList.toggle("on",step.k==="wait");banner(step.k==="wait"&&step.banner?step.banner:"");
+  if(step.k==="wait"&&!step.keepLight)setLight("dark");
+  if(step.bgm)bgm(true);if(step.bgmOff)bgm(false);
+  if(step.sfx)step.sfx.forEach(([n,d,v])=>setTimeout(()=>{if(running)sfx(n,v)},d||0));
+  if(step.k==="chall"){runChall(step);return}
+  const el=els[cur],other=els[1-cur];
+  if(step.k==="win"){step.stops=[false,false,false]}
+  const p=el.play();const vis=()=>{el.classList.add("show");other.classList.remove("show");other.pause();prep(other,i+1)};
+  if(p&&p.then)p.then(vis).catch(()=>{$("hud").textContent="再生できませんでした。STARTを押し直してください";idle()});else vis();
+}
+function next(){if(!running)return;
+  const nx=seq[idx+1];
+  if(!nx){finish();return}
+  if(nx.k==="chall"){idx++;startAt(idx);return} // chall keeps current video (loop)
+  cur=1-cur;startAt(idx+1)}
+els.forEach(el=>el.addEventListener("ended",()=>{if(running&&el===els[cur]&&step&&(step.k==="play"||step.k==="win"))next()}));
+function timeline(){if(!running||!step)return;
+  // 映像の再生位置に合わせて鳴らす音（虎拳アタックの声は、声の出だしをタイトルが出る瞬間 2.2秒 に合わせる）
+  if(step.vsfx){const ve=els[cur];if(ve.classList.contains("show"))step.vsfx.forEach(x=>{if(!x.done&&ve.currentTime>=x[1]){x.done=true;sfx(x[0])}})}
+  if(step.k!=="win")return;const el=els[cur];if(!el.classList.contains("show"))return;
+  const vt=el.currentTime,C=CLIP[step.clip];
+  if(!step.fist&&vt>=3.1){step.fist=true;sfx("devilrush",.8)} // 継続の拳突き上げ（7のあとに虎美が拳を上げる場面）
+  if(!step.stops[0]&&vt>=C.flash-1.0){step.stops[0]=true;shakeAll(step.target);sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
+  if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");
+    if(step.clip==="rainbow")sfx("rainbow05",.9);else if(step.clip==="gold")setTimeout(()=>sfx("v_tempai"),500)}}
+function onStop(i){if(!running||!step)return;
+  if(step.k==="win"&&i===2){flicker();if(step.say)callout(step.say);if(step.add!=null){plan.total+=step.add;hudR()}}
+  if(step.k==="chall"&&i===2){if(step.ok){flicker();sfx("voltageup",.8);callout(`倍チャレンジ成功！<small>×2　+${fmt(step.add)}</small>`);plan.total+=step.add;hudR()}else{setLight("dark");sfx("v_madamada");callout("まだまだ…<small>失敗</small>")}setTimeout(()=>{if(running&&step&&step.k==="chall")next()},1500)}}
+function runChall(s){banner("");$("oWait").classList.remove("on");setLight("on");
+  // reels already spinning (tap). stop by wall clock
+  setTimeout(()=>{if(!running)return;shakeAll(s.target);sfx("reellock_t2")},900);
+  setTimeout(()=>{if(!running)return;stopSfx("reellock_t2");
+    if(s.ok){slamAll(s.target);sfx("s777")}else{slamAll([s.target,s.target,norm(s.target-PITCH)])}},2250)}
+function hudR(){$("hudR").textContent=plan&&plan.hud?plan.hud():""}
+function finish(){running=false;bgm(false);$("oWait").classList.remove("on");banner("");setLight("on");$("res").innerHTML=plan.result()+`<button class="closebtn" type="button" id="again">もう一度見る</button>`;$("res").classList.add("on");$("again").addEventListener("click",()=>{idle(true)});$("hud").textContent="リザルト";idx=-1;renderPlan()}
+function idle(keepPlan){running=false;stopAll();$("res").classList.remove("on");banner("");els.forEach(e=>{e.pause();e.classList.remove("show")});$("oWait").classList.remove("on");
+  if(ready){setLight("dark");reels.forEach(r=>{r.state="idle";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel})}
+  $("oIdle").classList.add("on");const can=ready&&plan;$("startBtn").style.display=can?"inline-block":"none";
+  $("idleMsg").innerHTML=!ready?"3Dモデルを読み込み中…":plan?plan.idleText:"右の「このレートで1回引く」で結果を決めてください";
+  $("hud").textContent="待機中";if(plan)plan.total=0;hudR();seq=[];idx=-1;renderPlan()}
+$("startBtn").addEventListener("click",async()=>{if(!ready||!plan)return;audioUnlock();
+  if(!seReady()){$("idleMsg").innerHTML="音を読み込み中…";for(let k=0;k<40&&!seReady();k++)await new Promise(r=>setTimeout(r,100))}$("oIdle").classList.remove("on");$("res").classList.remove("on");
+  if(!plan.steps.length){plan.total=0;finish();return}
+  audioUnlock();seq=plan.steps.map(s=>({...s,vsfx:s.vsfx&&s.vsfx.map(x=>[...x])}));plan.total=0;hudR();running=true;cur=0;prep(els[0],0);prep(els[1],1);const u=els[1].play();if(u&&u.then)u.then(()=>els[1].pause()).catch(()=>{});setLight("dark");startAt(0)});
+$("oshi").addEventListener("pointerdown",()=>{if(!running||!step||step.k!=="wait")return;const o=$("oshi");o.classList.add("hit");setTimeout(()=>o.classList.remove("hit"),140);try{navigator.vibrate&&navigator.vibrate(25)}catch(_){}
+  const f=document.createElement("div");f.className="flash";$("stage").appendChild(f);setTimeout(()=>f.remove(),320);audioUnlock();setLight("on");sfx("punch",1);[0,1,2].forEach(spin);$("oWait").classList.remove("on");next()});
+$("skip").addEventListener("click",()=>{if(!running)return;els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel});if(plan)plan.total=plan.fullTotal||0;finish()});
+$("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();else{audioUnlock();if(running)bgm(true)}$("snd").textContent=soundOn?"音 ON":"音 OFF"});
+/* move stage between tabs */
+function mountStage(t){const slot=$("slot-"+t);if(slot&&$("stage").parentElement!==slot){slot.appendChild($("stage"));setTimeout(resize,30)}}
+
+/* =============== ガチャ設定（例） =============== */
+const UNIT=500; // 1口の価格（コイン）
+const RATES=[{r:500,n:1,l:"単発"},{r:5000,n:10,l:"10連"},{r:50000,n:100,l:"100連"},{r:500000,n:1000,l:"1000連"}];
+// 7の額：ガチャごと・レートごと（初期値はレートに比例）
+const VALS={};RATES.forEach(x=>VALS[x.r]={pS:x.r*0.1,pW:x.r*0.2,wS:x.r*1,wW:x.r*2,min:x.r});
+// BOXの登録景品（例）：[ランク, 景品名, PT(交換コイン数), 口数, 在庫]
+const BOX=[["S","マリオピカチュウ PSA10",3000000,1,1],["A","ビクティニ PSA10",1000000,2,2],["A","リーリエ SR PSA10",500000,4,4],["B","ピカチュウ SAR PSA10",100000,20,20],["B","リザードン SAR",50000,40,40],["C","ミュウ AR",20000,150,150],["C","ゲンガー SR",10000,300,300],["D","汎用 RR",1000,3000,3000],["その他","交換コイン",200,92966,Infinity]];
+const CUM=[];BOX.reduce((a,b,i)=>(CUM[i]=a+b[3]),0);const TOTAL=CUM[CUM.length-1];
+function drawOne(){const x=Math.random()*TOTAL;let lo=0,hi=CUM.length-1;while(lo<hi){const m=(lo+hi)>>1;if(CUM[m]>x)hi=m;else lo=m+1}return lo}
+// 代替景品マスタ（全体設定）：範囲の下限＝相当額
+const TIERS=[10000,20000,30000,50000,70000,100000,150000,200000,300000,500000,700000,1000000,1500000,2000000,3000000].map(v=>({v,stock:v>=1000000?1:v>=300000?3:v>=100000?10:30}));
+const man=v=>v>=10000?(v/10000).toLocaleString()+"万":fmt(v);
+/* =============== シナリオ =============== */
+const S4=(a,b,c,d)=>({pS:a,pW:b,wS:c,wW:d});
+const SCN=[
+ {n:"白7多めで長く続く",g:[8,12],sym:p=>S4(1,1,3,1),ex:p=>1},
+ {n:"後半爆発",g:[6,10],sym:p=>p<.6?S4(4,1,.2,0):S4(.3,1,2,3),ex:p=>p<.6?.05:1+3*p},
+ {n:"序盤ダブル連発",g:[5,8],sym:p=>p<.4?S4(.3,3,.3,2):S4(2,1,1,.3),ex:p=>p<.4?2:.5},
+ {n:"紫7コツコツ",g:[8,12],sym:p=>S4(5,2,.3,.1),ex:p=>1},
+ {n:"1発白7ダブル",g:[1,2],sym:p=>S4(.1,.1,1,5),ex:p=>p===0?1:.2},
+ {n:"最後に大上乗せ",g:[4,7],sym:p=>S4(2,2,1,.5),ex:p=>p>=.999?1:0},
+ {n:"じわじわ加速",g:[6,10],sym:p=>S4(3*(1-p)+.2,1,3*p+.2,2*p*p),ex:p=>p+.1},
+ {n:"紫→白の昇格",g:[5,8],sym:p=>p<.5?S4(3,2,0,0):S4(0,0,3,2),ex:p=>p<.5?.2:1},
+ {n:"紫と白が交互",g:[6,10],sym:(p,i)=>i%2?S4(0,0,2,1):S4(2,1,0,0),ex:p=>1},
+ {n:"最短決着",g:[1,3],sym:p=>S4(.5,1,2,3),ex:p=>1.1-p}
+];
+const SCNW=SCN.map(()=>10); // 出やすさ（%）
+const SYM={pS:{n:"紫7シングル",clip:"green",t:0,d:false},pW:{n:"紫7ダブル",clip:"red",t:0,d:true},wS:{n:"白7シングル",clip:"gold",t:W7,d:false},wW:{n:"白7ダブル",clip:"rainbow",t:W7,d:true}};
+function pickScn(){let x=Math.random()*SCNW.reduce((a,b)=>a+b,0);for(let i=0;i<SCN.length;i++){if((x-=SCNW[i])<0)return i}return 0}
+function wpick(w){const ks=Object.keys(w).filter(k=>w[k]>0);if(!ks.length)return null;let x=Math.random()*ks.reduce((a,k)=>a+w[k],0);for(const k of ks){if((x-=w[k])<0)return k}return ks[ks.length-1]}
+// SCOREぴったりまで：7の並び＋上乗せ
+function compose(score,V,si){
+  if(score<V.min||score<V.pS)return null;
+  const sc=SCN[si];const maxG=Math.floor(score/V.pS);
+  let G=sc.g[0]+Math.floor(Math.random()*(sc.g[1]-sc.g[0]+1));G=Math.max(1,Math.min(G,maxG));
+  const games=[];let R=score;
+  for(let i=0;i<G;i++){const p=G>1?i/(G-1):1,left=G-i-1;const cap=R-left*V.pS;
+    const w=sc.sym(p,i);const ok={};for(const k of ["pS","pW","wS","wW"])if(V[k]<=cap)ok[k]=w[k]||0;
+    const k=wpick(ok)||"pS";games.push({k,v:V[k],up:0,p});R-=V[k]}
+  // 上乗せの配分
+  const ws=games.map(g=>Math.max(0,sc.ex(g.p)));const tw=ws.reduce((a,b)=>a+b,0)||1;const unit=Math.max(V.pS,Math.pow(10,Math.max(0,Math.floor(Math.log10(Math.max(1,R/G)))-1))); // 上乗せは切りのいい単位で、端数は最後のゲームに
+  let E=R;games.forEach((g,i)=>{if(i===G-1)return;const a=Math.floor(R*ws[i]/tw/unit)*unit;g.up=a;E-=a});games[G-1].up+=E;
+  return{games,si,score}}
+// 払い出す景品を1個に決める
+function payout(score){
+  for(let t=TIERS.length-1;t>=0;t--){const T=TIERS[t];if(T.v>score)continue;const nx=t+1<TIERS.length?TIERS[t+1].v:Infinity;
+    const c=BOX.map((b,i)=>({b,i})).filter(x=>x.b[0]!=="その他"&&x.b[2]>=T.v&&x.b[2]<nx&&x.b[2]<=score&&x.b[4]>0).sort((a,b)=>b.b[2]-a.b[2]);
+    if(c.length)return{kind:"box",name:`${c[0].b[0]}賞 ${c[0].b[1]}`,v:c[0].b[2],tier:T.v,bi:c[0].i};
+    if(T.stock>0)return{kind:"alt",name:`PSA10 相当景品（${man(T.v)}）`,v:T.v,tier:T.v,ti:t}}
+  return{kind:"coin"}}
+/* =============== プロトの操作 =============== */
+let rate=5000,last=null;
+$("rateBtns").innerHTML=RATES.map(x=>`<button class="btn" type="button" data-r="${x.r}">${fmt(x.r)}（${x.l}）</button>`).join(" ");
+function paintRate(){$("rateBtns").querySelectorAll("button").forEach(b=>b.classList.toggle("pri",+b.dataset.r===rate))}
+$("rateBtns").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;rate=+b.dataset.r;paintRate();plan=null;$("drawOut").textContent="レートを変えました。もう一度引いてください。";idle()});
+paintRate();
+$("scnSel").innerHTML=`<option value="-1">おまかせ（出やすさの設定どおり）</option>`+SCN.map((s,i)=>`<option value="${i}">${i+1}. ${s.n}（${s.g[0]}〜${s.g[1]}ゲーム）</option>`).join("");
+function doDraw(forceS,fixed,quiet){const R=RATES.find(x=>x.r===rate);const hits={};let score=0;
+  if(fixed!=null){score=fixed}else{for(let i=0;i<R.n;i++){let k=drawOne();if(forceS&&i===0)k=0;hits[k]=(hits[k]||0)+1;score+=BOX[k][2]}}
+  const si=+$("scnSel").value<0?pickScn():+$("scnSel").value;
+  const c=compose(score,VALS[rate],si);const po=payout(score);
+  last={R,hits,score,c,po,fixed:fixed!=null};build(last)}
+$("drawBtn").addEventListener("click",()=>doDraw(false));
+$("drawS").addEventListener("click",()=>doDraw(true));
+$("drawRush").addEventListener("click",()=>{for(let k=0;k<20000;k++){doDraw(false);if(last.c)break}});
+$("scoreBtn").addEventListener("click",()=>doDraw(false,Math.max(0,+$("scoreIn").value||0)));
+$("scnSel").addEventListener("change",()=>{if(last&&last.c){last.c=compose(last.score,VALS[rate],+$("scnSel").value<0?pickScn():+$("scnSel").value);build(last)}});
+function hitsTxt(h){return Object.keys(h).map(Number).sort((a,b)=>a-b).map(k=>`${BOX[k][0]==="その他"?"はずれ（200コイン）":BOX[k][0]+"賞 "+BOX[k][1]}×${h[k]}`).join("、")}
+function poTxt(po,score){return po.kind==="coin"?`交換コイン ${fmt(score)}（自動で付与）`:`${po.name}（${man(po.tier)}の範囲${po.kind==="alt"?"・代替景品":""}）`}
+function build(L){const {R,hits,score,c,po}=L;
+  const steps=[];
+  if(c){steps.push({k:"play",f:"freeze",l:"プチュン",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",bgm:true,vsfx:[["v_attack",1.97]]});
+    c.games.forEach((g,i)=>{const s=SYM[g.k];
+      steps.push({k:"play",f:"lead",l:`${i+1}ゲーム目 導入`},{k:"wait",f:"loop",l:`${i+1}ゲーム目 押せ！`});
+      steps.push({k:"win",f:CLIP[s.clip].f,clip:s.clip,target:s.t,add:g.v+g.up,say:`${s.d?"DOUBLE!! ":""}${s.n.replace("シングル","")} +${fmt(g.v)}${g.up?`<small>上乗せ +${fmt(g.up)}</small>`:""}`,l:`${i+1}G ${s.n}${g.up?"＋上乗せ":""}`})});
+    steps.push({k:"play",f:c.games[c.games.length-1].k==="wW"?"total":"total_green",l:"TOTAL",bgmOff:true,vsfx:[["jingle",0.0],["v_result",0.82]]})}
+  const cnt={};if(c)c.games.forEach(g=>cnt[g.k]=(cnt[g.k]||0)+1);const ups=c?c.games.reduce((a,g)=>a+g.up,0):0;
+  plan={steps,total:0,fullTotal:score,hud:()=>`SCORE ${fmt(plan.total)}`,
+    idleText:`<b>レート ${fmt(R.r)}（${R.l}）</b><br>SCORE ${fmt(score)}<br>${c?`${SCN[c.si].n}・${c.games.length}ゲーム`:"RUSHなし（最低SCORE未満）"}<br><span style="font-size:11px;opacity:.8">STARTで再生</span>`,
+    result:()=>`<div style="text-align:center;opacity:.8">TORAMI RUSH 結果</div><div class="big">SCORE ${fmt(score)}</div>
+      ${["pS","pW","wS","wW"].filter(k=>cnt[k]).map(k=>`<div class="rw"><span>${SYM[k].n}</span><span>×${cnt[k]}</span></div>`).join("")}
+      ${ups?`<div class="rw"><span>上乗せ</span><span>+${fmt(ups)}</span></div>`:""}
+      <div style="margin-top:10px;font-weight:800">獲得景品</div>
+      ${po.kind==="coin"?`<div class="rw" style="font-size:15px"><span>交換コイン</span><b>${fmt(score)}</b></div><div style="font-size:11.5px;opacity:.85">1万未満のため、交換コインを自動で付与しました</div>`:
+      `<div class="rw" style="font-size:15px"><span>${po.name}</span><b>${man(po.tier)}相当</b></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="closebtn" style="margin:0;background:#fff;color:#111" type="button" data-pick="ship">発送する</button><button class="closebtn" style="margin:0" type="button" data-pick="coin">交換する（${fmt(score)}コイン）</button></div><div id="pickMsg" style="font-size:12px;margin-top:6px;text-align:center"></div>`}`};
+  $("drawOut").innerHTML=`<b>レート ${fmt(R.r)}（${R.l}）</b>${L.fixed?"・SCORE指定":`<br>中身：${hitsTxt(hits)}`}<br>SCORE <b>${fmt(score)}</b> → ${c?`シナリオ「${SCN[c.si].n}」${c.games.length}ゲーム`:"RUSHなし（最低SCORE "+fmt(VALS[rate].min)+" 未満）"}
+    <div class="chips">${c?c.games.map(g=>`<span class="chip k-${g.k}">${SYM[g.k].n} ${fmt(g.v)}${g.up?" ＋上乗せ"+fmt(g.up):""}</span>`).join(""):""}</div>
+    払い出し：<b>${poTxt(po,score)}</b>${po.kind!=="coin"?"／交換なら "+fmt(score)+" コイン":""}`;
+  idle(true)}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b||!last)return;const po=last.po;
+  if(b.dataset.pick==="ship"){if(po.kind==="box")BOX[po.bi][4]--;else if(po.kind==="alt")TIERS[po.ti].stock--;renderStock();$("pickMsg").textContent=`${po.name} を発送します（在庫を1つ減らしました）`}
+  else $("pickMsg").textContent=`交換コイン ${fmt(last.score)} を付与しました`;
+  $("res").querySelectorAll("[data-pick]").forEach(x=>x.disabled=true)});
+function renderStock(){$("stockBox").innerHTML=`<table class="t"><tr><th>BOXの登録景品</th><th class="n">PT</th><th class="n">在庫</th></tr>${BOX.filter(b=>b[0]!=="その他").map((b,i)=>`<tr><td>${b[0]}賞 ${b[1]}</td><td class="n">${fmt(b[2])}</td><td class="n"><input type="number" min="0" value="${b[4]}" data-bs="${i}" style="width:70px"></td></tr>`).join("")}</table>
+  <table class="t" style="margin-top:6px"><tr><th>代替景品（範囲）</th><th class="n">在庫</th></tr>${TIERS.map((t,i)=>`<tr><td>PSA10 相当景品（${man(t.v)}）</td><td class="n"><input type="number" min="0" value="${t.stock}" data-ts="${i}" style="width:70px"></td></tr>`).join("")}</table>`}
+$("stockBox").addEventListener("change",e=>{const x=e.target;if(x.dataset.bs!=null)BOX[+x.dataset.bs][4]=Math.max(0,+x.value);if(x.dataset.ts!=null)TIERS[+x.dataset.ts].stock=Math.max(0,+x.value);if(last){last.po=payout(last.score);build(last)}});
+renderStock();
+/* =============== シナリオ表 =============== */
+$("scnTable").innerHTML=`<tr><th>#</th><th>シナリオ</th><th>ゲーム数</th><th>7の出方</th><th>上乗せの配分</th><th class="n">出やすさ</th></tr>`+[
+ "白7が多めに出て長く続く","前半は紫7シングル中心、後半に白7・白7ダブル","序盤に紫7ダブル・白7ダブルが続く","紫7シングル中心で少しずつ積む","1〜2ゲームで白7ダブル","最後のゲームまで普通に進み、最後に大きく上乗せ","紫7から白7へ少しずつ移る","前半は紫7、後半は白7","紫7と白7が1ゲームごとに入れ替わる","1〜3ゲームで決着"].map((d,i)=>`<tr><td>${i+1}</td><td><b>${SCN[i].n}</b></td><td>${SCN[i].g[0]}〜${SCN[i].g[1]}</td><td>${d}</td><td>${["均等","終盤に寄せる","序盤に寄せる","均等","1ゲーム目に寄せる","最後に全部","後ろほど大きく","後半に寄せる","均等","前ほど大きく"][i]}</td><td class="n">${SCNW[i]}%</td></tr>`).join("");
+/* =============== 遊び方・平均継続率 =============== */
+const STAT={};let howRate=5000;
+function simulate(r){const R=RATES.find(x=>x.r===r);const M=R.n>=1000?300:R.n>=100?1500:4000;let rush=0,games=0;
+  for(let m=0;m<M;m++){let s=0;for(let i=0;i<R.n;i++)s+=BOX[drawOne()][2];const c=compose(s,VALS[r],pickScn());if(c){rush++;games+=c.games.length}}
+  return{rush:rush/M,avgG:rush?games/rush:0,cont:games?1-rush/games:0}}
+function calcAll(){RATES.forEach(x=>STAT[x.r]=simulate(x.r));renderHow();$("calcMsg").textContent="計算しました（BOXの口数とシナリオの出やすさで試算）"}
+const maxMul=()=>Math.max(...BOX.map(b=>b[2]))/UNIT;
+function renderHow(){const V=VALS[howRate],st=STAT[howRate]||{},R=RATES.find(x=>x.r===howRate);
+  $("howCard").innerHTML=`<div style="text-align:center;font-weight:900;font-size:17px;letter-spacing:.05em">TORAMI RUSH の遊び方</div>
+  <p style="font-size:12px;opacity:.85;margin:6px 0 10px">レートを選んで1回引くと、当たった景品のPTの合計（SCORE）まで7が連鎖します。7が揃うたびに当選PTと累計SCOREが増えていきます。</p>
+  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${RATES.map(x=>`<button type="button" data-hr="${x.r}" style="flex:1;border:1px solid ${x.r===howRate?"#ffd36b":"#4a3f66"};background:${x.r===howRate?"#ffd36b":"transparent"};color:${x.r===howRate?"#111":"#fff"};border-radius:6px;padding:4px;font:inherit;font-size:12px;cursor:pointer">${fmt(x.r)}<br><span style="font-size:10.5px">${x.l}</span></button>`).join("")}</div>
+  <div style="font-weight:800;margin-bottom:4px">7の価値（レート ${fmt(R.r)}）</div>
+  ${["wW","wS","pW","pS"].map(k=>`<div class="rw" style="display:flex;justify-content:space-between;border-bottom:1px solid #2d2442;padding:4px 0"><span><span class="chip k-${k}">${SYM[k].n}</span></span><b>${fmt(V[k])} PT</b></div>`).join("")}
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:12px 0;text-align:center">
+   <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">平均継続率</div><div style="font-size:20px;font-weight:900;color:#ffd36b">${st.cont!=null?(st.cont*100).toFixed(1)+"%":"…"}</div></div>
+   <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">RUSH突入率</div><div style="font-size:20px;font-weight:900">${st.rush!=null?(st.rush*100).toFixed(1)+"%":"…"}</div></div>
+   <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">平均ゲーム数</div><div style="font-size:20px;font-weight:900">${st.avgG!=null?st.avgG.toFixed(1):"…"}</div></div></div>
+  <div style="font-size:12px;line-height:1.8">・SCOREが ${fmt(V.min)} 以上でRUSH突入<br>・景品はSCOREに応じて<b>1個</b>（${man(TIERS[0].v)}〜${man(TIERS[TIERS.length-1].v)}の範囲ごとの景品）。<b>発送</b>か<b>交換（SCORE分の交換コイン）</b>を選べます<br>・SCOREが${man(TIERS[0].v)}未満のときは交換コイン（SCORE分）を付与<br>・最大倍率 ×${fmt(maxMul())}（1口${fmt(UNIT)}コインあたり）</div>
+  <div style="font-weight:800;margin:10px 0 4px">BOXの中身（1口あたり）</div>
+  <table style="width:100%;font-size:11.5px;border-collapse:collapse">${BOX.map(b=>`<tr style="border-bottom:1px solid #2d2442"><td style="padding:3px 0">${b[0]}${b[0]==="その他"?"":"賞"}</td><td>${b[0]==="その他"?"交換コイン":b[1]}</td><td style="text-align:right">${fmt(b[2])}PT</td><td style="text-align:right">${fmt(b[3])}口</td><td style="text-align:right">${(b[3]/TOTAL*100).toFixed(b[3]/TOTAL<.001?4:2)}%</td></tr>`).join("")}</table>
+  <p style="font-size:10.5px;opacity:.7;margin:8px 0 0">※平均継続率・RUSH突入率・平均ゲーム数は、BOX構成と演出シナリオから算出した平均値です。各ゲームは独立した抽選ではありません。演出はSCOREに応じて決まります。</p>`}
+$("howCard").addEventListener("click",e=>{const b=e.target.closest("[data-hr]");if(!b)return;howRate=+b.dataset.hr;renderHow()});
+function renderVals(){$("valTable").innerHTML=`<tr><th>レート</th><th>中身</th><th>紫7S</th><th>紫7W</th><th>白7S</th><th>白7W</th><th>最低SCORE</th></tr>`+RATES.map(x=>`<tr><td>${fmt(x.r)}</td><td>${x.l}</td>${["pS","pW","wS","wW","min"].map(k=>`<td><input type="number" min="1" value="${VALS[x.r][k]}" data-vr="${x.r}" data-vk="${k}" style="width:88px"></td>`).join("")}</tr>`).join("")}
+$("valTable").addEventListener("change",e=>{const x=e.target;if(!x.dataset.vr)return;VALS[+x.dataset.vr][x.dataset.vk]=Math.max(1,+x.value);calcAll()});
+$("recalc").addEventListener("click",calcAll);
+renderVals();renderHow();setTimeout(calcAll,300);
+/* =============== tabs =============== */
+function show(t){if(!["play","spec","howto","admin","est"].includes(t))t="play";
+  document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("act",p.id==="p-"+t));document.querySelectorAll("#tabs a").forEach(a=>a.classList.toggle("act",a.dataset.t===t));
+  if(t==="play"){mountStage("play");if(!running)idle()}else if(running)idle()}
+$("tabs").addEventListener("click",e=>{const a=e.target.closest("a");if(!a)return;e.preventDefault();history.replaceState(null,"","#"+a.dataset.t);show(a.dataset.t)});
+/* =============== 工数 =============== */
+const WBS=[
+["C-1","画面","RUSH専用のガチャ画面","レート選択→1回引く→演出→結果の画面。スキップ・中断からの復帰","2〜3"],
+["C-2","演出","演出プレイヤー：上の映像","映像パーツ（プチュン・OP・導入・待機ループ・7ごとの本編・TOTAL）を2つの動画で交互に先読み・切り替え","2〜3"],
+["C-3","演出","演出プレイヤー：下の3D筐体","筐体・リール3本の描画、高速回転→ガタガタ→3本同時停止、点灯切り替え、映像の再生位置に合わせた停止","3〜4"],
+["C-4","演出","押せ！・効果音・BGM","押せ！ボタン、効果音（映像の再生位置に合わせて鳴らす）、BGM、ミュート、iPhoneのマナーモード対策","1〜1.5"],
+["C-5","演出","7ごとの当選PT・累計SCOREの表示","7が揃うたびに当選PT・上乗せ・累計SCOREを表示","0.5〜1"],
+["F-1","抽選","レート選択と内部まとめ引き","1回の購入で単発／10連／100連／1000連を内部で実行し、当選PTを合計してSCOREにする。BOXの残口の消化","2〜3"],
+["F-2","抽選","演出の組み立て（シナリオ）","SCORE・7の額・シナリオから、ゲーム数・7の並び・上乗せを組み立てる（合計＝SCORE）。結果をサーバーで保存してAPIで返す","2〜3"],
+["F-3","払い出し","景品を1個に決めるロジック","SCOREの範囲→登録景品→代替景品→1つ下の範囲、1万未満は交換コイン","1.5〜2"],
+["F-4","払い出し","発送／交換の選択","リザルトで発送か交換（SCORE分の交換コイン）を選ぶ。既存の発送・交換の流れにつなぐ","1〜1.5"],
+["F-5","管理画面","RUSH設定（オリパ編集）","演出タイプ、レート一覧、7の額（レート×4種）、最低SCORE、シナリオの出やすさ","1.5〜2"],
+["F-6","管理画面","代替景品マスタ（全体設定）","範囲ごとの代替景品・在庫・通知のしきい値。在庫が少ないときの通知","1.5〜2"],
+["F-7","管理画面","シナリオマスタ（全体設定）","10種のシナリオの初期データと編集画面","1〜1.5"],
+["F-8","管理画面","平均継続率などの自動計算","BOX・7の額・シナリオから平均継続率・RUSH突入率・平均ゲーム数・最大倍率を試算して表示（保存時）","1〜1.5"],
+["F-9","画面","遊び方画面","レートで7の額・平均継続率が切り替わる遊び方、BOXの中身、算出方法の注記","1〜1.5"],
+["F-10","管理画面","当選履歴・発送管理の改修","SCORE・中身の内訳・払い出した景品（登録／代替）・発送／交換を記録","1〜1.5"],
+["C-6","管理画面","RUSH演出素材","映像パーツ・リール帯・3Dモデル・効果音・BGMの登録","1.5〜2"],
+["C-7","共通","素材の組み込み・最適化","受領素材の変換（GLB化・テクスチャ圧縮・映像の書き出し）、CDN配信","1〜1.5"],
+["C-8","共通","テスト","stg確認、実機テスト（iPhone・Android・LINE/Xのアプリ内ブラウザ）、払い出し・在庫切れのテスト","2.5〜3.5"],
+["O-1","オプション","倍チャレンジ（素材がそろってから）","継続失敗→リザルト→プチュン「まだまだ」→最終チャレンジ→7が倍に増殖","1.5〜2"]
+];
+const tagc={"画面":"tc","演出":"tc","共通":"tc","抽選":"t1","払い出し":"t1","管理画面":"t2","オプション":"tx"};
+$("wbs").innerHTML=`<tr><th>ID</th><th>区分</th><th>項目</th><th>内容・完了条件</th><th class="n">参考（人日）</th><th class="n" style="min-width:90px">見積（人日）</th><th>備考</th></tr>`+WBS.map(r=>`<tr><td>${r[0]}</td><td><span class="tag ${tagc[r[1]]}">${r[1]}</span></td><td><b>${r[2]}</b></td><td>${r[3]}</td><td class="n">${r[4]}</td><td class="n"></td><td></td></tr>`).join("");
+const sumR=f=>WBS.filter(f).reduce((a,r)=>{const [lo,hi]=r[4].split("〜").map(Number);return[a[0]+lo,a[1]+(hi||lo)]},[0,0]);
+const sMain=sumR(r=>r[1]!=="オプション"),sAll=sumR(()=>true);
+$("wbsTot").innerHTML=`参考の合計：<b>${sMain[0]}〜${sMain[1]}人日</b>（倍チャレンジを入れると ${sAll[0]}〜${sAll[1]}人日）<br><span class="note">素材費：ゆうぽんさん見積もり 15万円＋税（約1週間）は別途</span>`;
+$("copyCsv").addEventListener("click",async()=>{const txt=["ID\t区分\t項目\t内容・完了条件\t参考（人日）\t見積（人日）\t備考"].concat(WBS.map(r=>[r[0],r[1],r[2],r[3],r[4],"",""].join("\t"))).join("\n");
+  try{await navigator.clipboard.writeText(txt);$("copyMsg").textContent="コピーしました"}catch(e){$("copyMsg").textContent="コピーできませんでした（表を選択してコピーしてください）"}});
+const url=location.href.split("#")[0];
+const req=`お疲れさまです、鈴木です。
+TORAオリパの新機能「TORAMI RUSH（虎巻ATTACK）」の仕様が固まったので、工数見積もりをお願いしたいです。
+
+■ 資料（確定仕様・プロト・管理画面・見積もり項目）
+${url}
+・「確定仕様とロジック」タブに仕様と各ロジックの説明があります
+・「工数見積もり依頼」タブに項目一覧があります（「表をコピー」でスプレッドシートに貼れます）
+
+■ 概要
+・1つのガチャでレートを選んで1回引く（内部で単発〜1000連）→ 当選PTの合計（SCORE）まで7の連鎖で上乗せして見せる
+・景品はSCOREの範囲で1個。発送か交換（SCORE分の交換コイン）を選ぶ。在庫切れは代替景品マスタで吸収
+・7の額はガチャ×レートごとに設定、7の出方はシナリオ管理（10種）、平均継続率を自動計算して遊び方に表示
+・演出（上は映像・下は3D筐体）はプロトで検証済み
+
+■ お願いしたいこと
+1. 項目ごとの工数（人日）
+2. 抜けている作業・気になる点の追加
+3. 着手できる時期とリリース可能日の目安
+
+■ 前提
+・BOXは今のまま実物の景品を登録（有在庫）
+・素材（映像パーツ・リール帯・3Dモデル・効果音・BGM）は映像チームから受け取る
+・対象端末：iPhone（Safari/Chrome）、Android（Chrome）、LINE/Xのアプリ内ブラウザ
+
+○月○日（○）までにご回答いただけると助かります。よろしくお願いします。`;
+$("reqText").textContent=req;
+$("copyReq").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(req);$("copyMsg2").textContent="コピーしました"}catch(e){$("copyMsg2").textContent="コピーできませんでした（文を選択してコピーしてください）"}});
+show(location.hash.slice(1));
+
+</script>
+</body>
+</html>
