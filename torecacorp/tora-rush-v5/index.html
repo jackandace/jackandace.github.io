@@ -137,7 +137,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORAMI RUSH 確定仕様とプロト v5｜当初案ベース・レート選択・シナリオ・代替景品・チャージ限定</h1>
-<div class="meta"><b style="color:#b42318">11/25 15時半版</b>（ボタンをリールの外へ：PCは背景＋両サイドのパネル、スマホは筐体の下に操作パネル）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
+<div class="meta"><b style="color:#b42318">11/25 16時半版</b>（ボタンをリールの外へ：PCは背景＋両サイドのパネル、スマホは筐体の下に操作パネル）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
 <nav id="tabs"><a href="#play" data-t="play">▶ プロトで遊ぶ</a><a href="#spec" data-t="spec">確定仕様とロジック</a><a href="#howto" data-t="howto">遊び方画面（ユーザー向け）</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -149,7 +149,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
   <div class="pnl"><div class="ph">ガチャ</div><div class="seg" id="gachaBtns"><button class="pb on" type="button" data-g="normal">通常RUSH</button><button class="pb" type="button" data-g="charge">チャージ限定<br><small>GOLD</small></button></div>
    <div id="wakuBox" class="waku" style="display:none">挑戦枠 <b id="wakuN">0</b> 回<button class="pb sm" id="chargeBtn" type="button">1万円チャージ（デモ）で＋1</button></div></div>
   <div class="pnl"><div class="ph">購入コイン（レート）</div><div class="rates" id="rateBtns"></div></div>
-  <div class="pnl"><button class="pb big" id="drawBtn" type="button">このレートで引く</button><div class="pnote">引いたあと、真ん中のボタンで START</div></div>
+  <div class="pnl"><button class="pb big" id="drawBtn" type="button">このレートで引く</button><div class="pnote">引いたあと、真ん中のボタンで START</div><button class="pb sm on" id="demoBtn" type="button">デモ：毎回RUSH <b>ON</b></button></div>
  </div>
  <div class="center">
   <div class="slot" id="slot-play"></div>
@@ -600,7 +600,11 @@ function doDraw(forceS,fixed,quiet){const R=RATES.find(x=>x.r===rate);if(GACHAS[
   const si=+$("scnSel").value<0?pickScn():+$("scnSel").value;
   const c=compose(score,VALS[rate],si);const po=payout(score);
   last={R,hits,score,c,po,fixed:fixed!=null};build(last)}
-$("drawBtn").addEventListener("click",()=>doDraw(false));
+let DEMO=true; // デモ：毎回RUSHにする（本番の確率ではRUSHは数%しか出ないため）
+$("demoBtn").addEventListener("click",()=>{DEMO=!DEMO;$("demoBtn").classList.toggle("on",DEMO);$("demoBtn").innerHTML=DEMO?"デモ：毎回RUSH <b>ON</b>":"デモ：毎回RUSH <b>OFF</b>（本番の確率）"});
+$("drawBtn").addEventListener("click",()=>{if(!DEMO){doDraw(false);return}
+  if(GACHAS[GK].charge){if(WAKU<=0){$("drawOut").innerHTML="挑戦枠がありません。チャージすると挑戦枠がもらえます（デモ）。";plan=null;return}WAKU--;renderWaku()}
+  for(let k=0;k<20000;k++){doDraw(false,null,true);if(last&&last.c)break}});
 $("drawS").addEventListener("click",()=>doDraw(true,null,true));
 $("drawRush").addEventListener("click",()=>{for(let k=0;k<20000;k++){doDraw(false,null,true);if(last&&last.c)break}});
 $("scoreBtn").addEventListener("click",()=>doDraw(false,Math.max(0,+$("scoreIn").value||0)));
