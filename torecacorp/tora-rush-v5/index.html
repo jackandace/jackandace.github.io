@@ -55,39 +55,99 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .cb{font:800 11.5px/1 "Hiragino Sans",sans-serif;color:#fff;background:rgba(20,14,36,.82);border:1.5px solid rgba(255,215,120,.75);border-radius:8px;padding:7px 9px;min-width:64px;cursor:pointer;letter-spacing:.03em}
 .cb.on{background:linear-gradient(#ffd36b,#e8a10b);color:#2a1600;border-color:#fff}
 .cb:disabled{opacity:.4;cursor:default}
-/* ===== ゲームルーム（PC：背景＋中央に筐体＋両サイドのパネル／スマホ：縦積み） ===== */
+/* ===== ゲーム画面（11/25 承認版UI） ===== */
 #p-play.act{display:block}
-.room{position:relative;display:grid;grid-template-columns:minmax(200px,250px) min(410px,max(300px,calc((100vh - 300px)*.5625))) minmax(200px,250px);justify-content:center;gap:22px;padding:22px 18px 18px;border-radius:16px;background:#0b0716 url(bg.jpg) center/cover;box-shadow:inset 0 0 0 1px rgba(255,215,120,.25),inset 0 0 120px rgba(0,0,0,.65);margin:0 -4px}
-.side{display:flex;flex-direction:column;gap:12px;align-self:center}
-.pnl{background:rgba(14,9,28,.78);border:1.5px solid rgba(255,207,107,.55);border-radius:14px;padding:12px;color:#fff;backdrop-filter:blur(4px);box-shadow:0 6px 18px rgba(0,0,0,.45)}
-.ph{font:800 12px/1 "Hiragino Sans",sans-serif;color:#ffd36b;letter-spacing:.08em;margin-bottom:8px}
-.pnote{font-size:11px;opacity:.75;margin-top:6px;text-align:center}
-.pb{display:block;width:100%;text-align:center;text-decoration:none;font:700 13px/1.25 "Hiragino Sans",sans-serif;color:#fff;background:linear-gradient(#3a2a62,#21173c);border:1.5px solid rgba(255,207,107,.55);border-radius:10px;padding:9px 8px;cursor:pointer;min-height:44px}
-.pb:hover{filter:brightness(1.15)}.pb.on{background:linear-gradient(#ffdf86,#e5a21a);color:#2a1600;border-color:#fff}
-.pb.big{font-size:15px;padding:13px 8px;background:linear-gradient(#ff6b5a,#c62617);border-color:#ffd36b}
-.pb.sm{font-size:11.5px;min-height:34px;padding:6px;margin-top:6px}
-.pb small{font-size:10.5px;opacity:.85}
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.rates{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.rates .pb{padding:7px 4px}.rates .pb small{display:block;font-weight:600}
-.waku{margin-top:8px;font-size:12px;text-align:center}.waku b{font-size:18px;color:#ffd36b}
-.score .sv{font:900 30px/1.1 "Hiragino Sans",sans-serif;text-align:center;color:#ffe9a8;text-shadow:0 0 12px rgba(255,170,0,.6);font-variant-numeric:tabular-nums}
-.ops{display:flex;flex-direction:column;gap:6px}
-.vol{display:flex;align-items:center;gap:10px}.vol .pk{height:40px;width:58px;flex:none}.vol input{flex:1;accent-color:#ffd36b}
-.pk.sm{font-size:12px}
-.drawmini{font-size:11.5px;line-height:1.6;max-height:240px;overflow:auto}
-.drawmini .chip{font-size:10px}
-.center{display:flex;flex-direction:column;gap:10px}
-.center .stage{box-shadow:0 0 0 2px rgba(255,207,107,.6),0 12px 40px rgba(0,0,0,.7)}
-.panel{display:grid;grid-template-columns:1fr 1fr 1.35fr 1fr 1fr;align-items:center;gap:8px;background:rgba(14,9,28,.85);border:1.5px solid rgba(255,207,107,.55);border-radius:16px;padding:10px 10px}
-.pk{height:58px;border-radius:12px;border:1.5px solid rgba(255,207,107,.6);background:linear-gradient(#3a2a62,#1a1230);color:#fff;font:800 13px/1.2 "Hiragino Sans",sans-serif;cursor:pointer;padding:0}
-.pk b{font-size:14px;color:#ffd36b}
-#spdBtn,#skip{font-size:11px;letter-spacing:-.04em;white-space:nowrap}.pk.on{background:linear-gradient(#ffdf86,#e5a21a);color:#2a1600}.pk.on b{color:#2a1600}
-.pk:disabled{opacity:.35;cursor:default}
-.oshi{position:relative;justify-self:center;width:96px;height:96px;border-radius:50%;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.oshi.off{filter:grayscale(.85) brightness(.55);cursor:default}.oshi.off .cap,.oshi.off .rim{animation:none}
-#oIdle{height:64%!important;bottom:auto}
-.oshi .cap{white-space:nowrap;font-size:21px!important;letter-spacing:-.02em}
+body.playmode>header{display:none}body.playmode main{padding-top:0}body.playmode footer{display:none}
+.game{--W:clamp(300px,calc((100vh - 300px)*.5625),410px);--side:clamp(208px,17vw,258px);position:relative;width:100vw;margin-left:calc(50% - 50vw);background:#07060c;color:#fff;font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;overflow:hidden}
+.game:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,6,14,.55),rgba(6,6,14,.15) 35%,rgba(6,6,14,.25) 70%,rgba(6,6,14,.7)),url(art/sanctuary.webp) center/cover no-repeat;z-index:0}
+.ghead{position:relative;z-index:5;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,46px);background:#0b0d18;border-bottom:1px solid rgba(214,172,123,.22)}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#f0d7a8;font:italic 900 19px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:-.01em}.brand svg{width:28px;height:22px}
+.gnav{display:flex;align-items:center;gap:22px;position:relative}.gnav a,.gnav button{display:flex;align-items:center;gap:7px;color:#fff;text-decoration:none;font:800 13.5px/1 inherit;background:none;border:0;cursor:pointer;padding:8px 0}
+.gnav .q{width:17px;height:17px;border:1.5px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+.gnav .hb{width:15px;height:9px;border-top:1.5px solid #fff;border-bottom:1.5px solid #fff}
+.gmenu{display:none;position:absolute;right:0;top:44px;background:#19171f;border:1px solid #d6ac7b;border-radius:10px;padding:6px;min-width:190px;box-shadow:0 10px 30px rgba(0,0,0,.6)}.gmenu.on{display:block}
+.gmenu a{padding:10px 12px;border-radius:6px;font-weight:700}.gmenu a:hover{background:#29262f}
+.gbody{position:relative;z-index:2;display:grid;grid-template-columns:var(--side) calc(var(--W) + 12px) var(--side);grid-template-rows:auto auto auto;column-gap:clamp(22px,2.6vw,46px);justify-content:center;padding:clamp(14px,2.2vh,24px) 16px clamp(16px,3vh,30px)}
+.lp{grid-column:1;grid-row:1/-1;align-self:center;background:linear-gradient(#29262f,#19171f);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 16px 16px;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.gname{font:italic 900 19px/1.1 "Helvetica Neue",Arial,sans-serif;color:#fff;letter-spacing:-.01em;margin-bottom:14px}
+.rlab{font-size:11.5px;font-weight:700;color:#cfc8d8;margin-bottom:8px}
+.rlist{display:flex;flex-direction:column;gap:8px}
+.rrow{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:10px;width:100%;min-height:46px;padding:0 10px 0 12px;border-radius:7px;border:1px solid rgba(255,255,255,.14);background:rgba(10,9,14,.55);color:#fff;cursor:pointer;text-align:left;font:inherit}
+.rrow .rd{width:14px;height:14px;border-radius:50%;border:1.5px solid #cfc8d8;position:relative}
+.rrow.on{border:2px solid #d6ac7b;background:linear-gradient(#3a2a22,#241a17);box-shadow:inset 0 0 0 1px rgba(255,226,169,.18)}
+.rrow.on .rd{border-color:#d6ac7b}.rrow.on .rd:after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:#d6ac7b}
+.rrow .am{font:800 17px/1 "Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}.rrow .am small{font-size:11px;font-weight:700;margin-left:3px;opacity:.85}
+.rrow .ct{font-size:11px;font-weight:800;color:#e9e2f0;white-space:nowrap}
+.rrow:disabled{cursor:default;opacity:.82}
+.rsel{display:none}
+.waku{margin-top:12px;font-size:12px;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;white-space:nowrap}.waku b{font-size:18px;color:#ffe2a9;font-variant-numeric:tabular-nums}
+.waku button{margin-left:auto;font:700 11.5px/1 inherit;color:#fff;background:#3a3443;border:1px solid #d6ac7b;border-radius:6px;padding:8px 10px;cursor:pointer;min-height:34px}
+.plate{grid-column:2;grid-row:1;width:var(--W);justify-self:center;height:clamp(34px,5.1vh,49px);margin-bottom:4px;background:url(art/score-plate.webp) center/100% 100% no-repeat;display:flex;align-items:center;justify-content:center;gap:clamp(8px,1.4vw,14px);transition:filter .38s}
+.plate .pl{font:800 clamp(9.5px,1.15vh,11.5px)/1 inherit;letter-spacing:.08em;color:#e8d8b4}
+.plate .pv{font:800 clamp(17px,2.6vh,24px)/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#ffe2a9;font-variant-numeric:tabular-nums;min-width:2ch;text-shadow:0 0 10px rgba(255,190,90,.35)}
+.plate.glow{filter:brightness(1.7) saturate(1.2)}
+.frame{grid-column:2;grid-row:2;position:relative;width:calc(var(--W) + 12px);padding:5px 6px;border-radius:22px;background:linear-gradient(160deg,#6d6e76 0%,#1d1d22 18%,#3b3c43 40%,#0f0f13 62%,#4a4b52 82%,#16161a 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.6),0 18px 40px rgba(0,0,0,.65)}
+.frame:before,.frame:after{content:"";position:absolute;top:22px;bottom:22px;width:2px;background:linear-gradient(#b8342a,#d6ac7b 50%,#b8342a);border-radius:2px}.frame:before{left:2px}.frame:after{right:2px}
+.frame .stage{width:100%;aspect-ratio:9/16;border-radius:18px}
+.lcdidle{position:absolute;inset:0;z-index:3;background:url(art/torami.webp) center/cover no-repeat;transition:opacity .25s}.lcdidle.off{opacity:0;pointer-events:none}
+.lcdidle .ttl{position:absolute;width:76%;left:12%;bottom:5%}
+.pill{position:absolute;left:10px;top:10px;z-index:8;display:flex;align-items:center;gap:6px;max-width:80%;background:rgba(10,8,16,.55);backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 9px;font-size:10.5px;font-weight:800;color:#fff;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill i{width:6px;height:6px;border-radius:50%;background:#e3b25b;flex:none}
+.startw{grid-column:2;grid-row:3;display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:14px}
+.oshi{position:relative;width:min(240px,100%);min-height:58px;border-radius:6px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:linear-gradient(#e06152,#b32a2c 55%,#86142b);border:1.5px solid #f0b49a;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 0 1px #5a0d1a,0 6px 16px rgba(0,0,0,.5),0 0 18px rgba(255,214,140,.35);display:flex;align-items:center;justify-content:center;transition:transform .05s}
+.oshi:active{transform:translateY(1px)}
+.oshi .cap{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;color:#fff;text-shadow:0 1px 0 rgba(90,10,20,.8)}
+.oshi .en{font:italic 900 25px/1.05 "Helvetica Neue",Arial,sans-serif;letter-spacing:.02em}
+.oshi small{font-size:10.5px;font-weight:800;margin-top:3px}
+.oshi .jp{font:900 25px/1.15 "Hiragino Sans","Noto Sans JP",sans-serif;letter-spacing:.04em}
+.oshi.off{filter:saturate(.35) brightness(.55);cursor:default;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px #3a0a12}
+.oshi.hit{transform:translateY(1px)}
+.glinks{display:flex;gap:18px}.glinks a{color:#fff;font-size:12px;font-weight:700;text-decoration:none;opacity:.9}.glinks a:hover{text-decoration:underline}
+.ctlp{grid-column:3;grid-row:1/-1;align-self:center;position:relative;background:linear-gradient(#29262f,#19171f);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 14px 14px;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.ctlh{font-size:13px;font-weight:800;padding-bottom:12px;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12)}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cb{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 11px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#fff;font:800 12px/1 inherit;cursor:pointer;text-align:left}
+.cb i{font-style:normal;font-weight:900;font-size:13px;min-width:16px;text-align:center;color:#e8e0f0}
+.cb.wide{grid-column:1/-1}
+.cb.on{background:linear-gradient(#4a3a2a,#2c2119);border-color:#d6ac7b;color:#ffe2a9}.cb.on i{color:#ffe2a9}
+.cb:disabled{opacity:.38;cursor:default}
+.volpop{display:none;align-items:center;gap:10px;margin-top:8px;padding:10px;border-radius:8px;background:rgba(0,0,0,.35);border:1px solid rgba(214,172,123,.4)}.volpop.on{display:flex}
+.volpop button{min-width:48px;min-height:34px;border-radius:6px;border:1px solid #d6ac7b;background:#3a3443;color:#ffe2a9;font:800 12px/1 inherit;cursor:pointer}.volpop button.off{color:#aaa;border-color:#666}
+.volpop input{flex:1;accent-color:#d6ac7b;min-width:60px}.volpop span{font:700 12px/1 ui-monospace,Menlo,monospace;color:#ffe2a9;min-width:36px;text-align:right}
+.mpanel{display:none}
+.fly{position:fixed;left:0;top:0;z-index:60;pointer-events:none;text-align:center;transform-origin:50% 50%;will-change:transform,opacity}
+.fly b{display:block;font:900 clamp(32px,calc(var(--W,360px)*.14),58px)/1 "Helvetica Neue",Arial,sans-serif;color:#ffe2a9;font-variant-numeric:tabular-nums;-webkit-text-stroke:1.5px #2a1206;paint-order:stroke fill;text-shadow:0 2px 0 #3a1a06,0 0 18px rgba(255,170,60,.55),0 0 2px #000}
+.fly small{display:block;margin-top:4px;font-size:13px;font-weight:900;color:#fff;text-shadow:0 1px 3px #000,0 0 6px #000}
+.res{background:linear-gradient(rgba(41,38,47,.96),rgba(25,23,31,.96))!important;border-color:#d6ac7b!important}
+@media (max-width:980px){
+ .game{--W:min(calc(100vw - 56px),436px,calc((100svh - 230px)*.5625))}
+ .ghead{height:52px}
+ .gbody{grid-template-columns:calc((var(--W) + 12px - 8px)*.528) calc((var(--W) + 12px - 8px)*.472);grid-template-rows:auto auto auto auto auto auto;column-gap:8px;padding:8px 0 14px}
+ .plate{grid-column:1/-1;grid-row:1}
+ .frame{grid-column:1/-1;grid-row:2}
+ .lp,.startw{display:contents}
+ .mpanel{display:block;grid-column:1/-1;grid-row:3/7;margin-top:6px;background:linear-gradient(#29262f,#19171f);border:1px solid rgba(255,255,255,.1);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.55);z-index:0}
+ .gname{grid-column:1/-1;grid-row:3;z-index:1;margin:12px 12px 6px;font-size:14.5px}
+ .rlab,.rlist,.glinks{display:none}
+ .rsel{grid-column:1;grid-row:4;z-index:1;display:grid;grid-template-rows:auto auto;position:relative;margin-left:10px;padding:7px 26px 7px 10px;min-height:52px;border-radius:7px;border:1px solid rgba(255,255,255,.16);background:rgba(10,9,14,.6);cursor:pointer}
+ .rsel .r1{display:flex;justify-content:space-between;gap:6px;font-size:10.5px;font-weight:800;color:#e9e2f0;white-space:nowrap}
+ .rsel .r2{margin-top:4px;white-space:nowrap}.rsel .r2 b{font:900 clamp(15px,4.6vw,19px)/1 "Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums}.rsel .r2 small{font-size:10.5px;font-weight:700;margin-left:4px}
+ .rsel .chev{position:absolute;right:9px;top:50%;width:7px;height:7px;border-right:1.5px solid #ddd;border-bottom:1.5px solid #ddd;transform:translateY(-70%) rotate(45deg)}
+ .rsel select{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:16px}
+ .rsel.dis{opacity:.82}
+ .oshi{grid-column:2;grid-row:4;z-index:1;width:auto;margin-right:10px;min-height:52px;height:100%}
+ .oshi .en{font-size:22px}.oshi .jp{font-size:22px}
+ .waku{grid-column:1/-1;grid-row:5;z-index:1;margin:8px 10px 0}
+ .ctlp{grid-column:1/-1;grid-row:6;z-index:1;align-self:end;background:none;border:0;box-shadow:none;padding:0 6px 2px;margin-top:5px;border-top:1px solid rgba(255,255,255,.08)}
+ .ctlh{display:none}
+ .cg{grid-template-columns:repeat(5,1fr);gap:2px}
+ .cb,.cb.wide{grid-column:auto;flex-direction:column;justify-content:center;gap:4px;min-height:46px;padding:3px 2px;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;font-size:11px;text-align:center}
+ .cb.on{background:none;border-bottom-color:#d6ac7b}
+ .volpop{margin:6px 4px 0}
+}
+@media (max-width:600px){.ghead{height:46px}.brand{font-size:16px}.brand svg{width:22px;height:18px}.gnav{gap:14px}.gnav a,.gnav button{font-size:12.5px}}
+@media (prefers-reduced-motion:reduce){.plate{transition:none}}
+#oIdle{display:none!important}
 #startBtn{display:none!important}
 @media (max-width:980px){
  .room{grid-template-columns:1fr;max-width:460px;margin:0 auto;padding:12px;gap:12px}
@@ -97,12 +157,8 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
  .rates{grid-template-columns:repeat(4,1fr)}
 }
 @media (max-width:600px){h1{font-size:14px}.meta{display:none}header .in{padding-top:6px}nav a{padding:6px 10px;font-size:12px}}
-@media (max-width:420px){.panel{gap:5px;padding:8px}.pk{height:52px;font-size:12px}.oshi{width:84px;height:84px}.oshi .cap{font-size:17px!important}}
 
-.oshi .cap{position:absolute;inset:8px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff8a7a,#e0352b 55%,#8e140d);box-shadow:0 6px 0 #5b0c07,0 8px 14px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font:900 24px/1 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 2px 0 #6d0f09;animation:bob .55s ease-in-out infinite}
-.oshi .rim{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,220,120,.95);box-shadow:0 0 16px rgba(255,190,60,.9);animation:rim 1s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(3px)}}@keyframes rim{50%{transform:scale(1.08);opacity:.6}}
-.oshi.hit .cap{transform:translateY(5px);animation:none}
 .callout{position:absolute;left:0;right:0;top:44%;text-align:center;font:900 30px/1.15 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 0 8px #ff6a00,0 3px 0 #6d0f09,0 0 22px rgba(255,120,0,.8);pointer-events:none;z-index:8;opacity:0}
 .callout small{display:block;font-size:17px;margin-top:4px}
 .callout.on{animation:co 1.4s ease-out forwards}
@@ -140,32 +196,43 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORAMI RUSH 確定仕様とプロト v5｜当初案ベース・レート選択・シナリオ・代替景品・チャージ限定</h1>
-<div class="meta"><b style="color:#b42318">11/25 17時5分版</b>（毎回RUSH・チャージ限定は別入口・画面の要素を整理・映像の文字切れを修正）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
+<div class="meta"><b style="color:#b42318">11/25 承認版UI</b>（ゲーム画面のデザインを承認版に更新。ゲーム性・仕様は変更なし）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
 <nav id="tabs"><a href="#play" data-t="play">▶ プロトで遊ぶ</a><a href="#spec" data-t="spec">確定仕様とロジック</a><a href="#howto" data-t="howto">遊び方画面（ユーザー向け）</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
 
 <!-- ======== プロト ======== -->
 <section class="pane" id="p-play">
-<div class="room">
- <div class="side sl">
-  <div class="pnl"><div class="ph" id="gname">TORAMI RUSH</div><div class="ph" style="color:#fff;opacity:.8;margin-top:-2px">購入コイン（レート）</div><div class="rates" id="rateBtns"></div><div class="pnote">選んだら、真ん中の START</div>
-   <div id="wakuBox" class="waku" style="display:none">挑戦枠 <b id="wakuN">0</b> 回<button class="pb sm" id="chargeBtn" type="button">1万円チャージ（デモ）で＋1</button></div></div>
- </div>
- <div class="center">
-  <div class="slot" id="slot-play"></div>
-  <div class="panel">
-   <button class="pk" type="button" id="autoBtn"><span>AUTO</span></button>
-   <button class="pk" type="button" id="oneBtn"><span>一撃</span></button>
-   <div class="oshi" id="oshi" role="button" tabindex="0"><div class="rim"></div><div class="cap" id="mainLbl">START</div></div>
-   <button class="pk" type="button" id="spdBtn"><span>スピード<br><b>×1</b></span></button>
-   <button class="pk" type="button" id="skip"><span>スキップ</span></button>
+<div class="game" id="game">
+ <div class="ghead"><a class="brand" href="#play"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M3 21 12 1h4L7 21zm8 0 9-20h4l-9 20zm8 0 6-13h3l-6 13z" fill="#d6ac7b"/></svg><span>TORAMI RUSH</span></a>
+  <nav class="gnav"><a href="#howto" data-jump="howto"><span class="q">?</span>遊び方</a><button type="button" id="menuBtn"><span class="hb"></span>メニュー</button>
+   <div class="gmenu" id="gmenu"><a href="#howto" data-jump="howto">遊び方・注意事項</a><a href="#howto" data-jump="howto">実績還元率公開</a><a href="#spec" data-jump="spec">確定仕様とロジック（資料）</a><a href="#admin" data-jump="admin">管理画面（資料）</a><a href="#est" data-jump="est">工数見積もり依頼（資料）</a></div></nav></div>
+ <div class="gbody">
+  <div class="lp">
+   <div class="gname" id="gname">TORAMI RUSH</div>
+   <div class="rlab">購入レート</div>
+   <div class="rlist" id="rateBtns"></div>
+   <label class="rsel" id="rsel"><span class="r1"><span id="rsLab">購入レート</span><span id="rsCnt">10連</span></span><span class="r2"><b id="rsAmt">5,000</b><small>coin</small></span><span class="chev" aria-hidden="true"></span><select id="rateSel" aria-label="購入レート"></select></label>
+   <div id="wakuBox" class="waku" style="display:none">挑戦枠 <b id="wakuN">0</b> 回<button type="button" id="chargeBtn">チャージ（デモ）＋1</button></div>
   </div>
- </div>
- <div class="side sr">
-  <div class="pnl score"><div class="ph">SCORE</div><div class="sv" id="scoreBig">0</div><div class="pnote" id="scoreSub">—</div></div>
-  <div class="pnl"><div class="ph">音量</div><div class="vol"><button class="pk sm" type="button" id="snd"><span>ON</span></button><input type="range" id="volR" min="0" max="100" value="80"></div></div>
-  <div class="pnl"><div class="ops"><a class="pb" href="#howto" data-jump="howto">遊び方・注意事項</a><a class="pb" href="#howto" data-jump="howto">実績還元率公開</a></div></div>
+  <div class="plate" id="plate"><span class="pl">累計SCORE</span><span class="pv" id="plateVal">0</span></div>
+  <div class="frame" id="frame"><div class="slot" id="slot-play"></div></div>
+  <div class="startw">
+   <div class="oshi" id="oshi" role="button" tabindex="0"><div class="cap" id="mainLbl"><b class="en">START</b><small>抽選する</small></div></div>
+   <div class="glinks"><a href="#howto" data-jump="howto">遊び方・注意事項</a><a href="#howto" data-jump="howto">実績還元率</a></div>
+  </div>
+  <div class="ctlp">
+   <div class="ctlh">演出設定</div>
+   <div class="cg">
+    <button class="cb" type="button" id="autoBtn"><i>&#8635;</i><span>AUTO</span></button>
+    <button class="cb" type="button" id="oneBtn"><i><svg viewBox="0 0 12 16" width="11" height="15" aria-hidden="true"><path d="M7.5 0 0 9h4.5L3 16l9-10H7z" fill="currentColor"/></svg></i><span>一撃</span></button>
+    <button class="cb" type="button" id="spdBtn"><i id="spdX">&times;1</i><span>速度</span></button>
+    <button class="cb" type="button" id="skip"><i>&raquo;</i><span>スキップ</span></button>
+    <button class="cb wide" type="button" id="volBtn"><i>&#9835;</i><span>音量</span></button>
+   </div>
+   <div class="volpop" id="volPop"><button type="button" id="snd">ON</button><input type="range" id="volR" min="0" max="100" value="80" aria-label="音量"><span id="volPct">80%</span></div>
+  </div>
+  <div class="mpanel" aria-hidden="true"></div>
  </div>
 </div>
 <div class="plan" id="plan-play" style="max-width:1240px;margin:8px auto"></div>
@@ -185,9 +252,9 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 
 <div id="stageHome" style="display:none">
 <div class="stage" id="stage">
-  <div class="top"><video id="va" playsinline webkit-playsinline muted preload="auto"></video><video id="vb" playsinline webkit-playsinline muted preload="auto"></video></div>
+  <div class="top"><div class="lcdidle" id="lcdIdle"><img src="art/title.webp" alt="TORAMI RUSH" class="ttl"></div><video id="va" playsinline webkit-playsinline muted preload="auto"></video><video id="vb" playsinline webkit-playsinline muted preload="auto"></video></div>
   <canvas id="gl"></canvas>
-  <div class="hud"><span id="hud">読み込み中</span><b id="hudR"></b></div>
+  <div class="pill"><i></i><span id="hud">読み込み中</span><b id="hudR" hidden></b></div>
   <div class="banner" id="banner"></div>
   <div class="callout" id="callout"></div>
   <div class="ov" id="oWait"></div>
@@ -491,7 +558,7 @@ function timeline(){if(!running||!step)return;
   if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");
     if(step.clip==="rainbow")sfx("rainbow05",.9);else if(step.clip==="gold")setTimeout(()=>sfx("v_tempai"),500)}}
 function onStop(i){if(!running||!step)return;
-  if(step.k==="win"&&i===2){flicker();if(step.say)callout(step.say);if(step.add!=null){plan.total+=step.add;hudR()}}
+  if(step.k==="win"&&i===2){flicker();if(step.add!=null){plan.total+=step.add;flyScore(step.add,step.lab||"",plan.total)}}
   if(step.k==="chall"&&i===2){if(step.ok){flicker();sfx("voltageup",.8);callout(`倍チャレンジ成功！<small>×2　+${fmt(step.add)}</small>`);plan.total+=step.add;hudR()}else{setLight("dark");sfx("v_madamada");callout("まだまだ…<small>失敗</small>")}setTimeout(()=>{if(running&&step&&step.k==="chall")next()},1500)}}
 function runChall(s){banner("");setWait(false);setLight("on");
   // reels already spinning (tap). stop by wall clock
@@ -500,33 +567,52 @@ function runChall(s){banner("");setWait(false);setLight("on");
     if(s.ok){slamAll(s.target);sfx("s777")}else{slamAll([s.target,s.target,norm(s.target-PITCH)])}},2250)}
 function setWait(on){$("oWait").classList.toggle("on",on);paintMain()}
 function paintMain(){const o=$("oshi");if(!o)return;let t,off=false;
-  if(running){if(step&&step.k==="wait"){t="押せ！"}else{t="押せ！";off=true}}
-  else{t=plan&&!plan.played?"START":"引いて<br>START"}
-  $("mainLbl").innerHTML=t;o.classList.toggle("off",off);$("oneBtn").disabled=!running;$("skip").disabled=!running}
-function hudR(){$("hudR").textContent=plan&&plan.hud?plan.hud():"";$("scoreBig").textContent=fmt(plan?plan.total||0:0)}
-function finish(){running=false;bgm(false);setTimeout(paintMain,0);setWait(false);banner("");setLight("on");$("res").innerHTML=plan.result()+`<button class="closebtn" type="button" id="again">もう一度見る</button>`;$("res").classList.add("on");$("again").addEventListener("click",()=>{idle(true)});$("hud").textContent="リザルト";idx=-1;renderPlan()}
+  if(running){t='<b class="jp">押せ！</b>';off=!(step&&step.k==="wait")}
+  else{t=plan&&!plan.played?'<b class="en">START</b><small>演出を再生</small>':'<b class="en">START</b><small>抽選する</small>'}
+  if(!ready)off=true;
+  $("mainLbl").innerHTML=t;o.classList.toggle("off",off);$("oneBtn").disabled=!running;$("skip").disabled=!running;
+  $("lcdIdle").classList.toggle("off",running||!!(plan&&plan.played&&$("res").classList.contains("on")));try{paintRate()}catch(_){}}
+function hudR(){}
+/* 累計SCOREプレートと加点アニメーション */
+let DISP=0,FLY=[],CNT=null;const RM=matchMedia("(prefers-reduced-motion: reduce)");
+function setPlate(v){DISP=v;$("plateVal").textContent=fmt(v)}
+function countTo(to,ms){if(CNT)cancelAnimationFrame(CNT);const from=DISP,t0=performance.now();
+  const st=t=>{const p=Math.min(1,(t-t0)/ms);const v=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));$("plateVal").textContent=fmt(v);if(p<1)CNT=requestAnimationFrame(st);else{DISP=to;CNT=null}};CNT=requestAnimationFrame(st)}
+function plateGlow(){const pl=$("plate");pl.classList.add("glow");setTimeout(()=>pl.classList.remove("glow"),380)}
+function clearFly(){FLY.forEach(f=>{try{f.a&&f.a.cancel()}catch(_){}f.el.remove()});FLY=[];if(CNT){cancelAnimationFrame(CNT);CNT=null}}
+function flyScore(add,label,newTotal){const st=$("stage").getBoundingClientRect(),pv=$("plateVal").getBoundingClientRect();
+  const el=document.createElement("div");el.className="fly";el.style.setProperty("--W",st.width+"px");el.innerHTML=`<b>+${fmt(add)}</b>${label?`<small>${label}</small>`:""}`;document.body.appendChild(el);
+  const w=el.offsetWidth,h=el.offsetHeight;const x0=st.left+st.width/2-w/2,y0=st.top+st.height*.35-h/2;const dx=(pv.left+pv.width/2)-(st.left+st.width/2),dy=(pv.top+pv.height/2)-(st.top+st.height*.35);
+  const f={el};FLY.push(f);const done=()=>{el.remove();FLY=FLY.filter(z=>z!==f);if(!running&&!FLY.length)return;plateGlow();countTo(newTotal,RM.matches?1:340/Math.sqrt(SPD))};
+  if(RM.matches){el.style.transform=`translate(${x0}px,${y0}px)`;setTimeout(done,380);return}
+  const hold=1200*.57,move=1200*.43/Math.sqrt(SPD),T=hold+move,o=v=>v/T;const base=`translate(${x0}px,${y0}px)`;
+  f.a=el.animate([{transform:base+" scale(.8)",opacity:0,offset:0},{transform:base+" scale(1.08)",opacity:1,offset:o(1200*.12)},{transform:base+" scale(1)",opacity:1,offset:o(1200*.23)},{transform:base+" scale(1)",opacity:1,offset:o(hold)},{transform:`translate(${x0+dx}px,${y0+dy}px) scale(.24)`,opacity:0,offset:1}],{duration:T,easing:"linear",fill:"forwards"});
+  f.a.onfinish=done}
+function finish(){running=false;bgm(false);setTimeout(()=>{if(!FLY.length&&plan)setPlate(plan.total);paintMain()},0);setWait(false);banner("");setLight("on");$("res").innerHTML=plan.result()+`<button class="closebtn" type="button" id="again">もう一度見る</button>`;$("res").classList.add("on");$("again").addEventListener("click",()=>{idle(true)});$("hud").textContent="リザルト";idx=-1;renderPlan()}
 function idle(keepPlan){running=false;JUMP=false;stopAll();$("res").classList.remove("on");banner("");els.forEach(e=>{e.pause();e.classList.remove("show")});setWait(false);
   if(ready){setLight("dark");reels.forEach(r=>{r.state="idle";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel})}
   $("oIdle").classList.add("on");const can=ready&&plan;$("startBtn").style.display=can?"inline-block":"none";
   $("idleMsg").innerHTML=!ready?"3Dモデルを読み込み中…":plan?plan.idleText:"レートを選んで、下の START を押してください";
-  $("hud").textContent="待機中";if(plan)plan.total=0;hudR();seq=[];idx=-1;renderPlan();paintMain()}
+  $("hud").textContent=plan&&!plan.played?"準備OK：STARTで演出を再生":"レートを選んで START";if(plan)plan.total=0;clearFly();setPlate(0);seq=[];idx=-1;renderPlan();paintMain()}
 $("startBtn").addEventListener("click",async()=>{if(!ready||!plan)return;audioUnlock();
   if(!seReady()){$("idleMsg").innerHTML="音を読み込み中…";for(let k=0;k<40&&!seReady();k++)await new Promise(r=>setTimeout(r,100))}$("oIdle").classList.remove("on");$("res").classList.remove("on");try{if(innerWidth<980)document.querySelector(".room").scrollIntoView({behavior:"smooth",block:"start"})}catch(_){}
   if(!plan.steps.length){plan.total=0;finish();return}
-  plan.played=true;audioUnlock();seq=plan.steps.map(s=>({...s,vsfx:s.vsfx&&s.vsfx.map(x=>[...x])}));plan.total=0;hudR();running=true;cur=0;prep(els[0],0);prep(els[1],1);const u=els[1].play();if(u&&u.then)u.then(()=>els[1].pause()).catch(()=>{});setLight("dark");startAt(0)});
+  plan.played=true;$("lcdIdle").classList.add("off");clearFly();setPlate(0);audioUnlock();seq=plan.steps.map(s=>({...s,vsfx:s.vsfx&&s.vsfx.map(x=>[...x])}));plan.total=0;hudR();running=true;cur=0;prep(els[0],0);prep(els[1],1);const u=els[1].play();if(u&&u.then)u.then(()=>els[1].pause()).catch(()=>{});setLight("dark");startAt(0)});
 function tap(){if(!running||JUMP||!step||step.k!=="wait")return;const o=$("oshi");o.classList.add("hit");setTimeout(()=>o.classList.remove("hit"),140);try{navigator.vibrate&&navigator.vibrate(25)}catch(_){}
   const f=document.createElement("div");f.className="flash";$("stage").appendChild(f);setTimeout(()=>f.remove(),320);audioUnlock();setLight("on");sfx("punch",1);[0,1,2].forEach(spin);setWait(false);next()}
 $("oshi").addEventListener("pointerdown",e=>{e.preventDefault();if(running){tap();return}
   if(!ready)return;if(!plan||plan.played){$("drawBtn").click();if(!plan||!plan.steps)return}$("startBtn").click()});
-$("skip").addEventListener("click",()=>{if(!running)return;els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel});if(plan)plan.total=plan.fullTotal||0;finish()});
-$("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();else{audioUnlock();if(running)bgm(true)}$("snd").innerHTML="<span>"+(soundOn?"ON":"OFF")+"</span>";$("snd").classList.toggle("on",!soundOn)});
+$("skip").addEventListener("click",()=>{if(!running)return;els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel});if(plan)plan.total=plan.fullTotal||0;clearFly();setPlate(plan?plan.total:0);finish()});
+$("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();else{audioUnlock();if(running)bgm(true)}$("snd").textContent=soundOn?"ON":"OFF";$("snd").classList.toggle("off",!soundOn);$("volBtn").classList.toggle("on",$("volPop").classList.contains("on"))});
 /* AUTO・一撃・スピード・音量 */
-$("volR").addEventListener("input",e=>{VOL=+e.target.value/100;if(MASTER)MASTER.gain.value=VOL});
+$("volR").addEventListener("input",e=>{VOL=+e.target.value/100;if(MASTER)MASTER.gain.value=VOL;$("volPct").textContent=e.target.value+"%"});
+$("volBtn").addEventListener("click",()=>{const on=!$("volPop").classList.contains("on");$("volPop").classList.toggle("on",on);$("volBtn").classList.toggle("on",on)});
+$("menuBtn").addEventListener("click",e=>{e.stopPropagation();$("gmenu").classList.toggle("on")});document.addEventListener("click",()=>$("gmenu").classList.remove("on"));
 $("autoBtn").addEventListener("click",()=>{AUTO=!AUTO;$("autoBtn").classList.toggle("on",AUTO);if(AUTO&&running&&step&&step.k==="wait")tap()});
-$("spdBtn").addEventListener("click",()=>{SPD=SPD===1?1.5:SPD===1.5?2:1;$("spdBtn").innerHTML="<span>スピード<br><b>×"+SPD+"</b></span>";$("spdBtn").classList.toggle("on",SPD>1);els.forEach(e=>e.playbackRate=SPD)});
+$("spdBtn").addEventListener("click",()=>{SPD=SPD===1?1.5:SPD===1.5?2:1;$("spdX").textContent="×"+SPD;$("spdBtn").classList.toggle("on",SPD>1);els.forEach(e=>e.playbackRate=SPD)});
 function ichigeki(){if(!running||!plan||JUMP)return;const ti=seq.findIndex(x=>x.l==="TOTAL");if(ti<0||idx>=ti)return;
   els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=plan.lastTarget||0;r.g.rotation.x=r.ang;r.mat.map=tex.reel});
-  stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");flicker();plan.total=plan.fullTotal||0;hudR();
+  stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");flicker();plan.total=plan.fullTotal||0;clearFly();setPlate(plan.total);
   callout(`一撃！<small>SCORE ${fmt(plan.total)}</small>`);setWait(false);banner("");
   JUMP=true;cur=1-cur;prep(els[cur],ti);setTimeout(()=>{JUMP=false;if(running)startAt(ti)},900)}
 $("oneBtn").addEventListener("click",ichigeki);
@@ -538,7 +624,7 @@ function mountStage(t){const slot=$("slot-"+t);if(slot&&$("stage").parentElement
 const GACHAS={
  normal:{name:"TORAMI RUSH",unit:500,rates:[{r:500,n:1,l:"単発"},{r:5000,n:10,l:"10連"},{r:50000,n:100,l:"100連"},{r:500000,n:1000,l:"1000連"}],
   box:[["S","マリオピカチュウ PSA10",3000000,1,1],["A","ビクティニ PSA10",1000000,2,2],["A","リーリエ SR PSA10",500000,4,4],["B","ピカチュウ SAR PSA10",100000,20,20],["B","リザードン SAR",50000,40,40],["C","ミュウ AR",20000,150,150],["C","ゲンガー SR",10000,300,300],["D","汎用 RR",1000,3000,3000],["その他","交換コイン",200,92966,Infinity]]},
- charge:{name:"TORAMI RUSH GOLD（チャージ限定）",unit:0,charge:true,rates:[{r:5000,n:10,l:"挑戦枠1回"}],
+ charge:{name:"TORAMI RUSH GOLD",unit:0,charge:true,rates:[{r:5000,n:10,l:"挑戦枠1回"}],
   box:[["S","マリオピカチュウ PSA10",3000000,1,1],["A","ビクティニ PSA10",1000000,2,2],["A","リーリエ SR PSA10",500000,4,4],["B","ピカチュウ SAR PSA10",100000,60,60],["B","リザードン SAR",50000,120,120],["C","ミュウ AR",20000,600,600],["C","ゲンガー SR",10000,900,900],["D","汎用 RR",1000,3000,3000],["その他","交換コイン",200,5000,Infinity]]}};
 let GK="normal",UNIT,RATES,VALS,BOX,CUM,TOTAL;
 Object.values(GACHAS).forEach(g=>{g.vals={};g.rates.forEach(x=>g.vals[x.r]={pS:x.r*0.1,pW:x.r*0.2,wS:x.r*1,wW:x.r*2 })});
@@ -590,12 +676,16 @@ function payout(score){
   return{kind:"coin"}}
 /* =============== プロトの操作 =============== */
 let rate=5000,last=null;
-function renderRates(){$("rateBtns").innerHTML=RATES.map(x=>`<button class="pb" type="button" data-r="${x.r}">${GACHAS[GK].charge?x.l+"<small>0コイン・中身10連</small>":fmt(x.r)+"<small>"+x.l+"</small>"}</button>`).join("")}
+function rateLabel(x){const g=GACHAS[GK];return g.charge?{amt:"0",unit:"coin",cnt:x.n+"連",lab:"挑戦枠"}:{amt:fmt(x.r),unit:"coin",cnt:x.n===1?"単発":x.n+"連",lab:"購入レート"}}
+function renderRates(){$("rateBtns").innerHTML=RATES.map(x=>{const L=rateLabel(x);return`<button class="rrow" type="button" data-r="${x.r}"><span class="rd"></span><span class="am">${L.amt}<small>${L.unit}</small></span><span class="ct">${GACHAS[GK].charge?"挑戦枠・"+L.cnt:L.cnt}</span></button>`}).join("");
+  $("rateSel").innerHTML=RATES.map(x=>{const L=rateLabel(x);return`<option value="${x.r}">${L.amt} coin（${L.cnt}）</option>`}).join("")}
 renderRates();
-function paintRate(){$("rateBtns").querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.r===rate))}
-$("rateBtns").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;rate=+b.dataset.r;paintRate();plan=null;$("drawOut").textContent="レートを変えました。もう一度引いてください。";idle()});
+function paintRate(){$("rateBtns").querySelectorAll("button").forEach(b=>{b.classList.toggle("on",+b.dataset.r===rate);b.disabled=running});
+  const x=RATES.find(v=>v.r===rate)||RATES[0],L=rateLabel(x);$("rsLab").textContent=L.lab;$("rsCnt").textContent=L.cnt;$("rsAmt").textContent=L.amt;$("rateSel").value=String(x.r);$("rateSel").disabled=running;$("rsel").classList.toggle("dis",running)}
+$("rateSel").addEventListener("change",e=>{if(running)return;rate=+e.target.value;paintRate();plan=null;$("drawOut").textContent="レートを変えました。";idle()});
+$("rateBtns").addEventListener("click",e=>{const b=e.target.closest("button");if(!b||running)return;rate=+b.dataset.r;paintRate();plan=null;$("drawOut").textContent="レートを変えました。もう一度引いてください。";idle()});
 paintRate();
-function renderWaku(){if(!$("wakuBox"))return;$("wakuBox").style.display=GACHAS[GK].charge?"block":"none";$("wakuN").textContent=WAKU}
+function renderWaku(){if(!$("wakuBox"))return;$("wakuBox").style.display=GACHAS[GK].charge?"flex":"none";$("wakuN").textContent=WAKU}
 if(new URLSearchParams(location.search).get("g")==="gold"){useGacha("charge");rate=RATES[0].r;renderRates();paintRate()}
 $("gname").textContent=GACHAS[GK].name;
 $("chargeBtn").addEventListener("click",()=>{WAKU++;renderWaku();$("drawOut").textContent="10,000円チャージ（デモ）で挑戦枠が1回分増えました。"});
@@ -613,12 +703,12 @@ $("scoreBtn").addEventListener("click",()=>doDraw(false,Math.max(0,+$("scoreIn")
 $("scnSel").addEventListener("change",()=>{if(last&&last.c){last.c=compose(last.score,VALS[rate],+$("scnSel").value<0?pickScn():+$("scnSel").value);build(last)}});
 function hitsTxt(h){return Object.keys(h).map(Number).sort((a,b)=>a-b).map(k=>`${BOX[k][0]==="その他"?"はずれ（200コイン）":BOX[k][0]+"賞 "+BOX[k][1]}×${h[k]}`).join("、")}
 function poTxt(po,score){return po.kind==="coin"?`交換コイン ${fmt(score)}（自動で付与）`:`${po.name}（${man(po.tier)}の範囲${po.kind==="alt"?"・代替景品":""}）`}
-function build(L){const {R,hits,score,c,po}=L;$("scoreSub").textContent=`今回のSCORE ${fmt(score)}／${c?c.games.length+"ゲーム":"RUSHなし"}`;
+function build(L){const {R,hits,score,c,po}=L;
   const steps=[];
   if(c){steps.push({k:"play",f:"freeze",l:"プチュン",sfx:[["puchun",0,.9],["v_miseteyaru",1500]]},{k:"play",f:"op",l:"OP",bgm:true,vsfx:[["v_attack",1.97]]});
     c.games.forEach((g,i)=>{const s=SYM[g.k];
       steps.push({k:"play",f:"lead",l:`${i+1}ゲーム目 導入`},{k:"wait",f:"loop",l:`${i+1}ゲーム目 押せ！`});
-      steps.push({k:"win",f:CLIP[s.clip].f,clip:s.clip,target:s.t,add:g.v+g.up,say:`${s.d?"DOUBLE!! ":""}${s.n.replace("シングル","")} +${fmt(g.v)}${g.up?`<small>上乗せ +${fmt(g.up)}</small>`:""}`,l:`${i+1}G ${s.n}${g.up?"＋上乗せ":""}`})});
+      steps.push({k:"win",f:CLIP[s.clip].f,clip:s.clip,target:s.t,add:g.v+g.up,lab:`${s.n}${g.up?"＋上乗せ "+fmt(g.up):""}`,l:`${i+1}G ${s.n}${g.up?"＋上乗せ":""}`})});
     steps.push({k:"play",f:c.games[c.games.length-1].k==="wW"?"total":"total_green",l:"TOTAL",bgmOff:true,vsfx:[["jingle",0.0],["v_result",0.82]]})}
   const cnt={};if(c)c.games.forEach(g=>cnt[g.k]=(cnt[g.k]||0)+1);const ups=c?c.games.reduce((a,g)=>a+g.up,0):0;
   plan={steps,total:0,fullTotal:score,lastTarget:c?SYM[c.games[c.games.length-1].k].t:0,hud:()=>`SCORE ${fmt(plan.total)}`,
@@ -680,7 +770,7 @@ $("valTable").addEventListener("change",e=>{const x=e.target;if(!x.dataset.vr)re
 $("recalc").addEventListener("click",calcAll);
 renderVals();renderHow();setTimeout(calcAll,300);
 /* =============== tabs =============== */
-function show(t){if(!["play","spec","howto","admin","est"].includes(t))t="play";
+function show(t){if(!["play","spec","howto","admin","est"].includes(t))t="play";document.body.classList.toggle("playmode",t==="play");
   document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("act",p.id==="p-"+t));document.querySelectorAll("#tabs a").forEach(a=>a.classList.toggle("act",a.dataset.t===t));
   if(t==="play"){mountStage("play");if(!running)idle()}else if(running)idle()}
 document.querySelectorAll("[data-jump]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();history.replaceState(null,"","#"+a.dataset.jump);show(a.dataset.jump);scrollTo(0,0)}));
