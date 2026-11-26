@@ -159,6 +159,13 @@ body.playmode>header{display:none}body.playmode main{padding-top:0}body.playmode
 @media (max-width:600px){h1{font-size:14px}.meta{display:none}header .in{padding-top:6px}nav a{padding:6px 10px;font-size:12px}}
 
 @keyframes bob{50%{transform:translateY(3px)}}@keyframes rim{50%{transform:scale(1.08);opacity:.6}}
+.puchun{position:absolute;inset:0;z-index:7;background:#000;display:none;pointer-events:none}.puchun.on{display:block}
+.puchun i{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#fff;box-shadow:0 0 18px 8px #7fb4ff,0 0 60px 20px rgba(80,140,255,.7);opacity:0}
+.puchun.on i{animation:pc 1.1s ease-out .2s forwards}
+@keyframes pc{0%{opacity:0;transform:scale(30,.08)}12%{opacity:1;transform:scale(14,.1)}30%{opacity:1;transform:scale(1)}55%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(.2)}}
+.led{position:absolute;left:8%;right:8%;top:63.5%;height:7.5%;z-index:3;pointer-events:none;border-radius:40%;background:radial-gradient(ellipse at 50% 55%,rgba(255,240,190,.95),rgba(255,150,40,.6) 40%,rgba(255,60,0,0) 72%);mix-blend-mode:screen;opacity:0}
+.led.on{animation:led 1.6s steps(1,end)}
+@keyframes led{0%{opacity:1}6%{opacity:.15}12%{opacity:1}18%{opacity:.2}24%{opacity:1}30%{opacity:.25}36%{opacity:1}44%{opacity:.4}52%{opacity:1}64%{opacity:.6}76%{opacity:.9}100%{opacity:0}}
 .dim{position:absolute;inset:0;z-index:6;background:rgba(0,0,0,.42);opacity:0;transition:opacity .6s;pointer-events:none}.dim.on{opacity:1}
 .callout{position:absolute;left:0;right:0;top:44%;text-align:center;font:900 30px/1.15 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 0 8px #ff6a00,0 3px 0 #6d0f09,0 0 22px rgba(255,120,0,.8);pointer-events:none;z-index:8;opacity:0}
 .callout small{display:block;font-size:17px;margin-top:4px}
@@ -172,6 +179,11 @@ body.playmode>header{display:none}body.playmode main{padding-top:0}body.playmode
 .res{position:absolute;left:5%;right:5%;top:8%;max-height:84%;overflow:auto;background:rgba(10,8,20,.9);border:1px solid rgba(255,215,120,.6);border-radius:12px;padding:14px;color:#fff;z-index:9;display:none;font-size:12.5px}
 .res.on{display:block;animation:up .35s ease-out}@keyframes up{from{transform:translateY(12px);opacity:0}}
 .res .big{font-size:24px;font-weight:900;text-align:center}
+.res.m-red{background:linear-gradient(160deg,rgba(120,14,20,.97),rgba(40,8,14,.97))!important;border-color:#ff7a6a!important}
+.res.m-gold{background:linear-gradient(160deg,rgba(130,92,14,.97),rgba(50,32,6,.97))!important;border-color:#ffd36b!important}
+.res.m-rainbow{background:linear-gradient(135deg,rgba(170,30,60,.96),rgba(170,120,10,.96) 25%,rgba(20,140,70,.96) 50%,rgba(20,90,170,.96) 75%,rgba(110,30,170,.96))!important;border-color:#fff!important}
+.res .mul{text-align:center;font-weight:800;font-size:13px;margin-top:2px;opacity:.9}
+.res .prize{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:4px 0}.res .prize span{flex:1;min-width:0}.res .prize b{white-space:nowrap}
 .res .rw{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.12);padding:3px 0}
 .res .closebtn{width:100%;margin-top:10px;border:1px solid rgba(255,255,255,.6);background:none;color:#fff;border-radius:8px;padding:6px;font:inherit;cursor:pointer}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
@@ -197,7 +209,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORAMI RUSH 確定仕様とプロト v5｜当初案ベース・レート選択・シナリオ・代替景品・チャージ限定</h1>
-<div class="meta"><b style="color:#b42318">11/26 最終仕様版</b>（最低4連・ハズレは右リールの7が下段へ通過して終了／スマホを画面幅いっぱいに・累計SCOREを画面内へ・7揃わずで終了・レート15段階・10万回シミュレーション）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
+<div class="meta"><b style="color:#b42318">11/26 昼版</b>（プチュンを画面中央に・赤揃いのTOTALちらつき修正・LED強化・リザルト背景を倍率で変化・揃うたびにリール初期位置へ／最低4連・ハズレは右リールの7が下段へ通過して終了／スマホを画面幅いっぱいに・累計SCOREを画面内へ・7揃わずで終了・レート15段階・10万回シミュレーション）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
 <nav id="tabs"><a href="#play" data-t="play">▶ プロトで遊ぶ</a><a href="#spec" data-t="spec">確定仕様とロジック</a><a href="#howto" data-t="howto">遊び方画面（ユーザー向け）</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -254,7 +266,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <div class="stage" id="stage">
   <div class="plate" id="plate"><span class="pl">累計SCORE</span><span class="pv" id="plateVal">0</span></div>
   <div class="top"><div class="lcdidle" id="lcdIdle"><img src="art/title.webp" alt="TORAMI RUSH" class="ttl"></div><video id="va" playsinline webkit-playsinline muted preload="auto"></video><video id="vb" playsinline webkit-playsinline muted preload="auto"></video></div>
-  <canvas id="gl"></canvas>
+  <canvas id="gl"></canvas><div class="led" id="led"></div><div class="puchun" id="puchun"><i></i></div>
   <div class="pill"><i></i><span id="hud">読み込み中</span><b id="hudR" hidden></b></div>
   <div class="banner" id="banner"></div>
   <div class="dim" id="dim"></div><div class="callout" id="callout"></div>
@@ -520,10 +532,12 @@ async function init3d(){
 init3d().catch(e=>{$("idleMsg").textContent="3Dの読み込みに失敗しました："+e.message});
 let lightSeq=null;
 function setLight(k){if(!machineMat)return;machineMat.map=tex[k];machineMat.needsUpdate=true}
-function flicker(){const t0=performance.now();lightSeq=t=>{const e=t-t0;if(e>900){setLight("bright");lightSeq=null;return}setLight(Math.floor(e/110)%2?"on":"bright")}}
+function flicker(){const t0=performance.now();const L=$("led");if(L){L.classList.remove("on");void L.offsetWidth;L.classList.add("on")}lightSeq=t=>{const e=t-t0;if(e>1600){setLight("bright");lightSeq=null;return}setLight(Math.floor(e/(e<900?70:140))%2?"dark":"bright")}}
+// 揃ったあとはリールを初期位置に戻す（次のゲームは毎回同じ位置から回す）
+function homeReels(){if(!ready)return;const t0=performance.now();reels.forEach(r=>{r.state="idle";r.w=0;r.home={a0:norm(r.ang),t0}})}
 const MAXW=Math.PI*2*3.6; // 速い回転（ゆうぽんさん指摘）
 const norm=a=>{a%=Math.PI*2;return a<0?a+Math.PI*2:a};
-function spin(i){const r=reels[i];r.ang=norm(r.ang);r.state="accel"}
+function spin(i){const r=reels[i];r.home=null;r.ang=norm(r.ang);r.state="accel"}
 // ガタガタ：止まる直前に7の手前でリールを震わせる
 function shakeAll(target){const t0=performance.now();reels.forEach((r,i)=>{r.base=target-PITCH*(0.42+0.08*i);r.ang=r.base;r.w=0;r.state="shake";r.sh0=t0})}
 // ガシャーン：3本同時に一気に止める（強めのオーバーシュート）
@@ -539,6 +553,7 @@ function loop(t){const dt=Math.min(0.05,(t-lastT)/1000);lastT=t;
     else if(r.state==="spin"){r.ang+=r.w*dt}
     else if(r.state==="shake"){const e=(t-r.sh0)/1000;r.ang=r.base+Math.sin(e*62+i*1.7)*0.045+Math.sin(e*23+i)*0.025}
     else if(r.state==="stopping"){const s=r.stop;const p=Math.min(1,(t-s.t0)/s.dur);r.ang=s.a0+s.D*(s.slam?easeSlam(p):easeOutBack(p));r.w=MAXW*(1-p);if(p>=1){r.state="stopped";r.w=0;r.ang=norm(r.ang);onStop(i)}}
+    if(r.home){const p=Math.min(1,(t-r.home.t0)/320);let a0=r.home.a0;if(a0>Math.PI)a0-=Math.PI*2;r.ang=a0*(1-(1-Math.pow(1-p,3)));if(p>=1){r.ang=0;r.home=null}}
     r.g.rotation.x=r.ang;
     const fast=r.state==="spin"||(r.state==="accel"&&r.w>MAXW*0.5)||(r.state==="stopping"&&!r.stop.slam&&r.w>MAXW*0.55);const m=fast?tex.blur:tex.reel;if(r.mat.map!==m){r.mat.map=m;r.mat.needsUpdate=true}});
     if(lightSeq)lightSeq(t);timeline();renderer.render(scene,camera)}
@@ -562,14 +577,14 @@ function stopAll(){Object.keys(live).forEach(stopSfx)}
 let bgmWant=false;
 function bgm(on){bgmWant=on;stopSfx("bgm");/* 読み込み前なら、読み込み完了時に鳴らす */if(!on||!soundOn||!AC||!buf.bgm)return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=.38;s.buffer=buf.bgm;s.loop=true;s.connect(g).connect(master());s.start();live.bgm=[s]}
 /* =============== player =============== */
-const CLIP={miss:{f:"miss",flash:1.65,miss:true},green:{f:"win_green",flash:1.70},red:{f:"win_red",flash:1.73},gold:{f:"win_gold",flash:1.70},rainbow:{f:"win_rainbow",flash:1.70}}; // 本番映像 No.09（11/22受領）から切り出し
+const CLIP={miss:{f:"miss",flash:1.65,miss:true},green:{f:"win_green",flash:1.70},red:{f:"win_red",flash:1.60},gold:{f:"win_gold",flash:1.70},rainbow:{f:"win_rainbow",flash:1.70}}; // 本番映像 No.09（11/22受領）から切り出し
 const COLN={green:"緑",red:"赤",gold:"金",rainbow:"虹"};
 const els=[$("va"),$("vb")];let SPD=1,AUTO=false,JUMP=false;let cur=0,seq=[],idx=-1,running=false,step=null,plan=null,activeTab="play";
 function callout(html){const c=$("callout");c.innerHTML=html;c.classList.remove("on");void c.offsetWidth;c.classList.add("on")}
 function banner(t){const b=$("banner");if(t){b.textContent=t;b.classList.add("on")}else b.classList.remove("on")}
 function prep(el,i){while(i<seq.length&&(!seq[i].f||seq[i].k==="chall"))i++;if(i>=seq.length){el.removeAttribute("src");return}el.loop=seq[i].k==="wait"||seq[i].k==="chall";el.src=`v/${seq[i].f}.mp4`;el.load()}
 function renderPlan(){const box=$("plan-"+activeTab);if(!box)return;box.innerHTML=(seq.length?seq:[]).map((s,i)=>s.l?`<span class="${i===idx?"cur":""}">${s.l}</span>`:"").join("")}
-function startAt(i){$("dim").classList.remove("on");idx=i;step=seq[i];renderPlan();
+function startAt(i){$("dim").classList.remove("on");$("puchun").classList.toggle("on",seq[i]&&seq[i].f==="freeze");if(seq[i]&&seq[i].f==="lead")homeReels();idx=i;step=seq[i];renderPlan();
   $("hud").textContent=step.l||"";setWait(step.k==="wait");banner(step.k==="wait"&&step.banner?step.banner:"");
   if(step.k==="wait"&&!step.keepLight)setLight("dark");
   if(step.bgm)bgm(true);if(step.bgmOff)bgm(false);
@@ -592,7 +607,7 @@ function timeline(){if(!running||!step)return;
   if(step.vsfx){const ve=els[cur];if(ve.classList.contains("show"))step.vsfx.forEach(x=>{if(!x.done&&ve.currentTime>=x[1]){x.done=true;sfx(x[0])}})}
   if(step.k!=="win")return;const el=els[cur];if(!el.classList.contains("show"))return;
   const vt=el.currentTime,C=CLIP[step.clip];
-  if(!step.fist&&vt>=3.1){step.fist=true;sfx("devilrush",.8)} // 継続の拳突き上げ（7のあとに虎美が拳を上げる場面）
+  if(!step.fist&&vt>=3.1){step.fist=true;sfx("devilrush",.8);sfx("punch",.9)} // 継続の拳突き上げ（7のあとに虎美が拳を上げる場面）
   if(!step.stops[0]&&vt>=C.flash-1.0){step.stops[0]=true;shakeAll(step.target);sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
   if(C.miss){if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll([0,0,PITCH]);stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(!running)return;setLight("dark");$("dim").classList.add("on");callout("RUSH 終了<small>7揃わず</small>")},420)}return}
   if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");
@@ -628,7 +643,7 @@ function flyScore(add,label,newTotal){const st=$("stage").getBoundingClientRect(
   const hold=1200*.57,move=1200*.43/Math.sqrt(SPD),T=hold+move,o=v=>v/T;const base=`translate(${x0}px,${y0}px)`;
   f.a=el.animate([{transform:base+" scale(.8)",opacity:0,offset:0},{transform:base+" scale(1.08)",opacity:1,offset:o(1200*.12)},{transform:base+" scale(1)",opacity:1,offset:o(1200*.23)},{transform:base+" scale(1)",opacity:1,offset:o(hold)},{transform:`translate(${x0+dx}px,${y0+dy}px) scale(.24)`,opacity:0,offset:1}],{duration:T,easing:"linear",fill:"forwards"});
   f.a.onfinish=done}
-function finish(){running=false;bgm(false);setTimeout(()=>{if(!FLY.length&&plan)setPlate(plan.total);paintMain()},0);setWait(false);banner("");setLight("on");$("res").innerHTML=plan.result()+`<button class="closebtn" type="button" id="again">もう一度見る</button>`;$("res").classList.add("on");$("again").addEventListener("click",()=>{idle(true)});$("hud").textContent="リザルト";idx=-1;renderPlan()}
+function finish(){running=false;bgm(false);setTimeout(()=>{if(!FLY.length&&plan)setPlate(plan.total);paintMain()},0);setWait(false);banner("");setLight("on");const mu=plan.mul||0;$("res").classList.remove("m-red","m-gold","m-rainbow");if(mu>=10)$("res").classList.add("m-rainbow");else if(mu>=5)$("res").classList.add("m-gold");else if(mu>=2)$("res").classList.add("m-red");$("res").innerHTML=plan.result()+`<button class="closebtn" type="button" id="again">もう一度見る</button>`;$("res").classList.add("on");$("again").addEventListener("click",()=>{idle(true)});$("hud").textContent="リザルト";idx=-1;renderPlan()}
 function idle(keepPlan){running=false;JUMP=false;stopAll();$("res").classList.remove("on");banner("");els.forEach(e=>{e.pause();e.classList.remove("show")});setWait(false);
   if(ready){setLight("dark");reels.forEach(r=>{r.state="idle";r.w=0;r.ang=0;r.g.rotation.x=0;r.mat.map=tex.reel})}
   $("oIdle").classList.add("on");const can=ready&&plan;$("startBtn").style.display=can?"inline-block":"none";
@@ -755,14 +770,14 @@ function build(L){const {R,hits,score,c,po}=L;
     const nE=c.games.length+1;steps.push({k:"play",f:"lead",l:`${nE}ゲーム目 導入`},{k:"wait",f:"loop",l:`${nE}ゲーム目 押せ！`},{k:"win",f:"miss",clip:"miss",target:0,l:`${nE}G ハズレ → 終了`});
     steps.push({k:"play",f:c.games[c.games.length-1].k==="wW"?"total":"total_green",l:"TOTAL",bgmOff:true,vsfx:[["jingle",0.0],["v_result",0.82]]})}
   const cnt={};if(c)c.games.forEach(g=>cnt[g.k]=(cnt[g.k]||0)+1);const ups=c?c.games.reduce((a,g)=>a+g.up,0):0;
-  plan={steps,total:0,fullTotal:score,lastTarget:c?SYM[c.games[c.games.length-1].k].t:0,hud:()=>`SCORE ${fmt(plan.total)}`,
+  plan={steps,total:0,fullTotal:score,mul:R.r?score/R.r:0,lastTarget:c?SYM[c.games[c.games.length-1].k].t:0,hud:()=>`SCORE ${fmt(plan.total)}`,
     idleText:`<b>レート ${fmt(R.r)}（${R.l}）</b><br>SCORE ${fmt(score)}<br>${c?`${SCN[c.si].n}・${c.games.length}ゲーム`:"—"}<br><span style="font-size:11px;opacity:.8">STARTで再生</span>`,
-    result:()=>`<div style="text-align:center;opacity:.8">TORAMI RUSH 結果</div><div class="big">SCORE ${fmt(score)}</div>
+    result:()=>`<div style="text-align:center;opacity:.8">TORAMI RUSH 結果</div><div class="big">SCORE ${fmt(score)}</div><div class="mul">購入 ${fmt(R.r)} coin の ×${(score/R.r).toFixed(score/R.r<10?2:1)}</div>
       ${["pS","pW","wS","wW"].filter(k=>cnt[k]).map(k=>`<div class="rw"><span>${SYM[k].n}</span><span>×${cnt[k]}</span></div>`).join("")}
       ${ups?`<div class="rw"><span>上乗せ</span><span>+${fmt(ups)}</span></div>`:""}
       <div style="margin-top:10px;font-weight:800">獲得景品</div>
       ${po.kind==="coin"?`<div class="rw" style="font-size:15px"><span>交換コイン</span><b>${fmt(score)}</b></div><div style="font-size:11.5px;opacity:.85">1万未満のため、交換コインを自動で付与しました</div>`:
-      `<div class="rw" style="font-size:15px"><span>${po.name}</span><b>${man(po.tier)}相当</b></div>
+      `<div class="prize" style="font-size:15px"><span>${po.name}</span><b>${man(po.tier)}相当</b></div>
       <div style="display:flex;gap:8px;margin-top:8px"><button class="closebtn" style="margin:0;background:#fff;color:#111" type="button" data-pick="ship">発送する</button><button class="closebtn" style="margin:0" type="button" data-pick="coin">交換する（${fmt(score)}コイン）</button></div><div id="pickMsg" style="font-size:12px;margin-top:6px;text-align:center"></div>`}`};
   $("drawOut").innerHTML=`<b>レート ${fmt(R.r)}（${R.l}）</b>${L.fixed?"・SCORE指定":`<br>中身：${hitsTxt(hits)}`}<br>SCORE <b>${fmt(score)}</b> → ${c?`シナリオ「${SCN[c.si].n}」${c.games.length}ゲーム`:"—"}
     <div class="chips">${c?c.games.map(g=>`<span class="chip k-${g.k}">${SYM[g.k].n} ${fmt(g.v)}${g.up?" ＋上乗せ"+fmt(g.up):""}</span>`).join(""):""}</div>
