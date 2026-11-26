@@ -159,6 +159,7 @@ body.playmode>header{display:none}body.playmode main{padding-top:0}body.playmode
 @media (max-width:600px){h1{font-size:14px}.meta{display:none}header .in{padding-top:6px}nav a{padding:6px 10px;font-size:12px}}
 
 @keyframes bob{50%{transform:translateY(3px)}}@keyframes rim{50%{transform:scale(1.08);opacity:.6}}
+.dim{position:absolute;inset:0;z-index:6;background:rgba(0,0,0,.42);opacity:0;transition:opacity .6s;pointer-events:none}.dim.on{opacity:1}
 .callout{position:absolute;left:0;right:0;top:44%;text-align:center;font:900 30px/1.15 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 0 8px #ff6a00,0 3px 0 #6d0f09,0 0 22px rgba(255,120,0,.8);pointer-events:none;z-index:8;opacity:0}
 .callout small{display:block;font-size:17px;margin-top:4px}
 .callout.on{animation:co 1.4s ease-out forwards}
@@ -196,7 +197,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORAMI RUSH 確定仕様とプロト v5｜当初案ベース・レート選択・シナリオ・代替景品・チャージ限定</h1>
-<div class="meta"><b style="color:#b42318">11/26 最終仕様版</b>（スマホを画面幅いっぱいに・累計SCOREを画面内へ・7揃わずで終了・レート15段階・10万回シミュレーション）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
+<div class="meta"><b style="color:#b42318">11/26 最終仕様版</b>（最低4連・ハズレは右リールの7が下段へ通過して終了／スマホを画面幅いっぱいに・累計SCOREを画面内へ・7揃わずで終了・レート15段階・10万回シミュレーション）｜<a href="/torecacorp/tora-rush-v4/">v4（2案比較）</a>／<a href="/torecacorp/tora-rush-v3/">プロトv3</a>／<a href="/torecacorp/tora-rush-v2/">プロトv2</a></div>
 <nav id="tabs"><a href="#play" data-t="play">▶ プロトで遊ぶ</a><a href="#spec" data-t="spec">確定仕様とロジック</a><a href="#howto" data-t="howto">遊び方画面（ユーザー向け）</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -256,7 +257,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
   <canvas id="gl"></canvas>
   <div class="pill"><i></i><span id="hud">読み込み中</span><b id="hudR" hidden></b></div>
   <div class="banner" id="banner"></div>
-  <div class="callout" id="callout"></div>
+  <div class="dim" id="dim"></div><div class="callout" id="callout"></div>
   <div class="ov" id="oWait"></div>
   <div class="ov on" id="oIdle"><div id="idleMsg">3Dモデルを読み込み中…</div><button class="btn" type="button" id="startBtn" style="margin-top:12px;background:none;color:#fff;border:2px solid #fff;border-radius:999px;padding:8px 28px;font-weight:800;display:none">START</button></div>
   <div class="res" id="res"></div>
@@ -272,7 +273,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><th style="width:170px">項目</th><th>内容</th></tr>
 <tr><td>ゲーム性</td><td><b>当初案</b>（7の連鎖で額を見せる）。入江さん案（ランク＝連チャン数）は採用しない</td></tr>
 <tr><td>引き方</td><td>1つのガチャでレートを選んで<b>1回だけ</b>引く。レートに応じて内部で単発／10連／100連／1000連を実行し、当選した景品の交換コイン数（PT）の合計を<b>SCORE</b>とする</td></tr>
-<tr><td>RUSH</td><td><b>RUSHガチャなので1回引くと必ずRUSH</b>。最後は<b>7が揃わないゲーム（ハズレ）で終了</b>し、TOTALへ。7が揃うたびに<b>そのゲームの当選PT</b>と<b>累計SCORE</b>を表示し、SCOREぴったりまで上乗せする（上乗せ特化ゾーンの見せ方）。SCOREが紫7シングルの価値未満のときは1ゲームでSCORE分だけ見せる</td></tr>
+<tr><td>RUSH</td><td><b>RUSHガチャなので1回引くと必ずRUSH</b>。<b>最低4連</b>。最後は<b>7が揃わないゲーム（ハズレ）で終了</b>：右リールの7が下段へ通り過ぎて停止 → 画面がやや暗くなり「RUSH 終了」→ TOTAL → 最終リザルト。7が揃うたびに<b>そのゲームの当選PT</b>と<b>累計SCORE</b>を表示し、SCOREぴったりまで上乗せする（上乗せ特化ゾーンの見せ方）。SCOREが紫7シングルの価値未満のときは1ゲームでSCORE分だけ見せる</td></tr>
 <tr><td>7の額</td><td><b>ガチャごと・レートごと</b>に設定（紫7シングル／紫7ダブル／白7シングル／白7ダブル）。遊び方画面では、レートを切り替えると7の額と平均継続率が切り替わる</td></tr>
 <tr><td>7の出方</td><td><b>シナリオ管理</b>。10種類のシナリオ（白7多め・後半爆発など）をあらかじめ用意し、ガチャごとに出やすさ（%）を設定する</td></tr>
 <tr><td>受け取り</td><td>SCOREの範囲で<b>景品を1個</b>に決める（景品の額は範囲の下限にそろえる）。ユーザーは<b>発送</b>か<b>交換</b>を選ぶ。交換はSCOREと同じ額の交換コインで返す。SCOREが一番下の範囲（1万）未満なら、交換コイン（SCORE分）を自動で返す</td></tr>
@@ -318,17 +319,17 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 </div>
 
 <div class="card">
-<h2>シミュレーション結果（各レート10万回）</h2>
-<p class="note" style="margin:0 0 6px">プロトと同じロジック（例のBOX・7の額＝レート比例・シナリオ10種を均等）で、レートごとに10万回引いた結果。<b>BOXは仮の例</b>なので、還元率や交換コインの割合は本番のBOXで変わる。平均継続率＝7が揃ったゲーム数÷（7が揃ったゲーム数＋ハズレで終わったゲーム数）。</p>
-<div style="overflow:auto"><table class="t" style="font-size:12px;min-width:980px"><tr><th class="n">レート</th><th class="n">中身</th><th class="n">還元率</th><th class="n">平均継続率</th><th class="n">平均ゲーム数<br>（7揃い）</th><th class="n">最大<br>ゲーム数</th><th class="n">SCORE<br>中央値</th><th class="n">SCORE<br>上位1%</th><th class="n">SCORE<br>最大</th><th class="n">上乗せの<br>割合</th><th class="n">払い出し<br>登録景品</th><th class="n">代替景品</th><th class="n">交換コイン<br>（1万未満）</th></tr><tr><td class='n'>500</td><td class='n'>1連</td><td class='n'>78.4%</td><td class='n'><b>78.6%</b></td><td class='n'>3.66</td><td class='n'>12</td><td class='n'>200</td><td class='n'>1,000</td><td class='n'>3,000,000</td><td class='n'>41.6%</td><td class='n'>0.5%</td><td class='n'>0.0%</td><td class='n'>99.5%</td></tr><tr><td class='n'>1,000</td><td class='n'>2連</td><td class='n'>80.9%</td><td class='n'><b>79.0%</b></td><td class='n'>3.77</td><td class='n'>12</td><td class='n'>400</td><td class='n'>10,200</td><td class='n'>3,000,200</td><td class='n'>40.1%</td><td class='n'>1.0%</td><td class='n'>0.0%</td><td class='n'>99.0%</td></tr><tr><td class='n'>2,000</td><td class='n'>4連</td><td class='n'>78.0%</td><td class='n'><b>79.6%</b></td><td class='n'>3.91</td><td class='n'>12</td><td class='n'>800</td><td class='n'>10,600</td><td class='n'>3,000,600</td><td class='n'>33.7%</td><td class='n'>2.2%</td><td class='n'>0.0%</td><td class='n'>97.8%</td></tr><tr><td class='n'>3,000</td><td class='n'>6連</td><td class='n'>82.1%</td><td class='n'><b>79.6%</b></td><td class='n'>3.91</td><td class='n'>12</td><td class='n'>1,200</td><td class='n'>21,000</td><td class='n'>3,001,800</td><td class='n'>36.3%</td><td class='n'>3.1%</td><td class='n'>0.0%</td><td class='n'>96.9%</td></tr><tr><td class='n'>5,000</td><td class='n'>10連</td><td class='n'>78.7%</td><td class='n'><b>79.8%</b></td><td class='n'>3.96</td><td class='n'>12</td><td class='n'>2,000</td><td class='n'>22,600</td><td class='n'>3,002,600</td><td class='n'>31.4%</td><td class='n'>5.2%</td><td class='n'>0.1%</td><td class='n'>94.7%</td></tr><tr><td class='n'>10,000</td><td class='n'>20連</td><td class='n'>79.6%</td><td class='n'><b>79.9%</b></td><td class='n'>3.97</td><td class='n'>12</td><td class='n'>4,800</td><td class='n'>54,600</td><td class='n'>3,014,400</td><td class='n'>32.2%</td><td class='n'>9.9%</td><td class='n'>0.3%</td><td class='n'>89.8%</td></tr><tr><td class='n'>20,000</td><td class='n'>40連</td><td class='n'>79.9%</td><td class='n'><b>80.7%</b></td><td class='n'>4.19</td><td class='n'>12</td><td class='n'>8,800</td><td class='n'>107,800</td><td class='n'>3,060,000</td><td class='n'>30.2%</td><td class='n'>27.9%</td><td class='n'>1.7%</td><td class='n'>70.4%</td></tr><tr><td class='n'>30,000</td><td class='n'>60連</td><td class='n'>83.3%</td><td class='n'><b>81.3%</b></td><td class='n'>4.34</td><td class='n'>12</td><td class='n'>13,600</td><td class='n'>114,200</td><td class='n'>3,112,400</td><td class='n'>29.9%</td><td class='n'>90.0%</td><td class='n'>10.0%</td><td class='n'>0.0%</td></tr><tr><td class='n'>50,000</td><td class='n'>100連</td><td class='n'>79.6%</td><td class='n'><b>81.7%</b></td><td class='n'>4.48</td><td class='n'>12</td><td class='n'>24,000</td><td class='n'>142,000</td><td class='n'>3,520,400</td><td class='n'>26.7%</td><td class='n'>66.1%</td><td class='n'>33.9%</td><td class='n'>0.0%</td></tr><tr><td class='n'>100,000</td><td class='n'>200連</td><td class='n'>80.0%</td><td class='n'><b>82.4%</b></td><td class='n'>4.69</td><td class='n'>12</td><td class='n'>56,200</td><td class='n'>557,600</td><td class='n'>3,573,800</td><td class='n'>24.4%</td><td class='n'>47.3%</td><td class='n'>52.7%</td><td class='n'>0.0%</td></tr><tr><td class='n'>200,000</td><td class='n'>400連</td><td class='n'>80.6%</td><td class='n'><b>82.9%</b></td><td class='n'>4.85</td><td class='n'>12</td><td class='n'>120,000</td><td class='n'>1,109,200</td><td class='n'>6,128,400</td><td class='n'>21.8%</td><td class='n'>58.6%</td><td class='n'>41.4%</td><td class='n'>0.0%</td></tr><tr><td class='n'>300,000</td><td class='n'>600連</td><td class='n'>79.9%</td><td class='n'><b>83.2%</b></td><td class='n'>4.97</td><td class='n'>12</td><td class='n'>185,400</td><td class='n'>1,214,400</td><td class='n'>4,266,600</td><td class='n'>20.5%</td><td class='n'>15.1%</td><td class='n'>84.9%</td><td class='n'>0.0%</td></tr><tr><td class='n'>500,000</td><td class='n'>1,000連</td><td class='n'>80.1%</td><td class='n'><b>83.5%</b></td><td class='n'>5.07</td><td class='n'>12</td><td class='n'>320,800</td><td class='n'>3,242,600</td><td class='n'>6,363,400</td><td class='n'>20.8%</td><td class='n'>4.6%</td><td class='n'>95.4%</td><td class='n'>0.0%</td></tr><tr><td class='n'>750,000</td><td class='n'>1,500連</td><td class='n'>79.9%</td><td class='n'><b>83.8%</b></td><td class='n'>5.15</td><td class='n'>12</td><td class='n'>490,600</td><td class='n'>3,455,200</td><td class='n'>12,556,600</td><td class='n'>19.8%</td><td class='n'>40.0%</td><td class='n'>60.0%</td><td class='n'>0.0%</td></tr><tr><td class='n'>1,000,000</td><td class='n'>2,000連</td><td class='n'>80.0%</td><td class='n'><b>83.9%</b></td><td class='n'>5.22</td><td class='n'>12</td><td class='n'>661,600</td><td class='n'>3,662,800</td><td class='n'>7,845,400</td><td class='n'>19.6%</td><td class='n'>71.0%</td><td class='n'>29.0%</td><td class='n'>0.0%</td></tr></table></div>
-<p style="font-size:12.5px;margin:8px 0 0">チャージ限定（GOLD・挑戦枠1回＝10連）：平均継続率 86.7%／平均ゲーム数 6.54／SCORE中央値 26,600（例のBOX）。</p>
-<p style="font-size:12.5px;margin:4px 0 0">ゲーム数の分布（5,000レート）：1ゲーム 8.2%／2〜3 11.6%／4〜6 75.2%／7〜10 4.6%／11〜12 0.4%</p>
+<h2>シミュレーション結果（各レート10万回・11/26 最低4連版）</h2>
+<p class="note" style="margin:0 0 6px">プロトと同じロジック（例のBOX・7の額＝レート比例・シナリオ10種を均等・最低4連）で、レートごとに10万回引いた結果。<b>BOXは仮の例</b>なので、還元率や交換コインの割合は本番のBOXで変わる。平均継続率＝7が揃ったゲーム数÷（7が揃ったゲーム数＋ハズレで終わったゲーム数）。</p>
+<div style="overflow:auto"><table class="t" style="font-size:12px;min-width:980px"><tr><th class="n">レート</th><th class="n">中身</th><th class="n">還元率</th><th class="n">平均継続率</th><th class="n">平均ゲーム数<br>（7揃い）</th><th class="n">最大<br>ゲーム数</th><th class="n">SCORE<br>中央値</th><th class="n">SCORE<br>上位1%</th><th class="n">SCORE<br>最大</th><th class="n">上乗せの<br>割合</th><th class="n">払い出し<br>登録景品</th><th class="n">代替景品</th><th class="n">交換コイン<br>（1万未満）</th></tr><tr><td class='n'>500</td><td class='n'>1連</td><td class='n'>75.3%</td><td class='n'><b>80.5%</b></td><td class='n'>4.12</td><td class='n'>12</td><td class='n'>200</td><td class='n'>1,000</td><td class='n'>3,000,000</td><td class='n'>34.4%</td><td class='n'>0.5%</td><td class='n'>0.0%</td><td class='n'>99.5%</td></tr><tr><td class='n'>1,000</td><td class='n'>2連</td><td class='n'>75.2%</td><td class='n'><b>80.9%</b></td><td class='n'>4.23</td><td class='n'>12</td><td class='n'>400</td><td class='n'>10,200</td><td class='n'>3,000,200</td><td class='n'>31.0%</td><td class='n'>1.0%</td><td class='n'>0.0%</td><td class='n'>99.0%</td></tr><tr><td class='n'>2,000</td><td class='n'>4連</td><td class='n'>83.7%</td><td class='n'><b>81.4%</b></td><td class='n'>4.38</td><td class='n'>12</td><td class='n'>800</td><td class='n'>11,400</td><td class='n'>3,000,600</td><td class='n'>32.7%</td><td class='n'>2.2%</td><td class='n'>0.0%</td><td class='n'>97.8%</td></tr><tr><td class='n'>3,000</td><td class='n'>6連</td><td class='n'>80.2%</td><td class='n'><b>81.5%</b></td><td class='n'>4.39</td><td class='n'>12</td><td class='n'>1,200</td><td class='n'>21,000</td><td class='n'>3,001,800</td><td class='n'>28.9%</td><td class='n'>3.2%</td><td class='n'>0.0%</td><td class='n'>96.8%</td></tr><tr><td class='n'>5,000</td><td class='n'>10連</td><td class='n'>81.0%</td><td class='n'><b>81.6%</b></td><td class='n'>4.45</td><td class='n'>12</td><td class='n'>2,000</td><td class='n'>22,600</td><td class='n'>3,021,600</td><td class='n'>27.8%</td><td class='n'>5.2%</td><td class='n'>0.1%</td><td class='n'>94.7%</td></tr><tr><td class='n'>10,000</td><td class='n'>20連</td><td class='n'>82.4%</td><td class='n'><b>81.6%</b></td><td class='n'>4.44</td><td class='n'>12</td><td class='n'>4,800</td><td class='n'>53,800</td><td class='n'>3,043,400</td><td class='n'>30.2%</td><td class='n'>9.9%</td><td class='n'>0.2%</td><td class='n'>89.9%</td></tr><tr><td class='n'>20,000</td><td class='n'>40連</td><td class='n'>83.2%</td><td class='n'><b>82.4%</b></td><td class='n'>4.69</td><td class='n'>12</td><td class='n'>8,800</td><td class='n'>108,600</td><td class='n'>3,510,000</td><td class='n'>27.5%</td><td class='n'>28.5%</td><td class='n'>1.6%</td><td class='n'>69.9%</td></tr><tr><td class='n'>30,000</td><td class='n'>60連</td><td class='n'>79.7%</td><td class='n'><b>82.9%</b></td><td class='n'>4.83</td><td class='n'>12</td><td class='n'>13,600</td><td class='n'>113,400</td><td class='n'>3,113,200</td><td class='n'>23.0%</td><td class='n'>90.0%</td><td class='n'>10.0%</td><td class='n'>0.0%</td></tr><tr><td class='n'>50,000</td><td class='n'>100連</td><td class='n'>79.2%</td><td class='n'><b>83.3%</b></td><td class='n'>4.99</td><td class='n'>12</td><td class='n'>24,000</td><td class='n'>142,000</td><td class='n'>3,170,200</td><td class='n'>20.4%</td><td class='n'>66.2%</td><td class='n'>33.8%</td><td class='n'>0.0%</td></tr><tr><td class='n'>100,000</td><td class='n'>200連</td><td class='n'>80.5%</td><td class='n'><b>84.0%</b></td><td class='n'>5.23</td><td class='n'>12</td><td class='n'>56,200</td><td class='n'>561,000</td><td class='n'>4,063,400</td><td class='n'>18.0%</td><td class='n'>46.8%</td><td class='n'>53.2%</td><td class='n'>0.0%</td></tr><tr><td class='n'>200,000</td><td class='n'>400連</td><td class='n'>79.7%</td><td class='n'><b>84.4%</b></td><td class='n'>5.42</td><td class='n'>12</td><td class='n'>120,000</td><td class='n'>1,101,600</td><td class='n'>4,150,000</td><td class='n'>14.7%</td><td class='n'>58.3%</td><td class='n'>41.7%</td><td class='n'>0.0%</td></tr><tr><td class='n'>300,000</td><td class='n'>600連</td><td class='n'>79.8%</td><td class='n'><b>84.7%</b></td><td class='n'>5.53</td><td class='n'>12</td><td class='n'>186,000</td><td class='n'>1,213,600</td><td class='n'>6,157,800</td><td class='n'>13.3%</td><td class='n'>15.0%</td><td class='n'>85.0%</td><td class='n'>0.0%</td></tr><tr><td class='n'>500,000</td><td class='n'>1,000連</td><td class='n'>79.9%</td><td class='n'><b>84.9%</b></td><td class='n'>5.64</td><td class='n'>12</td><td class='n'>320,200</td><td class='n'>3,234,400</td><td class='n'>6,485,200</td><td class='n'>12.8%</td><td class='n'>4.5%</td><td class='n'>95.5%</td><td class='n'>0.0%</td></tr><tr><td class='n'>750,000</td><td class='n'>1,500連</td><td class='n'>79.8%</td><td class='n'><b>85.2%</b></td><td class='n'>5.74</td><td class='n'>12</td><td class='n'>490,400</td><td class='n'>3,452,800</td><td class='n'>9,487,400</td><td class='n'>12.7%</td><td class='n'>39.9%</td><td class='n'>60.1%</td><td class='n'>0.0%</td></tr><tr><td class='n'>1,000,000</td><td class='n'>2,000連</td><td class='n'>80.0%</td><td class='n'><b>85.3%</b></td><td class='n'>5.81</td><td class='n'>12</td><td class='n'>660,800</td><td class='n'>3,662,200</td><td class='n'>7,255,000</td><td class='n'>12.5%</td><td class='n'>71.2%</td><td class='n'>28.8%</td><td class='n'>0.0%</td></tr></table></div>
+<p style="font-size:12.5px;margin:8px 0 0">チャージ限定（GOLD・挑戦枠1回＝10連）：平均継続率 87.7%／平均ゲーム数 7.12／SCORE中央値 26,600（例のBOX）。</p>
+<p style="font-size:12.5px;margin:4px 0 0">ゲーム数の分布：レート5,000 … 3ゲーム以下 0%／4〜6 95.0%／7〜10 4.5%／11〜12 0.4%　レート1,000,000 … 3ゲーム以下 0%／4〜6 78.8%／7〜10 20.3%／11〜12 0.9%</p>
 <h3>わかったこと</h3>
 <ul style="font-size:12.5px;margin:0;padding-left:18px">
-<li>平均継続率は約79〜84%。レートが高いほど中身の合計が大きくなり、少し上がる</li>
-<li>レートが上がっても還元率はほぼ一定（例のBOXで約80%）。7の額がレートに比例しているため、どのレートでも見え方（ゲーム数）はほぼ同じ</li>
-<li>低レート（〜1万）は SCORE が1万未満になりやすく、払い出しの多くが交換コインになる。景品で受け取れる割合を上げるなら、BOX か代替景品の一番下の範囲（1万）を見直す</li>
-<li>最大ゲーム数はシナリオの上限（12）で頭打ち。超える分は上乗せで見せる</li>
+<li><b>全レートで最低4連</b>（3ゲーム以下は0%）。平均継続率は約81〜85%</li>
+<li>ただし低〜中レートはほとんどが<b>ちょうど4〜6連</b>。中身の多くがはずれ（200コイン）でSCOREが小さく、紫7シングル（レート×0.1）で割ると4ゲーム分にしかならないため。もっと長く続けたい場合は、7の額を下げる（例：紫7シングル＝レート×0.05で最低8連）か、BOXの下位の当たりを厚くする</li>
+<li>レートが上がっても還元率はほぼ一定（例のBOXで約80%）</li>
+<li>低レート（〜1万）は SCORE が1万未満になりやすく、払い出しの多くが交換コインになる</li>
 </ul>
 </div>
 <div class="card">
@@ -568,7 +569,7 @@ function callout(html){const c=$("callout");c.innerHTML=html;c.classList.remove(
 function banner(t){const b=$("banner");if(t){b.textContent=t;b.classList.add("on")}else b.classList.remove("on")}
 function prep(el,i){while(i<seq.length&&(!seq[i].f||seq[i].k==="chall"))i++;if(i>=seq.length){el.removeAttribute("src");return}el.loop=seq[i].k==="wait"||seq[i].k==="chall";el.src=`v/${seq[i].f}.mp4`;el.load()}
 function renderPlan(){const box=$("plan-"+activeTab);if(!box)return;box.innerHTML=(seq.length?seq:[]).map((s,i)=>s.l?`<span class="${i===idx?"cur":""}">${s.l}</span>`:"").join("")}
-function startAt(i){idx=i;step=seq[i];renderPlan();
+function startAt(i){$("dim").classList.remove("on");idx=i;step=seq[i];renderPlan();
   $("hud").textContent=step.l||"";setWait(step.k==="wait");banner(step.k==="wait"&&step.banner?step.banner:"");
   if(step.k==="wait"&&!step.keepLight)setLight("dark");
   if(step.bgm)bgm(true);if(step.bgmOff)bgm(false);
@@ -585,7 +586,7 @@ function next(){if(!running||JUMP)return;
   if(!nx){finish();return}
   if(nx.k==="chall"){idx++;startAt(idx);return} // chall keeps current video (loop)
   cur=1-cur;startAt(idx+1)}
-els.forEach(el=>el.addEventListener("ended",()=>{if(running&&el===els[cur]&&step&&(step.k==="play"||step.k==="win"))next()}));
+els.forEach(el=>el.addEventListener("ended",()=>{if(running&&el===els[cur]&&step&&(step.k==="play"||step.k==="win")){if(step.clip==="miss"){const st=step;setTimeout(()=>{if(running&&step===st)next()},1100/SPD)}else next()}}));
 function timeline(){if(!running||!step)return;
   // 映像の再生位置に合わせて鳴らす音（虎拳アタックの声は、声の出だしをタイトルが出る瞬間 2.2秒 に合わせる）
   if(step.vsfx){const ve=els[cur];if(ve.classList.contains("show"))step.vsfx.forEach(x=>{if(!x.done&&ve.currentTime>=x[1]){x.done=true;sfx(x[0])}})}
@@ -593,7 +594,7 @@ function timeline(){if(!running||!step)return;
   const vt=el.currentTime,C=CLIP[step.clip];
   if(!step.fist&&vt>=3.1){step.fist=true;sfx("devilrush",.8)} // 継続の拳突き上げ（7のあとに虎美が拳を上げる場面）
   if(!step.stops[0]&&vt>=C.flash-1.0){step.stops[0]=true;shakeAll(step.target);sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
-  if(C.miss){if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll([0,0,norm(-PITCH)]);stopSfx("reellock_t1");stopSfx("reellock_t2");setLight("dark");callout("RUSH 終了<small>7揃わず</small>")}return}
+  if(C.miss){if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll([0,0,PITCH]);stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(!running)return;setLight("dark");$("dim").classList.add("on");callout("RUSH 終了<small>7揃わず</small>")},420)}return}
   if(!step.stops[1]&&vt>=C.flash-0.1){step.stops[1]=true;slamAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");
     if(step.clip==="rainbow")sfx("rainbow05",.9);else if(step.clip==="gold")setTimeout(()=>sfx("v_tempai"),500)}}
 function onStop(i){if(!running||!step)return;
@@ -681,12 +682,12 @@ const SCN=[
  {n:"後半爆発",g:[6,10],sym:p=>p<.6?S4(4,1,.2,0):S4(.3,1,2,3),ex:p=>p<.6?.05:1+3*p},
  {n:"序盤ダブル連発",g:[5,8],sym:p=>p<.4?S4(.3,3,.3,2):S4(2,1,1,.3),ex:p=>p<.4?2:.5},
  {n:"紫7コツコツ",g:[8,12],sym:p=>S4(5,2,.3,.1),ex:p=>1},
- {n:"1発白7ダブル",g:[1,2],sym:p=>S4(.1,.1,1,5),ex:p=>p===0?1:.2},
+ {n:"序盤に白7ダブル",g:[4,6],sym:p=>p<.3?S4(.1,.1,1,5):S4(3,1,.5,.2),ex:p=>p<.3?1:.15},
  {n:"最後に大上乗せ",g:[4,7],sym:p=>S4(2,2,1,.5),ex:p=>p>=.999?1:0},
  {n:"じわじわ加速",g:[6,10],sym:p=>S4(3*(1-p)+.2,1,3*p+.2,2*p*p),ex:p=>p+.1},
  {n:"紫→白の昇格",g:[5,8],sym:p=>p<.5?S4(3,2,0,0):S4(0,0,3,2),ex:p=>p<.5?.2:1},
  {n:"紫と白が交互",g:[6,10],sym:(p,i)=>i%2?S4(0,0,2,1):S4(2,1,0,0),ex:p=>1},
- {n:"最短決着",g:[1,3],sym:p=>S4(.5,1,2,3),ex:p=>1.1-p}
+ {n:"短期決着",g:[4,5],sym:p=>S4(.5,1,2,3),ex:p=>1.1-p}
 ];
 const SCNW=SCN.map(()=>10); // 出やすさ（%）
 const SYM={pS:{n:"紫7シングル",clip:"green",t:0,d:false},pW:{n:"紫7ダブル",clip:"red",t:0,d:true},wS:{n:"白7シングル",clip:"gold",t:W7,d:false},wW:{n:"白7ダブル",clip:"rainbow",t:W7,d:true}};
@@ -697,7 +698,8 @@ function compose(score,V,si){
   if(score<=0)return null;
   if(score<V.pS)return{games:[{k:"pS",v:score,up:0,p:1,small:true}],si,score}; // RUSHガチャは毎回RUSH：紫7シングル未満は1ゲームでSCORE分だけ見せる
   const sc=SCN[si];const maxG=Math.floor(score/V.pS);
-  let G=sc.g[0]+Math.floor(Math.random()*(sc.g[1]-sc.g[0]+1));G=Math.max(1,Math.min(G,maxG));
+  const MING=4; // RUSHは最低4連（SCOREが紫7シングル×4に届かない場合のみ少なくなる）
+  let G=sc.g[0]+Math.floor(Math.random()*(sc.g[1]-sc.g[0]+1));G=Math.max(Math.min(MING,maxG),Math.min(G,maxG),1);
   const games=[];let R=score;
   for(let i=0;i<G;i++){const p=G>1?i/(G-1):1,left=G-i-1;const cap=R-left*V.pS;
     const w=sc.sym(p,i);const ok={};for(const k of ["pS","pW","wS","wW"])if(V[k]<=cap)ok[k]=w[k]||0;
@@ -776,7 +778,7 @@ $("stockBox").addEventListener("change",e=>{const x=e.target;if(x.dataset.bs!=nu
 renderStock();
 /* =============== シナリオ表 =============== */
 $("scnTable").innerHTML=`<tr><th>#</th><th>シナリオ</th><th>ゲーム数</th><th>7の出方</th><th>上乗せの配分</th><th class="n">出やすさ</th></tr>`+[
- "白7が多めに出て長く続く","前半は紫7シングル中心、後半に白7・白7ダブル","序盤に紫7ダブル・白7ダブルが続く","紫7シングル中心で少しずつ積む","1〜2ゲームで白7ダブル","最後のゲームまで普通に進み、最後に大きく上乗せ","紫7から白7へ少しずつ移る","前半は紫7、後半は白7","紫7と白7が1ゲームごとに入れ替わる","1〜3ゲームで決着"].map((d,i)=>`<tr><td>${i+1}</td><td><b>${SCN[i].n}</b></td><td>${SCN[i].g[0]}〜${SCN[i].g[1]}</td><td>${d}</td><td>${["均等","終盤に寄せる","序盤に寄せる","均等","1ゲーム目に寄せる","最後に全部","後ろほど大きく","後半に寄せる","均等","前ほど大きく"][i]}</td><td class="n">${SCNW[i]}%</td></tr>`).join("");
+ "白7が多めに出て長く続く","前半は紫7シングル中心、後半に白7・白7ダブル","序盤に紫7ダブル・白7ダブルが続く","紫7シングル中心で少しずつ積む","最初の数ゲームで白7ダブル、そのあと紫7で続く","最後のゲームまで普通に進み、最後に大きく上乗せ","紫7から白7へ少しずつ移る","前半は紫7、後半は白7","紫7と白7が1ゲームごとに入れ替わる","4〜5ゲームで決着"].map((d,i)=>`<tr><td>${i+1}</td><td><b>${SCN[i].n}</b></td><td>${SCN[i].g[0]}〜${SCN[i].g[1]}</td><td>${d}</td><td>${["均等","終盤に寄せる","序盤に寄せる","均等","序盤に寄せる","最後に全部","後ろほど大きく","後半に寄せる","均等","前ほど大きく"][i]}</td><td class="n">${SCNW[i]}%</td></tr>`).join("");
 /* =============== 遊び方・平均継続率 =============== */
 const STAT={};let howRate=5000;
 function simulate(r){const R=RATES.find(x=>x.r===r);const M=R.n>=1000?150:R.n>=100?800:3000;let rush=0,games=0,sum=0;
