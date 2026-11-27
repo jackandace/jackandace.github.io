@@ -62,6 +62,7 @@ body.playmode>header{display:none}body.playmode main{padding-top:0}body.playmode
 .game:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,6,14,.55),rgba(6,6,14,.15) 35%,rgba(6,6,14,.25) 70%,rgba(6,6,14,.7)),url(art/sanctuary.webp) center/cover no-repeat;z-index:0}
 .ghead{position:relative;z-index:5;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,46px);background:#0b0d18;border-bottom:1px solid rgba(214,172,123,.22)}
 .brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#f0d7a8;font:italic 900 19px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:-.01em}.brand svg{width:28px;height:22px}
+#howM{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.72);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:14px 10px}#howM.on{display:flex}#howM .in{position:relative;width:min(480px,100%);background:#0d0a18;color:#fff;border:1px solid #4a3f66;border-radius:12px;padding:16px 14px 18px;margin:auto 0}#howM .x{position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:22px;cursor:pointer}
 .gnav{display:flex;align-items:center;gap:22px;position:relative}.gnav a,.gnav button{display:flex;align-items:center;gap:7px;color:#fff;text-decoration:none;font:800 13.5px/1 inherit;background:none;border:0;cursor:pointer;padding:8px 0}
 .gnav .q{width:17px;height:17px;border:1.5px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
 .gnav .hb{width:15px;height:9px;border-top:1.5px solid #fff;border-bottom:1.5px solid #fff}
@@ -222,7 +223,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <section class="pane" id="p-play">
 <div class="game" id="game">
  <div class="ghead"><a class="brand" href="#play"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M3 21 12 1h4L7 21zm8 0 9-20h4l-9 20zm8 0 6-13h3l-6 13z" fill="#d6ac7b"/></svg><span>TORAMI RUSH</span></a>
-  <nav class="gnav"><a href="#howto" data-jump="howto"><span class="q">?</span>遊び方</a><button type="button" id="menuBtn"><span class="hb"></span>メニュー</button>
+  <nav class="gnav"><a href="#howto" data-howm="1"><span class="q">?</span>遊び方</a><button type="button" id="menuBtn"><span class="hb"></span>メニュー</button>
    <div class="gmenu" id="gmenu"><a href="#howto" data-jump="howto">遊び方・注意事項</a><a href="#howto" data-jump="howto">実績還元率公開</a><a href="#spec" data-jump="spec">確定仕様とロジック（資料）</a><a href="#admin" data-jump="admin">管理画面（資料）</a><a href="#est" data-jump="est">工数見積もり依頼（資料）</a></div></nav></div>
  <div class="gbody">
   <div class="lp">
@@ -489,6 +490,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <footer>パレットグループ トレカ商事カンパニー｜TORAMI RUSH 倍率BOXプロト v6（2026-11-27）｜倍率の表・レート帯・在庫は案。3Dモデル・本番映像No.09・音素材は受領素材を検証用に縮小して使用。白7は仮の色替え</footer>
 </main>
 
+<div id="howM"><div class="in"><button class="x" type="button" id="howX" aria-label="閉じる">×</button><div id="howMB"></div></div></div>
 <script src="state.js"></script>
 <script type="module">
 import * as THREE from './lib/three.module.js';
@@ -626,7 +628,7 @@ function flyScore(add,label,newTotal){const st=$("stage").getBoundingClientRect(
   const w=el.offsetWidth,h=el.offsetHeight;const x0=st.left+st.width/2-w/2,y0=st.top+st.height*.35-h/2;const dx=(pv.left+pv.width/2)-(st.left+st.width/2),dy=(pv.top+pv.height/2)-(st.top+st.height*.35);
   const f={el};FLY.push(f);const done=()=>{el.remove();FLY=FLY.filter(z=>z!==f);if(!running&&!FLY.length)return;plateGlow();countTo(newTotal,RM.matches?1:340/Math.sqrt(SPD))};
   if(RM.matches){el.style.transform=`translate(${x0}px,${y0}px)`;setTimeout(done,380);return}
-  const hold=1200*.57,move=1200*.43/Math.sqrt(SPD),T=hold+move,o=v=>v/T;const base=`translate(${x0}px,${y0}px)`;
+  const hold=1200*.57/Math.sqrt(SPD),move=1200*.43/Math.sqrt(SPD),T=hold+move,o=v=>v/T;const base=`translate(${x0}px,${y0}px)`;
   f.a=el.animate([{transform:base+" scale(.8)",opacity:0,offset:0},{transform:base+" scale(1.08)",opacity:1,offset:o(1200*.12)},{transform:base+" scale(1)",opacity:1,offset:o(1200*.23)},{transform:base+" scale(1)",opacity:1,offset:o(hold)},{transform:`translate(${x0+dx}px,${y0+dy}px) scale(.24)`,opacity:0,offset:1}],{duration:T,easing:"linear",fill:"forwards"});
   f.a.onfinish=done}
 function finish(){running=false;bgm(false);setTimeout(()=>{if(!FLY.length&&plan)setPlate(plan.total);paintMain()},0);setWait(false);banner("");setLight("on");const mu=plan.mul||0;$("res").classList.remove("m-red","m-gold","m-rainbow");if(mu>=10)$("res").classList.add("m-rainbow");else if(mu>=5)$("res").classList.add("m-gold");else if(mu>=2)$("res").classList.add("m-red");$("res").innerHTML=plan.result()+`<button class="closebtn" type="button" id="again">もう一度見る</button>`;$("res").classList.add("on");$("again").addEventListener("click",()=>{idle(true)});$("hud").textContent="リザルト";idx=-1;renderPlan()}
@@ -650,7 +652,7 @@ $("volR").addEventListener("input",e=>{VOL=+e.target.value/100;if(MASTER)MASTER.
 $("volBtn").addEventListener("click",()=>{const on=!$("volPop").classList.contains("on");$("volPop").classList.toggle("on",on);$("volBtn").classList.toggle("on",on)});
 $("menuBtn").addEventListener("click",e=>{e.stopPropagation();$("gmenu").classList.toggle("on")});document.addEventListener("click",()=>$("gmenu").classList.remove("on"));
 $("autoBtn").addEventListener("click",()=>{AUTO=!AUTO;$("autoBtn").classList.toggle("on",AUTO);if(AUTO&&running&&step&&step.k==="wait")tap()});
-$("spdBtn").addEventListener("click",()=>{SPD=SPD===1?1.5:SPD===1.5?2:1;$("spdX").textContent="×"+SPD;$("spdBtn").classList.toggle("on",SPD>1);els.forEach(e=>e.playbackRate=SPD)});
+$("spdBtn").addEventListener("click",()=>{SPD=SPD===1?1.5:SPD===1.5?2:SPD===2?4:1;$("spdX").textContent="×"+SPD;$("spdBtn").classList.toggle("on",SPD>1);els.forEach(e=>e.playbackRate=SPD)});
 function ichigeki(){if(!running||!plan||JUMP)return;const ti=seq.findIndex(x=>x.l==="TOTAL");if(ti<0||idx>=ti)return;
   els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=plan.lastTarget||0;r.g.rotation.x=r.ang;r.mat.map=tex.reel});
   stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");flicker();plan.total=plan.fullTotal||0;clearFly();setPlate(plan.total);
@@ -815,6 +817,7 @@ const NOTICE=STATE.notice||"表示している還元率は、BOX全体（1周分
 function renderHow(){if(!RATES.find(x=>x.r===howRate))howRate=RATES[0].r;const V=VALS[howRate],st=STAT[howRate]||{},R=RATES.find(x=>x.r===howRate),k=R.t,ts=tStat(k),rows=TBL[k].rows;
   $("howCard").innerHTML=`<div style="text-align:center;font-weight:900;font-size:17px;letter-spacing:.05em">${GACHAS[GK].name} の遊び方</div>${GACHAS[GK].charge?`<div style="text-align:center;font-size:11.5px;color:#ffd36b;margin-top:4px">チャージ限定：チャージでもらえる挑戦枠で遊べます（購入は0コイン）</div>`:""}
   <p style="font-size:12px;opacity:.85;margin:6px 0 10px">レートを選んで1回引くと、BOXから倍率の口を1つ引きます。<b>SCORE＝倍率×レート</b>。SCOREまで7が連鎖し、7が揃うたびに獲得PTと累計SCOREが増えていきます。</p>
+  <div style="background:#1b1530;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.7;margin-bottom:10px"><b style="color:#ffd36b">ゲームのルール</b><br>① レートを選んでSTART → 必ずRUSHスタート<br>② 押せ！でリールが止まり、7が揃うと7の価値ぶんPTを獲得（累計SCOREに加算）<br>③ 7が揃い続ける限りRUSH継続（最低3連）<br>④ 7が揃わなかったゲームでRUSH終了 → TOTAL表示<br>⑤ SCOREと同じPTの景品を獲得 →「発送」か「ポイント」を選ぶ</div>
   <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${RATES.map(x=>`<button type="button" data-hr="${x.r}" style="flex:1 0 18%;border:1px solid ${x.r===howRate?"#ffd36b":"#4a3f66"};background:${x.r===howRate?"#ffd36b":"transparent"};color:${x.r===howRate?"#111":"#fff"};border-radius:6px;padding:4px;font:inherit;font-size:11.5px;cursor:pointer">${man(x.r)}</button>`).join("")}</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0 12px;text-align:center">
    <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">還元率（設計値）</div><div style="font-size:19px;font-weight:900;color:#ffd36b">${(ts.ret*100).toFixed(1)}%</div></div>
@@ -823,7 +826,7 @@ function renderHow(){if(!RATES.find(x=>x.r===howRate))howRate=RATES[0].r;const V
   ${["wW","wS","pW","pS"].map(k=>`<div class="rw" style="display:flex;justify-content:space-between;border-bottom:1px solid #2d2442;padding:4px 0"><span><span class="chip k-${k}">${SYM[k].n}</span> <span style="font-size:10.5px;opacity:.7">（レート×${{wW:2,wS:1,pW:0.2,pS:0.1}[k]}）</span></span><b>${fmt(V[k])} PT</b></div>`).join("")}
 
   ${(GACHAS[GK].feat||[]).length?`<div style="font-weight:800;margin:12px 0 4px">目玉景品（SCOREが同じPTのとき優先してお渡し）</div><table style="width:100%;font-size:11.5px;border-collapse:collapse">${GACHAS[GK].feat.map(f=>`<tr style="border-bottom:1px solid #2d2442"><td style="padding:3px 0">${f.name}</td><td style="text-align:right">${fmt(f.pt)}PT</td><td style="text-align:right">${f.stock>0?"残り"+f.stock:'<span style="opacity:.6">終了</span>'}</td></tr>`).join("")}</table>`:""}
-  <div style="font-size:12px;line-height:1.8;margin-top:10px">・1回引くと必ずRUSH（最低3連）。<b>7が揃わなかったゲームで終了</b>します<br>・SCOREが目玉景品のPTと同じなら<b>目玉景品</b>（在庫がある間）。それ以外でSCOREが1万以上なら<b>SCOREと同じPTのPSA景品</b>。<b>発送</b>か<b>ポイント（SCORE分）</b>を選べます。1万未満はポイントで付与<br>・<b>AUTO</b>：押せ！を自動で押します　<b>一撃</b>：残りのゲームを飛ばしてTOTALへ　<b>スピード</b>：×1／×1.5／×2</div>
+  <div style="font-size:12px;line-height:1.8;margin-top:10px">・1回引くと必ずRUSH（最低3連）。<b>7が揃わなかったゲームで終了</b>します<br>・SCOREが目玉景品のPTと同じなら<b>目玉景品</b>（在庫がある間）。それ以外でSCOREが1万以上なら<b>SCOREと同じPTのPSA景品</b>。<b>発送</b>か<b>ポイント（SCORE分）</b>を選べます。1万未満はポイントで付与<br>・<b>AUTO</b>：押せ！を自動で押します　<b>一撃</b>：残りのゲームを飛ばしてTOTALへ　<b>スピード</b>：×1／×1.5／×2／×4</div>
   <div style="font-weight:800;margin:12px 0 4px">ご注意</div>
   <ul style="font-size:11px;opacity:.9;margin:0;padding-left:16px;line-height:1.7">
   <li><b style="color:#ffd36b">${NOTICE}</b></li>
@@ -834,6 +837,11 @@ function renderHow(){if(!RATES.find(x=>x.r===howRate))howRate=RATES[0].r;const V
   ${GACHAS[GK].charge?"<li>挑戦枠はチャージ時に付与されます。付与の条件・有効期限は別途表示します</li>":""}</ul>
   <p style="font-size:10.5px;opacity:.7;margin:8px 0 0">※平均継続率は、倍率の表と演出シナリオから算出した平均値です。各ゲームは独立した抽選ではありません。</p>`}
 $("howCard").addEventListener("click",e=>{const b=e.target.closest("[data-hr]");if(!b)return;howRate=+b.dataset.hr;renderHow()});
+// ゲーム画面の「遊び方」：画面を離れずにルール（取扱説明書）をその場で開く
+function openHow(){howRate=rate;renderHow();$("howMB").innerHTML=$("howCard").innerHTML;$("howM").classList.add("on")}
+document.querySelectorAll("[data-howm]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();openHow()}));
+$("howX").addEventListener("click",()=>$("howM").classList.remove("on"));
+$("howM").addEventListener("click",e=>{if(e.target.id==="howM"){$("howM").classList.remove("on");return}const b=e.target.closest("[data-hr]");if(!b)return;howRate=+b.dataset.hr;renderHow();$("howMB").innerHTML=$("howCard").innerHTML});
 function renderRet(){const st=GKSUM();$("retTable").innerHTML=`<tr><th>対象</th><th class="n">購入回数</th><th class="n">実績還元率</th></tr><tr><td><b>${GACHAS[GK].name}（全レート合算）</b></td><td class="n">（本番は集計値）</td><td class="n">${st.n?(st.p/st.s*100).toFixed(1)+"%（このプロトでの実績）":"—"}</td></tr>`}
 const ACC=STATE.acc;function GKSUM(){return ACC[GK]||(ACC[GK]={s:0,p:0,n:0})}
 function renderNews(){const el=$("newsList");if(!el)return;el.innerHTML=NEWS.length?NEWS.slice(0,8).map(n=>`<div class="rw" style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:4px 0;font-size:12.5px"><span>${n.at.toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}　レート${man(n.r)}　<b>${mulTxt(n.u/10)}</b>${n.top?`　白7ダブル${n.top}回`:""}　${n.G}連</span><b>${fmt(n.score)}PT 獲得</b></div>`).join(""):`<p class="note" style="margin:0">×5以上が出ると、ここに流れます（プロトでSTARTを押すと追加されます）</p>`}
