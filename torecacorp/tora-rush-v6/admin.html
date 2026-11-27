@@ -58,7 +58,7 @@ td{font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line);vertical-
  <a>友達招待報酬</a><a>ユーザーランク</a><a>クーポン</a><a>アフィリコード</a><a>メンテナンスモード</a><a>設定</a>
 </nav>
 <main><div class="panel" id="pg"></div></main>
-<div class="legend" id="lg"><a onclick="this.parentNode.style.display='none'" style="float:right;cursor:pointer;color:#718096;margin-left:6px">✕</a><b>紫の点線</b>＝今回追加する部分／<span style="color:#a0aec0;font-weight:700">グレー</span>＝RUSHのときは使わない既存項目。<br>ここで作った・変えたRUSHガチャは、オリパ一覧の<b>「プロトで遊ぶ」</b>でそのまま遊べます（設定とBOXはこのブラウザに保存）。<a href="./">プロトv6</a></div>
+<div class="legend" id="lg"><a onclick="this.parentNode.style.display='none'" style="float:right;cursor:pointer;color:#718096;margin-left:6px">✕</a><b>紫の点線</b>＝今回追加する部分／<span style="color:#a0aec0;font-weight:700">グレー</span>＝RUSHのときは使わない既存項目。<br>ここで作った・変えたRUSHガチャは、オリパ一覧の<b>「プロトで遊ぶ」</b>でそのまま遊べます（設定とBOXはこのブラウザに保存）。<a href="./">プロトv6</a>／<a href="manual.html">説明書</a></div>
 <style>.toast{position:fixed;top:48px;left:50%;transform:translateX(-50%);background:#2f855a;color:#fff;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;z-index:20;box-shadow:0 4px 12px rgba(0,0,0,.15)}.toast a{color:#fff;text-decoration:underline;margin-left:8px}.btn.pur{background:#805ad5}</style>
 <script src="state.js"></script>
 <script>
@@ -158,7 +158,7 @@ function pScn(){return`<div class="bc">TORAMI RUSH<span>/</span>シナリオ</di
 function pDisp(){return`<div class="bc">TORAMI RUSH<span>/</span>表示設定</div><h1>表示設定 <span class="badge p">全オリパ共通</span></h1>
 <label class="l">注意書き（購入ボタンの近くと遊び方に表示）</label><textarea rows="4" id="nTxt">${S.notice}</textarea>
 <div class="hint">文言は弁護士の確認後に確定。小さく書くだけでは打消し表示として無効とされやすいため、購入ボタンの近くに出す</div>
-<div class="grid2"><div><label class="l">還元率・最大倍率の表示</label><select disabled><option>倍率の表から自動計算（例：97.5%・×30）</option></select></div><div><label class="l">BOXの残り状況（残り口数・残り倍率・残り還元率）</label><select disabled><option>表示しない（固定）</option></select></div>
+<div class="grid2"><div><label class="l">還元率の表示（最大倍率・倍率の表は非公開）</label><select disabled><option>倍率の表から自動計算（例：97.5%）</option></select></div><div><label class="l">BOXの残り状況（残り口数・残り倍率・残り還元率）</label><select disabled><option>表示しない（固定）</option></select></div>
 <div><label class="l">実績還元率の公開</label><select><option>全レート合算・直近30日</option><option>全レート合算・直近1週間</option></select></div><div><label class="l">当たり速報</label><select><option>×5以上を表示</option><option>×10以上を表示</option><option>表示しない</option></select></div></div>
 <div class="row" style="margin-top:18px"><button class="btn" id="dSave">保存</button><span style="margin-left:auto"></span><button class="btn gray sm" id="allReset">テスト用：すべての設定・BOX・履歴を初期状態に戻す</button></div>`}
 /* ---------- ルーター ---------- */

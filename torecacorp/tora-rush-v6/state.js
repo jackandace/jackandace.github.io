@@ -3,7 +3,7 @@
 (function(){
 const ALLR=[500,1000,2000,3000,5000,10000,20000,30000,50000,100000,200000,300000,500000,750000,1000000];
 const LS="toraRush.v6";
-const NOTICE="表示している還元率・最大倍率・倍率の表は、BOX全体（1周分）の設計値です。BOXは販売開始時に全口をシャッフルしており、販売中のBOXでは上位の倍率がすでに排出されている場合があります。完売したBOXは同じ内容で自動的に再販されます。";
+const NOTICE="表示している還元率は、BOX全体（1周分）の設計値です。BOXは販売開始時に全口をシャッフルしており、販売中のBOXでは上位の倍率がすでに排出されている場合があります。完売したBOXは同じ内容で自動的に再販されます。";
 const f=(card,cond,pt,stock)=>({card,cond,name:card+" "+cond,pt,stock});
 function defState(){return{v:1,
  tables:{t1000:[[30,1],[10,6],[5,15],[3,40],[2,90],[1,280],[0.5,298],[0.3,270]],t100:[[10,1],[5,1],[3,4],[2,8],[1,33],[0.5,28],[0.3,25]],t50:[[5,1],[3,2],[2,5],[1,18],[0.5,14],[0.3,10]]},
@@ -13,7 +13,8 @@ function defState(){return{v:1,
  gachas:[{id:1073,name:"TORAMI RUSH",charge:false,pub:true,sell:ALLR.slice(),feat:[f("マリオピカチュウ","PSA10",1000000,1),f("リザードン SAR","PSA10",150000,1),f("ピカチュウ SAR","PSA10",50000,2),f("ミュウ AR","PSA10",15000,3)]},
          {id:1074,name:"TORAMI RUSH GOLD",charge:true,pub:false,sell:[5000],feat:[f("リザードン SAR","PSA10",150000,1)]}],
  boxes:{},rounds:[],hist:[],acc:{}}}
-function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.v===1&&s.gachas&&s.tables)return s}catch(e){}return defState()}
+const OLDN="表示している還元率・最大倍率・倍率の表は、BOX全体（1周分）の設計値です。BOXは販売開始時に全口をシャッフルしており、販売中のBOXでは上位の倍率がすでに排出されている場合があります。完売したBOXは同じ内容で自動的に再販されます。";
+function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.v===1&&s.gachas&&s.tables){if(s.notice===OLDN)s.notice=NOTICE;return s}}catch(e){}return defState()}
 function save(s){try{localStorage.setItem(LS,JSON.stringify(s))}catch(e){}}
 function reset(){try{localStorage.removeItem(LS)}catch(e){}}
 window.RS={ALLR,LS,NOTICE,defState,load,save,reset};
