@@ -70,6 +70,7 @@ body.playmode>header{display:none}body.playmode main{padding-top:0}body.playmode
 .gmenu a{padding:10px 12px;border-radius:6px;font-weight:700}.gmenu a:hover{background:#29262f}
 .gbody{position:relative;z-index:2;display:grid;grid-template-columns:var(--side) calc(var(--W) + 12px) var(--side);grid-template-rows:auto auto auto;column-gap:clamp(22px,2.6vw,46px);justify-content:center;padding:clamp(14px,2.2vh,24px) 16px clamp(16px,3vh,30px)}
 .lp{grid-column:1;grid-row:1/-1;align-self:center;background:linear-gradient(#29262f,#19171f);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 14px 12px;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.gback{color:#d6ac7b;text-decoration:none;font-weight:800;font-size:20px;margin-right:12px;white-space:nowrap}.gback span{font-size:12.5px;vertical-align:2px}.ghead .brand{margin-right:auto}
 .gname{font:italic 900 19px/1.1 "Helvetica Neue",Arial,sans-serif;color:#fff;letter-spacing:-.01em;margin-bottom:14px}
 .rlab{font-size:11.5px;font-weight:700;color:#cfc8d8;margin-bottom:8px}
 .rlist{display:flex;flex-direction:column;gap:3px}
@@ -221,7 +222,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <body>
 <header><div class="in">
 <h1>TORAMI RUSH プロト v8｜1オリパで全レート対応（既存の景品登録を流用・Sの隠しキリ番景品を何個でも）</h1>
-<div class="meta"><b style="color:#b42318">11/28 v8</b>（1つのオリパに販売レートをまとめて登録。景品は倍率で登録し、個数はレート帯ごと。BOXはレートごとに自動。ゲーム・演出・リールはv6/v7と同じ）｜<a href="admin.html" target="_blank"><b>管理画面モック</b></a>｜<a href="/torecacorp/tora-rush-v7/">v7（1レート1オリパ）</a>／<a href="/torecacorp/tora-rush-v6/">v6</a></div>
+<div class="meta"><b style="color:#b42318">11/28 v8</b>（1つのオリパに販売レートをまとめて登録。景品は倍率で登録し、個数はレート帯ごと。BOXはレートごとに自動。ゲーム・演出・リールはv6/v7と同じ）｜<a href="front.html"><b>フロント（オリパ一覧）</b></a>｜<a href="admin.html" target="_blank"><b>管理画面モック</b></a>｜<a href="/torecacorp/tora-rush-v7/">v7（1レート1オリパ）</a>／<a href="/torecacorp/tora-rush-v6/">v6</a></div>
 <nav id="tabs"><a href="#play" data-t="play">▶ プロトで遊ぶ</a><a href="#spec" data-t="spec">確定仕様とロジック</a><a href="#howto" data-t="howto">遊び方画面（ユーザー向け）</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
 </div></header>
 <main>
@@ -229,7 +230,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <!-- ======== プロト ======== -->
 <section class="pane" id="p-play">
 <div class="game" id="game">
- <div class="ghead"><a class="brand" href="#play"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M3 21 12 1h4L7 21zm8 0 9-20h4l-9 20zm8 0 6-13h3l-6 13z" fill="#d6ac7b"/></svg><span>TORAMI RUSH</span></a>
+ <div class="ghead"><a class="gback" href="front.html" aria-label="オリパ一覧に戻る">‹<span> 一覧</span></a><a class="brand" href="#play"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M3 21 12 1h4L7 21zm8 0 9-20h4l-9 20zm8 0 6-13h3l-6 13z" fill="#d6ac7b"/></svg><span>TORAMI RUSH</span></a>
   <nav class="gnav"><a href="#howto" data-howm="1"><span class="q">?</span>遊び方</a><button type="button" id="menuBtn"><span class="hb"></span>メニュー</button>
    <div class="gmenu" id="gmenu"><a href="#howto" data-jump="howto">遊び方・注意事項</a><a href="#howto" data-jump="howto">実績還元率公開</a><a href="#spec" data-jump="spec">確定仕様とロジック（資料）</a><a href="#admin" data-jump="admin">管理画面（資料）</a><a href="#est" data-jump="est">工数見積もり依頼（資料）</a></div></nav></div>
  <div class="gbody">
@@ -799,7 +800,7 @@ $("rateBtns").addEventListener("click",e=>{const b=e.target.closest("button");if
 paintRate();
 function renderWaku(){if(!$("wakuBox"))return;$("wakuBox").style.display=GACHAS[GK].charge?"flex":"none";$("wakuN").textContent=WAKU}
 if(GACHAS[GK].charge){rate=RATES[0].r;renderRates();paintRate()}
-$("gname").textContent=GACHAS[GK].name;
+$("gname").textContent=GACHAS[GK].name;document.title=GACHAS[GK].name+"｜TORAMI RUSH プロト v8";
 $("chargeBtn").addEventListener("click",()=>{WAKU++;renderWaku();$("drawOut").textContent="10,000円チャージ（デモ）で挑戦枠が1回分増えました。"});
 renderWaku();
 $("scnSel").innerHTML=`<option value="-1">おまかせ（出やすさの設定どおり）</option>`+SCN.map((s,i)=>`<option value="${i}">${i+1}. ${s.n}（${s.g[0]}〜${s.g[1]}ゲーム）</option>`).join("");
