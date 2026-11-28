@@ -27,7 +27,7 @@ footer{text-align:center;font-size:12px;color:var(--mut);margin-top:18px}
 @media print{body{background:#fff;font-size:12.5px}.wrap{padding:0;max-width:none}section{border:none;padding:6px 0;page-break-inside:auto}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}.pb{page-break-before:always}.shots img,.wide img{break-inside:avoid}.wide img{max-height:190mm;width:auto;max-width:100%;margin:0 auto}.wide figcaption{text-align:center}tr{break-inside:avoid}.tag,.key,.warn,.ng,th{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 @media(max-width:640px){.shots{grid-template-columns:1fr 1fr}}
 </style></head><body><div class="wrap">
-<header><h1>TORAMI RUSH 説明書（v8・最新仕様）</h1><p>フロントの動き／管理画面でのガチャの作り方／交換景品（何かのカード）／シミュレーション結果／既知の課題とゆうぽんさんへの依頼　2026年11月28日</p></header>
+<header><h1>TORAMI RUSH 説明書（v8・最新仕様）</h1><p>11/28 23時 入江さんのご指摘を反映（スマホ1画面に収める／SCOREと景品のptを完全一致／レート帯→BOXの大きさのグループ）｜フロントの動き／管理画面でのガチャの作り方／交換景品（何かのカード）／シミュレーション結果／既知の課題とゆうぽんさんへの依頼　2026年11月28日</p></header>
 
 <div class="toc"><b>目次</b><ol>
 <li><a href="#s1">確認用URL</a></li><li><a href="#s2">全体像（今回決まったこと）</a></li><li><a href="#s3">フロントの動き</a></li><li><a href="#s4">景品の受け取り（何かのカード）</a></li><li><a href="#s5">管理画面でのガチャの作り方</a></li><li><a href="#s6">初期値の景品表</a></li><li><a href="#s7">シミュレーション結果</a></li><li><a href="#s8">既知の課題（音・リール）</a></li><li><a href="#s9">ゆうぽんさんへの依頼内容</a></li><li><a href="#s10">決めてほしいこと</a></li></ol></div>
@@ -48,7 +48,7 @@ footer{text-align:center;font-size:12px;color:var(--mut);margin-top:18px}
 <tr><td>レート</td><td>500〜1,000,000 coin の15段階から選んで販売</td></tr>
 <tr><td>抽選</td><td><b>1回の購入＝1回の抽選</b>。そのレートのBOXから「倍率の口」を1つ引く。<b>SCORE＝レート×倍率</b></td></tr>
 <tr><td>BOX</td><td>レートごとに自動で作られる<b>固定BOX</b>（全口シャッフル → 順に販売）。完売したら同じ内容で自動補充。<b>1周売り切ると必ず設計どおりの還元率</b>で着地</td></tr>
-<tr><td>景品</td><td>S〜その他のランクに<b>「何かのカード」を倍率で登録</b>（既存の景品登録の形を流用）。当たったら SCORE に合わせて<b>何かのR／AR／SR／SAR（素体）／PSA</b>のどれかになり、<b>カードを受け取る か ptに交換</b>を選ぶ</td></tr>
+<tr><td>景品</td><td>S〜その他のランクに<b>「何かのカード」を倍率で登録</b>（既存の景品登録の形を流用）。当たったら<b>SCOREと同じpt</b>の<b>何かのR／AR／SR／SAR（素体）／PSA</b>、または<b>同じ価値の固定カード</b>になり、<b>カードを受け取る か 同じptに交換</b>を選ぶ</td></tr>
 <tr><td>目玉景品</td><td>Sの<b>「隠しキリ番景品」</b>（既存機能）に実物カードを何個でも。対象レートとキリ番を指定</td></tr>
 <tr><td>表示</td><td>還元率はBOX全体の設計値として表示。最大倍率・キリ番の番号・BOXの残り状況は出さない</td></tr>
 <tr><td>演出</td><td>RUSHは最低3連。7が揃わなかったゲームで終了。7は紫7・白7のシングル／ダブル（レート×0.1／0.2／1／2）。逆転演出（倍プッシュ・輪廻転生）とダブル前のフリーズあり</td></tr></table>
@@ -58,9 +58,9 @@ footer{text-align:center;font-size:12px;color:var(--mut);margin-top:18px}
 <div class="flow"><span>① オリパ一覧</span><i>→</i><span>② RUSHのカードをタップ</span><i>→</i><span>③ プレイ待機画面でレートを選ぶ</span><i>→</i><span>④ START（購入）</span><i>→</i><span>⑤ RUSH演出</span><i>→</i><span>⑥ 結果・受け取り方法を選ぶ</span><i>→</i><span>「‹ 一覧」で戻る</span></div>
 <div class="shots">
 <figure><img src="man/f1.jpg" alt=""><figcaption>① 通常のオリパと同じ一覧に、公開中のRUSHガチャがカードで並ぶ。価格は「500〜100万／1回」、残数の代わりに「15レートから選べる」</figcaption></figure>
-<figure><img src="man/f2.jpg" alt=""><figcaption>③ プレイ待機画面。左上「‹ 一覧」で戻れる。下で購入レートを選んでSTART</figcaption></figure>
+<figure><img src="man/f2.jpg" alt=""><figcaption>③ プレイ待機画面。<b>上のヘッダーから下の操作バーまで1画面に収まる</b>（画面の高さに合わせて筐体の大きさを自動調整）。左上「‹ 一覧」で戻れる</figcaption></figure>
 <figure><img src="man/f3.jpg" alt=""><figcaption>⑤ RUSH中。「押せ！」でリールが止まり、7が揃うたびに累計SCOREが増える（AUTO・一撃・速度×1〜×4あり）</figcaption></figure>
-<figure><img src="man/f4.jpg" alt=""><figcaption>⑥ 結果。SCOREと獲得景品（例：A賞 何かのPSA 25,000pt）。<b>「カードを受け取る」か「ptに交換」</b>を選ぶ</figcaption></figure>
+<figure><img src="man/f4.jpg" alt=""><figcaption>⑥ 結果。SCOREと獲得景品は同じpt（例：SCORE 25,000 → A賞 何かのPSA 25,000pt）。<b>「カードを受け取る」か「ptに交換」</b>を選ぶ</figcaption></figure>
 </div>
 <h3>ゲームのルール（ユーザーから見た流れ）</h3>
 <ol class="steps">
@@ -73,18 +73,20 @@ footer{text-align:center;font-size:12px;color:var(--mut);margin-top:18px}
 </section>
 
 <section id="s4"><h2><span class="n">4</span>景品の受け取り（何かのカード）</h2>
-<p>SCOREを<b>キリのいいpt</b>に切り上げ（上振れ15%以内）、そのptの高さで景品の種類が決まります。どのSCOREでも<b>現物の発送</b>か<b>pt交換</b>を選べます（EC要素を残す・法的にも現物発送がある形）。</p>
-<table><tr><th>交換pt</th><th>景品</th><th>例</th></tr>
+<div class="key"><b>SCOREと景品のptは完全に一致</b>します。SCOREが225,000なら <b>225,000ptの何かのPSA</b>、または <b>225,000pt相当の固定カード</b>。切り上げ・上振れはありません。</div>
+<p>ptの高さで景品の種類が決まり、どのSCOREでも<b>現物の発送</b>か<b>同じptに交換</b>を選べます（EC要素を残す・法的にも現物発送がある形）。</p>
+<table><tr><th>pt</th><th>景品</th><th>例</th></tr>
 <tr><td>〜999</td><td><span class="tag o">何かのR</span>（素体）</td><td>SCORE 300 → 何かのR（300pt）</td></tr>
 <tr><td>1,000〜</td><td><span class="tag o">何かのAR</span>（素体）</td><td>SCORE 1,500 → 何かのAR（1,500pt）</td></tr>
 <tr><td>3,000〜</td><td><span class="tag o">何かのSR</span>（素体）</td><td>SCORE 4,000 → 何かのSR（4,000pt）</td></tr>
 <tr><td>5,000〜</td><td><span class="tag o">何かのSAR</span>（素体）</td><td>SCORE 9,000 → 何かのSAR（9,000pt）</td></tr>
-<tr><td>10,000〜</td><td><span class="tag">何かのPSA</span></td><td>SCORE 225,000 → 何かのPSA（250,000pt）※上振れ</td></tr></table>
+<tr><td>10,000〜</td><td><span class="tag">何かのPSA</span></td><td>SCORE 225,000 → 何かのPSA（225,000pt）</td></tr>
+<tr><td>（任意のpt）</td><td><span class="tag g">固定カード</span></td><td>150,000ptに「リザードン ex SAR PSA10」を登録 → SCORE 150,000 はそのカード（150,000pt）</td></tr></table>
 <p style="font-size:12.5px;color:var(--sub)">帯の区切り（1,000／3,000／5,000／10,000）は仮の値です。管理画面で自由に変更・追加でき、名前を空にした帯は「ポイントのみ（自動付与）」になります。</p>
 <ul>
+<li>ラインナップは<b>出うるSCOREそのもの</b>（今の設定で44種類）。管理画面「何かのカード」で、ptごとに<b>固定カード</b>を登録できる（登録しないptは何かのR／AR／SR／SAR／PSA）</li>
 <li><b>隠しキリ番景品</b>（目玉の実物カード）の番目を引いたときは、そのカードを受け取るか、SCORE分のptかを選ぶ</li>
-<li>何かのカードの<b>銘柄・状態は運営が選定</b>（ユーザーは選べない）。遊び方画面に明記</li>
-<li>交換ラインナップは<b>全RUSHガチャ共通</b>。今の設定で出うるSCORE 44種類を44種類の交換ptでカバー（R 6／AR 4／SR 2／SAR 3／PSA 29）</li></ul>
+<li>何かのカードの<b>銘柄・状態は運営が選定</b>（ユーザーは選べない）。遊び方画面に明記</li></ul>
 </section>
 
 <section id="s5" class="pb"><h2><span class="n">5</span>管理画面でのガチャの作り方</h2>
@@ -95,26 +97,26 @@ footer{text-align:center;font-size:12px;color:var(--mut);margin-top:18px}
 <li><b>オリパ一覧 →「＋ 新規作成」</b>。演出タイプ＝TORAMI RUSH のオリパができる（全レートの初期値入り）</li>
 <li><b>オリパ名・カテゴリ・ヘッダー画像・消費タイプ</b>を入れる（ここは既存と同じ）。チャージ限定にするなら消費タイプ＝課金額消費</li>
 <li><b>販売レート</b>をチェックで選ぶ（15レート全部／高額だけ など）。BOXはレートごとに自動で作られる</li>
-<li><b>レート帯の区切り</b>を決める（初期値：〜5万／10万〜30万／50万〜）。高いレートほど口数を少なくするため、景品の個数を3つの帯で分けて入れる</li>
-<li><b>景品</b>（S〜その他）に「何かのカード」を<b>倍率</b>で登録し、<b>個数を帯ごとに3列</b>で入れる。合計がそのレートの口数。交換ptは自動表示（↑＝SCOREより上振れ）</li>
+<li><b>BOXの大きさ（口数）のグループ分け</b>を決める（初期値：グループ1＝〜5万は1,000口、グループ2＝10万〜30万は100口、グループ3＝50万〜は50口）。<br><span style="font-size:12.5px;color:var(--sub)">理由：100万レートで1,000口のBOXにすると1周の売上が10億になり、上位の景品がいつまでも出ないため、高いレートほど口数の少ないBOXにする。画面に「含まれるレート・BOXの口数・1周の売上」が出ます</span></li>
+<li><b>景品</b>（S〜その他）に「何かのカード」を<b>倍率</b>で登録し、<b>個数をグループごとに3列</b>で入れる。各列の合計がそのグループのBOXの口数。ptはレート×倍率で自動表示（SCOREと同じ）</li>
 <li>Sの<b>「隠しキリ番景品」</b>に実物カードを何個でも追加（対象レート・カード・状態・倍率・キリ番・在庫）。対象レートのBOXで<b>同じ倍率の口1つと入れ替え</b>てその番目に置くので、口数・還元率は変わらない。在庫0なら次の周から何かのカードのまま</li>
-<li>下の<b>自動チェック</b>（帯ごとの口数・還元率95〜99%・白7率・倍率の刻み・何かのカードのカバー・キリ番）が全部OKなら<b>保存</b>。足りない交換ptは保存時に自動で追加</li>
+<li>下の<b>自動チェック</b>（グループごとの口数・還元率95〜99%・白7率・倍率の刻み・キリ番）が全部OKなら<b>保存</b>。新しいSCOREが出るようになった場合は、何かのカードのラインナップに保存時に自動で追加</li>
 <li><b>「▶ プロトで遊ぶ」</b>で確認 → 公開にすると<b>フロントの一覧に並ぶ</b></li></ol>
-<div class="wide"><img src="man/a2a.jpg" alt=""><figcaption>オリパ編集（上）：演出タイプ・販売レート・レート帯の区切り。下の表でレートごとの口数・還元率（SCORE基準／全部pt交換した場合）・最大倍率・隠しキリ番を一覧できる</figcaption></div>
-<div class="wide"><img src="man/a2b.jpg" alt=""><figcaption>オリパ編集（景品）：Sの隠しキリ番景品（何個でも）と、通常景品＝何かのカードを倍率＋帯ごとの個数で登録</figcaption></div>
-<div class="wide"><img src="man/a2c.jpg" alt=""><figcaption>保存時の自動チェック（レート帯ごと）</figcaption></div>
+<div class="wide"><img src="man/a2a.jpg" alt=""><figcaption>オリパ編集（上）：演出タイプ・販売レート・BOXの大きさのグループ分け（含まれるレート・口数・1周の売上）。下の表でレートごとの口数・還元率・最大倍率・隠しキリ番を一覧できる</figcaption></div>
+<div class="wide"><img src="man/a2b.jpg" alt=""><figcaption>オリパ編集（景品）：Sの隠しキリ番景品（何個でも）と、通常景品＝何かのカードを倍率＋グループごとの個数で登録</figcaption></div>
+<div class="wide"><img src="man/a2c.jpg" alt=""><figcaption>保存時の自動チェック（グループごと）</figcaption></div>
 <h3>そのほかの画面</h3>
 <table><tr><th style="width:170px">画面</th><th>使い方</th></tr>
-<tr><td>何かのカード</td><td>交換景品の種類（ptの帯ごとの名前）と、交換ptのラインナップ。「全RUSHオリパの出うるSCOREから自動作成」で作り直せる。各交換ptに「このカードになるSCORE」が出るので、手配が必要なカードがわかる</td></tr>
+<tr><td>何かのカード</td><td>景品の種類（ptの帯ごとの名前）と、ラインナップ（＝出うるSCORE）。ptごとに<b>固定カード</b>を登録できる。各ptに「このSCOREが出るレート×倍率」が出るので、手配が必要なカードがわかる</td></tr>
 <tr><td>BOXモニター</td><td>オリパ×レートごとのBOXの進み具合・この周の還元率・最大持ち出し・隠しキリ番の位置と排出済みか（運営だけが見る）</td></tr>
 <tr><td>当選履歴</td><td>引いた結果（レート・BOXの何口目・倍率・SCORE・景品・受け取り方法）</td></tr>
 <tr><td>シナリオ</td><td>7の出方のパターン12種の出やすさ、ガセ（失敗する逆転）の率、フリーズの率（全RUSH共通）</td></tr>
 <tr><td>表示設定</td><td>購入ボタン近くと遊び方に出す注意書き</td></tr></table>
-<div class="wide"><img src="man/a3.jpg" alt=""><figcaption>何かのカード（交換景品のラインナップ）</figcaption></div>
+<div class="wide"><img src="man/a3.jpg" alt=""><figcaption>何かのカード（ラインナップ）：pt＝SCORE。固定カード（任意）を入れるとそのptは固定カードになる</figcaption></div>
 </section>
 
-<section id="s6"><h2><span class="n">6</span>初期値の景品表（倍率×レート帯ごとの個数）</h2>
-<table><tr><th>ランク</th><th class="n">倍率</th><th class="n">〜5万</th><th class="n">10万〜30万</th><th class="n">50万〜</th></tr>
+<section id="s6"><h2><span class="n">6</span>初期値の景品表（倍率×グループごとの個数）</h2>
+<table><tr><th>ランク</th><th class="n">倍率</th><th class="n">G1（〜5万）</th><th class="n">G2（10万〜30万）</th><th class="n">G3（50万〜）</th></tr>
 <tr><td>S</td><td class="n">×30</td><td class="n">1</td><td class="n">0</td><td class="n">0</td></tr>
 <tr><td>A</td><td class="n">×10</td><td class="n">6</td><td class="n">1</td><td class="n">0</td></tr>
 <tr><td>A</td><td class="n">×5</td><td class="n">15</td><td class="n">1</td><td class="n">1</td></tr>
@@ -124,23 +126,21 @@ footer{text-align:center;font-size:12px;color:var(--mut);margin-top:18px}
 <tr><td>D</td><td class="n">×0.5</td><td class="n">298</td><td class="n">28</td><td class="n">14</td></tr>
 <tr><td>その他</td><td class="n">×0.3</td><td class="n">270</td><td class="n">25</td><td class="n">10</td></tr>
 <tr><th>口数／還元率</th><th></th><th class="n">1,000口／97.5%</th><th class="n">100口／97.5%</th><th class="n">50口／98.0%</th></tr></table>
-<p style="font-size:12.5px;color:var(--sub)">最大は 〜5万が×30、10万〜30万が×10、50万〜が×5。隠しキリ番の初期値：5,000（リザードン SAR・800番目）、10,000（ブラッキー SAR・700番目）、50,000（ルギア V SA・900番目）、100,000（マリオピカチュウ・80番目）、1,000,000（ポケモンイラストレーター・40番目）</p>
+<p style="font-size:12.5px;color:var(--sub)">最大は G1が×30、G2が×10、G3が×5。隠しキリ番の初期値：5,000（リザードン SAR・800番目）、10,000（ブラッキー SAR・700番目）、50,000（ルギア V SA・900番目）、100,000（マリオピカチュウ・80番目）、1,000,000（ポケモンイラストレーター・40番目）</p>
 </section>
 
 <section id="s7" class="pb"><h2><span class="n">7</span>シミュレーション結果</h2>
 <h3>① BOXが固定なので、1周売り切ると還元率は確定</h3>
 <p>全口をシャッフルして順に売るため、1周（全口）売り切ると、払い出しは必ず<b>「売上×設計の還元率」</b>になります（運に左右されない）。プロトのBOXモニター「100回売る／全レートを1周分ずつ売る」で確認済み。</p>
 <h3>② 全員がptに交換した場合でもコインは増え続けないか</h3>
-<p>交換ptはキリのいい数字に切り上げるため、SCOREより少し上振れします。現物が出ずにptに交換されるならCF上は許容できる一方、<b>全部交換したときの還元率が100%を超えるとコインが膨らみ続ける</b>ので検証しました。</p>
+<p>現物が出ずにptに交換されるならCF上は許容できる一方、<b>交換したときの還元率が100%を超えるとコインが膨らみ続ける</b>ので検証しました。<b>SCOREと景品のptを完全一致</b>にしたので、交換したときの還元率＝設計の還元率（97.5〜98%）になり、<b>どのレートでも必ず収束</b>します。</p>
 <p style="font-size:12.5px;color:var(--sub)">条件：元手＝100回分のコイン。当たりは全部ptに交換し、そのコインで同じレートを打ち続ける（最大5,000回・2,000人分）</p>
-<table><tr><th>レート</th><th class="n">口数</th><th class="n">還元率（SCORE基準）</th><th class="n">還元率（全部pt交換）</th><th class="n">破産率</th><th>結果</th></tr>
-<tr><td>500〜50,000</td><td class="n">1,000</td><td class="n">97.5%</td><td class="n">97.5%</td><td class="n">100%</td><td>元手の約32倍の回数を打ってゼロに収束</td></tr>
-<tr><td>100,000〜300,000</td><td class="n">100</td><td class="n">97.5%</td><td class="n">97.5%</td><td class="n">100%</td><td>約37倍の回数でゼロに収束</td></tr>
-<tr><td>500,000・1,000,000</td><td class="n">50</td><td class="n">98.0%</td><td class="n">98.0%</td><td class="n">100%</td><td>約48倍の回数でゼロに収束</td></tr>
-<tr style="background:#fff5f5"><td>750,000（修正前）</td><td class="n">50</td><td class="n">98.0%</td><td class="n" style="color:var(--red);font-weight:700">101.6%</td><td class="n">0%</td><td style="color:var(--red)"><b>打つほど増える</b>（100回分 → 5,000回後に180回分）。1周3,750万売るたびに約60万pt多く出る</td></tr>
-<tr style="background:#f0fff4"><td>750,000（修正後）</td><td class="n">50</td><td class="n">98.0%</td><td class="n" style="color:var(--grn);font-weight:700">98.7%</td><td class="n">—</td><td>減っていく（100回分 → 5,000回後に33回分）。時間をかけてゼロに収束</td></tr></table>
-<div class="key"><b>対策（実装済み）</b>：交換ptのラインナップを自動作成するときに、<b>全員がpt交換しても、どのレートも還元率99%以下</b>になるようにしました。超えるレートにはSCOREぴったりの交換pt（375,000／2,250,000／3,750,000）を追加。オリパ編集のレート一覧にも「全部pt交換したら」の還元率を出し、99%を超えると赤で表示します。</div>
-<div class="warn"><b>まだ見ていない点</b>：RUSHで得たコインが通常オリパに流れた場合の全体の収束（通常オリパの原価も含めた検証）。99%の上限を何%にするかは要相談。</div>
+<table><tr><th>レート</th><th class="n">口数</th><th class="n">還元率（＝全部pt交換）</th><th class="n">破産率</th><th>結果</th></tr>
+<tr><td>500〜50,000（G1）</td><td class="n">1,000</td><td class="n">97.5%</td><td class="n">100%</td><td>元手の約32倍の回数を打ってゼロに収束</td></tr>
+<tr><td>100,000〜300,000（G2）</td><td class="n">100</td><td class="n">97.5%</td><td class="n">100%</td><td>約37倍の回数でゼロに収束</td></tr>
+<tr><td>500,000〜1,000,000（G3）</td><td class="n">50</td><td class="n">98.0%</td><td class="n">100%</td><td>約48倍の回数でゼロに収束</td></tr></table>
+<div class="warn"><b>参考：切り上げ（上振れ）にした場合</b>　交換ptをキリのいい数字に切り上げる案では、750,000レートだけ全部交換したときの還元率が101.6%になり、<b>打つほどコインが増える</b>（100回分 → 5,000回後に180回分、1周3,750万売るたびに約60万pt多く出る）結果でした。<b>完全一致にしたことで、この問題はなくなっています。</b></div>
+<div class="warn"><b>まだ見ていない点</b>：RUSHで得たコインが通常オリパに流れた場合の全体の収束（通常オリパの原価も含めた検証）。</div>
 </section>
 
 <section id="s8"><h2><span class="n">8</span>既知の課題（音・リール）</h2>
@@ -172,8 +172,8 @@ footer{text-align:center;font-size:12px;color:var(--mut);margin-top:18px}
 <section id="s10"><h2><span class="n">10</span>決めてほしいこと</h2>
 <table><tr><th style="width:30px">#</th><th>論点</th><th>今の仮の値</th></tr>
 <tr><td>1</td><td>何かのカードの帯の区切り（R／AR／SR／SAR／PSA）。特にSRとSARの価格感</td><td>〜999 R／1,000〜 AR／3,000〜 SR／5,000〜 SAR／10,000〜 PSA</td></tr>
-<tr><td>2</td><td>全部pt交換したときの還元率の上限</td><td>99%</td></tr>
-<tr><td>3</td><td>レート帯ごとの口数</td><td>1,000口／100口／50口</td></tr>
+<tr><td>2</td><td>固定カードを登録するptと、そのカード（任意）</td><td>未登録（全部 何かのカード）</td></tr>
+<tr><td>3</td><td>BOXの大きさのグループ分けと口数</td><td>〜5万＝1,000口／10万〜30万＝100口／50万〜＝50口</td></tr>
 <tr><td>4</td><td>隠しキリ番の在庫が2枚以上のとき</td><td>1周に1枚ずつ、在庫が尽きるまで毎周入れる</td></tr>
 <tr><td>5</td><td>フロントのカード画像・価格表記・並び順</td><td>RUSH素材の仮画像／「500〜100万」／通常オリパの2枚目</td></tr>
 <tr><td>6</td><td>シナリオ・表示設定をRUSHガチャごとに変えたいか</td><td>全RUSH共通</td></tr>
