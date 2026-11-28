@@ -538,11 +538,12 @@ const PAT={P1:[],P2:[],W1:[],W2:[],missP:{},missW:{}};
 for(let a=0;a<NC;a++)for(let b=0;b<NC;b++)for(let c=0;c<NC;c++){const cs=[a,b,c],e=evalCells(cs);if(e.edge)continue;
   for(const X of ["P","W"]){const Y=X==="P"?"W":"P";
     if(e.hit[Y].length)continue;
+    if(!e.hit[X].includes(1)&&e.hit[X].length)continue; // 7は必ず中段（上下センター）で止める（11/28）。ダブルは中段＋斜め
     if(e.hit[X].length===1)PAT[X+"1"].push({cs,lines:e.hit[X]});
     if(e.hit[X].length===2)PAT[X+"2"].push({cs,lines:e.hit[X]});
     if(e.hit[X].length===0&&!e.hit[Y].length){
       // テンパイ：L・Cが同じラインに7。右リールの外れ方で分類
-      LINES.forEach((L,li)=>{if(sym(0,a+L[0])!==X||sym(1,b+L[1])!==X)return;const need=c+L[2];
+      LINES.forEach((L,li)=>{if(li!==1)return; /* テンパイも中段 */if(sym(0,a+L[0])!==X||sym(1,b+L[1])!==X)return;const need=c+L[2];
         const kind=sym(2,need-1)===X&&need-1>=c-1?"上段で止まる":sym(2,need+1)===X&&need+1<=c+1?"滑ってズレる":null;if(!kind)return;
         (PAT["miss"+X][kind]=PAT["miss"+X][kind]||[]).push({cs,line:li})})}}}
 const pickA=a=>a[Math.floor(Math.random()*a.length)];
