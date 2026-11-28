@@ -515,8 +515,8 @@ addEventListener("resize",resize);
 const tl=new THREE.TextureLoader();const loadTex=f=>new Promise((res,rej)=>tl.load("model/"+f,t=>{t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;res(t)},undefined,rej));
 const PIV={y:-18.206274,z:-28.074114},PITCH=Math.PI*2/21,REELX=[-55,0,55],W7=141.2*Math.PI/180;
 // リール帯（L/C/R・21コマ／ゆうぽんさん 11/27版をそのまま使用）。上段＝c-1、下段＝c+1
-// リール帯：old＝最初にもらった1本の絵（紫7・白7が1個ずつ）を3本に使う（11/28 じぇいさん：作り直しが届くまで）／new＝11/27のL・C・R（?reel=new）
-const REELSET=new URLSearchParams(location.search).get("reel")==="new"?"new":"old";
+// リール帯：new＝11/27のL・C・R（21コマ・ダブル2ライン対応。標準）／old＝最初にもらった1本の絵（?reel=old）
+const REELSET=new URLSearchParams(location.search).get("reel")==="old"?"old":"new";
 const CELL_OFF=0;
 const CELL=c=>(13-CELL_OFF-c)*PITCH; // 21コマ：コマcを中段に止める角度
 // 7の位置：L＝紫0,1／白10,11　C＝紫3／白4　R＝紫1,2／白11,12（縦2連）
