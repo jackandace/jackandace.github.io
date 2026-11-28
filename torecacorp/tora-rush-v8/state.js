@@ -25,13 +25,19 @@ function niceCeil(x,cap){if(x<=0)return 0;cap=cap==null?15:cap;const d=Math.pow(
   for(const k of [d*5,d,d/10]){const v=Math.round(Math.ceil(x/k-1e-9)*k);if((v/x-1)*100<=cap+1e-9)return v}return x}
 // 全RUSHオリパ・全販売レートで出うるSCORE（レート×倍率、個数>0のもの）
 function allScores(gachas){const m=new Map();gachas.forEach(g=>g.rates.forEach(r=>{const bi=band(g,r);g.prizes.forEach(p=>{if((p.q[bi]||0)>0){const sc=Math.round(r*p.m);if(!m.has(sc))m.set(sc,[]);m.get(sc).push({g:g.id,r,m:p.m})}})}));return m}
-function genLineup(gachas,cap){return[...new Set([...allScores(gachas).keys()].map(x=>niceCeil(x,cap)))].sort((a,b)=>a-b)}
-function defState(){const gs=[mkGacha(1201),mkGacha(1202,true)];return{v:8,psa:{name:"何かのPSA",cap:15,vals:genLineup(gs,15)},scnw:[10,10,10,10,10,10,10,10,10,10,6,6],revFake:12,freezeP:25,notice:NOTICE,gachas:gs,boxes:{},rounds:[],hist:[],acc:{}}}
-function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.v===8&&s.gachas&&s.psa)return s}catch(e){}return defState()}
+function genLineup(gachas,cap,min){min=min||0;return[...new Set([...allScores(gachas).keys()].filter(x=>x>=min).map(x=>niceCeil(x,cap)))].sort((a,b)=>a-b)}
+// 景品の種類（交換ptの下限ごと）。名前が空＝ポイントのみ（自動付与）
+const TIERS=[[0,"何かのR"],[1000,"何かのAR"],[3000,"何かのSR"],[5000,"何かのSAR"],[10000,"何かのPSA"]];
+const tierMin=t=>{const x=t.find(r=>r[1]);return x?x[0]:Infinity};
+function defState(){const gs=[mkGacha(1201),mkGacha(1202,true)];return{v:8,psa:{name:"何かのカード",cap:15,tiers:TIERS.map(r=>r.slice()),min:tierMin(TIERS),vals:genLineup(gs,15,tierMin(TIERS))},scnw:[10,10,10,10,10,10,10,10,10,10,6,6],revFake:12,freezeP:25,notice:NOTICE,gachas:gs,boxes:{},rounds:[],hist:[],acc:{}}}
+function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.v===8&&s.gachas&&s.psa&&s.psa.tiers)return s}catch(e){}return defState()}
 function save(s){try{localStorage.setItem(LS,JSON.stringify(s))}catch(e){}}
 function reset(){try{localStorage.removeItem(LS)}catch(e){}}
 // レート→帯（0,1,2）
 // SCORE → 何かのPSAの交換pt（ラインナップのうちSCORE以上で一番小さいもの）
-const psaFor=(st,score)=>st.psa.vals.find(v=>v>=score)||null;
-window.RS={ALLR,LS,NOTICE,defState,load,save,reset,mkGacha,ROWS,band,niceCeil,allScores,genLineup,psaFor};
+// 下限未満のSCOREはptで自動付与（何かのPSAにしない）
+const psaFor=(st,score)=>score<(st.psa.min||0)?null:(st.psa.vals.find(v=>v>=score)||null);
+// 交換pt → 景品名（何かのAR／SR／SAR／PSA）
+const psaName=(st,v)=>{let n="";st.psa.tiers.forEach(([f,nm])=>{if(v>=f)n=nm});return n};
+window.RS={tierMin,psaName,ALLR,LS,NOTICE,defState,load,save,reset,mkGacha,ROWS,band,niceCeil,allScores,genLineup,psaFor};
 })();
