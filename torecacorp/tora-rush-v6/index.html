@@ -513,27 +513,27 @@ const camera=new THREE.PerspectiveCamera(24,1.5,10,3000);camera.position.set(0,2
 function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;const tf=2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));camera.position.z=Math.max(196/camera.aspect/tf,146/tf);camera.updateProjectionMatrix()}
 addEventListener("resize",resize);
 const tl=new THREE.TextureLoader();const loadTex=f=>new Promise((res,rej)=>tl.load("model/"+f,t=>{t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;res(t)},undefined,rej));
-const PIV={y:-18.206274,z:-28.074114},PITCH=Math.PI*2/21,REELX=[-55,0,55],W7=141.2*Math.PI/180;
-// リール帯（L/C/R・21コマ）のコマ番号→角度。コマcを中段に止める角度＝(13-c)×PITCH。上段＝c-1、下段＝c+1
-const CELL_OFF=-0.3; // リール帯を21コマちょうどに切り出したので、コマの中心が少しずれる分の補正
-const CELL=c=>(13-CELL_OFF-c)*PITCH;
-// 7の位置：L＝紫0,1／白10,11　C＝紫3／白4　R＝紫1,2／白11,12（縦2連）
+const PIV={y:-18.206274,z:-28.074114},PITCH=Math.PI*2/12,REELX=[-55,0,55],W7=141.2*Math.PI/180;
+// リール帯（L/C/R・12コマ／ゆうぽんさんの絵から作成）。上段＝c-1、下段＝c+1
+const CELL_OFF=0;
+const CELL=c=>(5.5-CELL_OFF-c)*PITCH; // 12コマ：コマcを中段に止める角度
+// 7の位置：L＝紫0,1／白6,7　C＝紫3／白4　R＝紫1,2／白7,8（縦2連）
 // シングル＝中段1ラインだけ（L・Rは7が中段＋下段）。ダブル＝中段＋右下がり斜めの2ライン（Lは上段＋中段、Rは中段＋下段）
 // ハズレ＝L・Cは中段に7（テンパイ）。Lは上段＋中段、Rは7が上段（1コマ手前）→ 右上がり斜めも揃わない
-const TG={pS:[0,3,1],pW:[1,3,1],wS:[10,4,11],wW:[11,4,11],missP:[1,3,3],missW:[11,4,13]};
+const TG={pS:[0,3,1],pW:[1,3,1],wS:[6,4,7],wW:[7,4,7],missP:[1,3,3],missW:[7,4,9]};
 Object.keys(TG).forEach(k=>TG[k]=TG[k].map(CELL));
-const HOME=[CELL(5),CELL(12),CELL(7)]; // 待機位置：3本ともコインの位置（7が見えない）
+const HOME=[CELL(3),CELL(8),CELL(5)]; // 待機位置：3本ともコインの位置（7が見えない）
 // 止まり方のパターン（11/28）：リール帯から「どのラインに何本揃うか」を全通り計算して、毎回ランダムに選ぶ
 //  シングル＝5ライン（上・中・下・右下がり・右上がり）のどれか1本、ダブル＝2本。ハズレ＝0本で、右リールの外れ方を数パターン
-const STRIP=[{P:[0,1],W:[10,11]},{P:[3],W:[4]},{P:[1,2],W:[11,12]}].map(o=>{const a=Array(21).fill("-");o.P.forEach(c=>a[c]="P");o.W.forEach(c=>a[c]="W");return a});
-const sym=(r,c)=>STRIP[r][((c%21)+21)%21];
+const NC=12;const STRIP=[{P:[0,1],W:[6,7]},{P:[3],W:[4]},{P:[1,2],W:[7,8]}].map(o=>{const a=Array(NC).fill("-");o.P.forEach(c=>a[c]="P");o.W.forEach(c=>a[c]="W");return a});
+const sym=(r,c)=>STRIP[r][((c%NC)+NC)%NC];
 const LINES=[[-1,-1,-1],[0,0,0],[1,1,1],[-1,0,1],[1,0,-1]]; // 上段・中段・下段・右下がり・右上がり
 const LNAME=["上段","中段","下段","右下がり","右上がり"];
 function evalCells(cs){const hit={P:[],W:[]};LINES.forEach((L,li)=>{const a=sym(0,cs[0]+L[0]);if(a!=="-"&&a===sym(1,cs[1]+L[1])&&a===sym(2,cs[2]+L[2]))hit[a].push(li)});
   const edge=[-2,2].some(o=>{const a=sym(0,cs[0]+o);return a!=="-"&&a===sym(1,cs[1]+o)&&a===sym(2,cs[2]+o)}); // 枠外の段（見える上下2段）にも揃って見えないように
   return{hit,edge}}
 const PAT={P1:[],P2:[],W1:[],W2:[],missP:{},missW:{}};
-for(let a=0;a<21;a++)for(let b=0;b<21;b++)for(let c=0;c<21;c++){const cs=[a,b,c],e=evalCells(cs);if(e.edge)continue;
+for(let a=0;a<NC;a++)for(let b=0;b<NC;b++)for(let c=0;c<NC;c++){const cs=[a,b,c],e=evalCells(cs);
   for(const X of ["P","W"]){const Y=X==="P"?"W":"P";
     if(e.hit[Y].length)continue;
     if(e.hit[X].length===1)PAT[X+"1"].push({cs,lines:e.hit[X]});
@@ -541,20 +541,27 @@ for(let a=0;a<21;a++)for(let b=0;b<21;b++)for(let c=0;c<21;c++){const cs=[a,b,c]
     if(e.hit[X].length===0&&!e.hit[Y].length){
       // テンパイ：L・Cが同じラインに7。右リールの外れ方で分類
       LINES.forEach((L,li)=>{if(sym(0,a+L[0])!==X||sym(1,b+L[1])!==X)return;const need=c+L[2];
-        const kind=sym(2,need-1)===X?"上に1コマ":sym(2,need+1)===X?"下に1コマ（通過）":(sym(2,need-2)===X||sym(2,need+2)===X)?"2コマずれ":"7が見えない";
+        const kind=sym(2,need-1)===X&&need-1>=c-1?"上段で止まる":sym(2,need+1)===X&&need+1<=c+1?"滑ってズレる":null;if(!kind)return;
         (PAT["miss"+X][kind]=PAT["miss"+X][kind]||[]).push({cs,line:li})})}}}
 const pickA=a=>a[Math.floor(Math.random()*a.length)];
 const toAng=cs=>cs.map(CELL);
-const MISSW={"上に1コマ":35,"下に1コマ（通過）":30,"2コマずれ":20,"7が見えない":15};
+const MISSW={"上段で止まる":50,"滑ってズレる":50}; // ハズレは必ずテンパイ。右リールの7は必ず見える（11/28）
 function pickWin(k){const X=k[0]==="p"?"P":"W",n=k[1]==="W"?2:1,p=pickA(PAT[X+n]);return{ang:toAng(p.cs),line:p.lines.map(i=>LNAME[i]).join("＋")}}
-function pickMiss(X){const M=PAT["miss"+X];let tot=0;const ks=Object.keys(MISSW).filter(k=>M[k]&&M[k].length);ks.forEach(k=>tot+=MISSW[k]);let x=Math.random()*tot,kk=ks[0];for(const k of ks){if((x-=MISSW[k])<0){kk=k;break}}const p=pickA(M[kk]);return{ang:toAng(p.cs),kind:kk,line:LNAME[p.line]}}
+function pickMiss(X){const M=PAT["miss"+X];let tot=0;const ks=Object.keys(MISSW).filter(k=>M[k]&&M[k].length);ks.forEach(k=>tot+=MISSW[k]);let x=Math.random()*tot,kk=ks[0];for(const k of ks){if((x-=MISSW[k])<0){kk=k;break}}const p=pickA(M[kk]);const ang=toAng(p.cs);return{ang,kind:kk,line:LNAME[p.line],slideFrom:kk==="滑ってズレる"?ang[2]-PITCH:null}}
 let tex={},machineMat,reels=[],ready=false;
 async function init3d(){
   const [dark,on,bright,rL,rC,rR,bL,bC,bR]=await Promise.all(["slot_dark.jpg","slot_on.jpg","slot_bright.jpg","reel_L.jpg","reel_C.jpg","reel_R.jpg","blur_L.jpg","blur_C.jpg","blur_R.jpg"].map(loadTex));
+  [rL,rC,rR,bL,bC,bR].forEach(t=>{t.wrapT=THREE.RepeatWrapping;t.needsUpdate=true});
   tex={dark,on,bright,reels:[{reel:rL,blur:bL},{reel:rC,blur:bC},{reel:rR,blur:bR}]}; // リール帯はL／C／R別（ゆうぽんさん 11/27 版）
   const L=new OBJLoader();const [m,r]=await Promise.all([L.loadAsync("model/Slot_Machine.obj"),L.loadAsync("model/Reel.obj")]);
   machineMat=new THREE.MeshBasicMaterial({map:dark});m.traverse(o=>{if(o.isMesh)o.material=machineMat});scene.add(m);
-  REELX.forEach((x,ri)=>{const g=new THREE.Group();g.position.set(x,PIV.y,PIV.z);const mat=new THREE.MeshBasicMaterial({map:tex.reels[ri].reel});fade3x3(mat);const c=r.clone();c.traverse(o=>{if(o.isMesh)o.material=mat});c.position.set(0,-PIV.y,-PIV.z);g.add(c);scene.add(g);reels.push({g,mat,tex:tex.reels[ri],ang:HOME[reels.length],w:0,state:"idle"});g.rotation.x=HOME[reels.length-1]});
+  // リール面のUVを角度から作り直す（元モデルのUVは1周の96%しか使わず、つなぎ目で絵が潰れていた）。1周＝リール帯1本ぶん
+  r.traverse(o=>{if(!o.isMesh)return;const pos=o.geometry.attributes.position,uv=o.geometry.attributes.uv;if(!uv)return;
+    for(let k=0;k<pos.count;k++){const y=pos.getY(k)-PIV.y,z=pos.getZ(k)-PIV.z;if(Math.hypot(y,z)<45)continue;uv.setY(k,0.5+Math.atan2(y,z)/(Math.PI*2))}
+    // つなぎ目をまたぐ三角形は、vが0付近の頂点を+1して連続にする（テクスチャは縦方向リピート）
+    if(!o.geometry.index)for(let t=0;t<pos.count;t+=3){const v=[uv.getY(t),uv.getY(t+1),uv.getY(t+2)];if(Math.max(...v)-Math.min(...v)>0.5)for(let q=0;q<3;q++)if(v[q]<0.5)uv.setY(t+q,v[q]+1)}
+    uv.needsUpdate=true});
+  REELX.forEach((x,ri)=>{const g=new THREE.Group();g.position.set(x,PIV.y,PIV.z);const mat=new THREE.MeshBasicMaterial({map:tex.reels[ri].reel});const c=r.clone();c.traverse(o=>{if(o.isMesh)o.material=mat});c.position.set(0,-PIV.y,-PIV.z);g.add(c);scene.add(g);reels.push({g,mat,tex:tex.reels[ri],ang:HOME[reels.length],w:0,state:"idle"});g.rotation.x=HOME[reels.length-1]});
   resize();ready=true;window.RUSH_DBG={reels,PITCH,TG,HOME,PAT:()=>PAT,pickWin,pickMiss};idle();
 }
 init3d().catch(e=>{$("idleMsg").textContent="3Dの読み込みに失敗しました："+e.message});
@@ -649,7 +656,8 @@ function timeline(){if(!running||!step)return;
   const vt=el.currentTime,C=CLIP[step.clip];
   if(!step.fist&&vt>=3.1){step.fist=true;sfx("devilrush",.8);sfx("punch",.9)} // 継続の拳突き上げ（7のあとに虎美が拳を上げる場面）
   if(!step.stops[0]&&vt>=C.flash-1.0){step.stops[0]=true;shakeAll(step.target);sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
-  if(C.miss){if(!step.stops[1]&&vt>=C.flash-FULL_MS/1000){step.stops[1]=true;spinStopAll(step.target); /* 1回転してハズレ（右リールの外れ方はパターンから） */stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(!running)return;setLight("dark");$("dim").classList.add("on");callout("RUSH 終了<small>7揃わず</small>")},420+FULL_MS/SPD)}return}
+  if(C.miss){if(!step.stops[1]&&vt>=C.flash-FULL_MS/1000){step.stops[1]=true;spinStopAll(step.pre||step.target); /* 1回転してハズレ。「滑ってズレる」は一度揃う位置で止まり、1コマ滑る */
+    if(step.pre){const st=step;setTimeout(()=>{if(!running||step!==st)return;const r=reels[2];r.stop={a0:r.ang,D:norm(st.target[2]-r.ang),t0:performance.now(),dur:240/SPD,slam:false};r.state="stopping";sfx("reellock_t1",.5)},(FULL_MS+160)/SPD)}stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(!running)return;setLight("dark");$("dim").classList.add("on");callout("RUSH 終了<small>7揃わず</small>")},420+(FULL_MS+(step.pre?420:0))/SPD)}return}
   if(!step.stops[1]&&vt>=C.flash-FULL_MS/1000){step.stops[1]=true;spinStopAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(running)sfx("s777")},FULL_MS/SPD-40);
     if(step.clip==="rainbow")sfx("rainbow05",.9);else if(step.clip==="gold")setTimeout(()=>sfx("v_tempai"),500)}}
 function onStop(i){if(!running||!step)return;
@@ -862,7 +870,7 @@ function build(L){const {R,t,score,c,po}=L;let PM;
   c.games.forEach((g,i)=>{const s=SYM[g.k];
     steps.push({k:"play",f:"lead",l:`${i+1}ゲーム目 導入`},{k:"wait",f:"loop",l:`${i+1}ゲーム目 押せ！`});
     const pw=pickWin(g.k);steps.push({k:"win",f:CLIP[s.clip].f,clip:s.clip,target:pw.ang,line:pw.line,add:g.v,lab:s.n,l:`${i+1}G ${s.n}（${pw.line}）`,freeze:s.d&&Math.random()*100<(STATE.freezeP??25)})});
-  const nE=c.games.length+1;steps.push({k:"play",f:"lead",l:`${nE}ゲーム目 導入`},{k:"wait",f:"loop",l:`${nE}ゲーム目 押せ！`},{k:"win",f:"miss",clip:"miss",target:(PM=pickMiss(Math.random()<.5?"P":"W")).ang,l:`${nE}G ハズレ（右リール${PM.kind}）→ 終了`});
+  const nE=c.games.length+1;steps.push({k:"play",f:"lead",l:`${nE}ゲーム目 導入`},{k:"wait",f:"loop",l:`${nE}ゲーム目 押せ！`},{k:"win",f:"miss",clip:"miss",target:(PM=pickMiss(Math.random()<.5?"P":"W")).ang,pre:PM.slideFrom!=null?[PM.ang[0],PM.ang[1],PM.slideFrom]:null,l:`${nE}G ハズレ（右リール${PM.kind}）→ 終了`});
   steps.push({k:"play",f:c.games[c.games.length-1].k==="wW"?"total":"total_green",l:"TOTAL",bgmOff:true,vsfx:[["jingle",0.0],["v_result",0.82]]});
   if(c.rev)steps.push({k:"rev",rev:c.rev,add:c.rev.ok?score-c.rev.base:0,l:(c.rev.type==="push"?"倍プッシュ":"輪廻転生")+"（"+LV[c.rev.lv].n+"）"+(c.rev.ok?"成功":"失敗")});
   const cnt={};c.games.forEach(g=>cnt[g.k]=(cnt[g.k]||0)+1);const mul=t.u/10;
