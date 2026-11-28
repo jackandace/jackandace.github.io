@@ -702,7 +702,8 @@ STATE.gachas.forEach(g=>g.rates.forEach(r=>{TBL[tk(g,r)]={get rows(){const m={};
 function tStat(k,rows){rows=rows||TBL[k].rows;const N=rows.reduce((a,b)=>a+b[1],0),S=rows.reduce((a,b)=>a+b[0]*b[1],0);return{N,ret:N?S/N:0,w7:N?rows.filter(x=>x[0]>=1).reduce((a,b)=>a+b[1],0)/N:0,max:Math.max(...rows.filter(x=>x[1]>0).map(x=>x[0])),min:Math.min(...rows.filter(x=>x[1]>0).map(x=>x[0])),ceil:rows.reduce((a,b)=>a+Math.max(0,b[0]-1)*b[1],0)}}
 // シリーズ：通常／GOLD（チャージ限定）。レートを選ぶ＝そのレートのオリパを選ぶ
 const GACHAS={normal:{name:"TORAMI RUSH",charge:false},gold:{name:"TORAMI RUSH GOLD",charge:true}};
-Object.values(GACHAS).forEach(G=>{G.g=STATE.gachas.find(g=>!!g.charge===G.charge&&g.pub!==false);if(G.g)G.name=G.g.name;G.feat=G.g?G.g.kiri.filter(k=>G.g.rates.includes(k.rate)).map(k=>({name:k.card+" "+k.cond,pt:k.rate*k.m,rate:k.rate,no:k.no,stock:k.stock??1})):[]});
+const QID=new URLSearchParams(location.search).get("id");
+Object.values(GACHAS).forEach(G=>{G.g=(QID&&STATE.gachas.find(g=>String(g.id)===QID&&!!g.charge===G.charge))||STATE.gachas.find(g=>!!g.charge===G.charge&&g.pub!==false);if(G.g)G.name=G.g.name;G.feat=G.g?G.g.kiri.filter(k=>G.g.rates.includes(k.rate)).map(k=>({name:k.card+" "+k.cond,pt:k.rate*k.m,rate:k.rate,no:k.no,stock:k.stock??1})):[]});
 let GK="",RATES=[];const VALS={};
 ALLR.forEach(r=>VALS[r]={pS:r*0.1,pW:r*0.2,wS:r,wW:r*2}); // 7の額＝レート×0.1／0.2／1／2（固定）
 const boxOf=r=>{const g=GACHAS[GK].g;return{id:tk(g,r),rate:r,g,name:g.name+"（"+fmt(r)+"）"}};

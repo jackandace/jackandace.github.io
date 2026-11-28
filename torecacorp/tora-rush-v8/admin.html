@@ -66,7 +66,7 @@ td{font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line);vertical-
 const $=id=>document.getElementById(id);const fmt=v=>Math.round(v).toLocaleString();const man=v=>v>=10000?(v/10000).toLocaleString()+"万":fmt(v);const mt=m=>"×"+(Math.round(m*10)/10);
 const ALLR=RS.ALLR;let S=RS.load();const RANKS=["S","A","B","C","D","その他"];
 function save(msg,g){RS.save(S);if(msg)toast(msg,g)}
-const pURL=(g,r)=>`index.html?${g.charge?"g=gold&":""}r=${r||g.rates.slice().sort((a,b)=>a-b)[0]||5000}#play`;
+const pURL=(g,r)=>`index.html?id=${g.id}&${g.charge?"g=gold&":""}r=${r||g.rates.slice().sort((a,b)=>a-b)[0]||5000}#play`;
 function toast(msg,g){const t=document.createElement("div");t.className="toast";t.innerHTML=msg+(g?`<a href="${pURL(g)}" target="_blank">プロトで遊ぶ →</a>`:"");document.body.appendChild(t);setTimeout(()=>t.remove(),g?4500:2200)}
 const G=id=>S.gachas.find(g=>String(g.id)===String(id));
 const sw=on=>`<span class="sw ${on?"on":""}"></span>`;
