@@ -294,7 +294,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <!-- ======== 確定仕様 ======== -->
 <section class="pane" id="p-spec">
 <div class="card">
-<h2>v8のルール（1オリパで全レート対応・11/28）</h2><p class="note" style="margin:0 0 6px">v7との違い：レートごとにオリパを作らず、<b>1つのオリパに販売レートをまとめて登録</b>。景品は S〜その他 のPTカードを<b>倍率</b>で登録（交換ポイント＝レート×倍率を自動計算）し、個数は<b>レート帯（〜5万／10万〜30万／50万〜）ごと</b>に入れる。Sの「隠しキリ番景品」に実物カードを対象レート・キリ番つきで何個でも登録。下の表はv6からの共通部分を含みます。</p>
+<h2>v8のルール（1オリパで全レート対応・11/28）</h2><p class="note" style="margin:0 0 6px">v7との違い：レートごとにオリパを作らず、<b>1つのオリパに販売レートをまとめて登録</b>。景品は S〜その他 に<b>「何かのPSA」</b>を<b>倍率</b>で登録。当たったら<b>SCORE以上で一番近いキリのいいpt</b>の「何かのPSA」になり、<b>カードを受け取るか、そのptに交換するか</b>を選ぶ（交換は少し上振れOK）し、個数は<b>レート帯（〜5万／10万〜30万／50万〜）ごと</b>に入れる。Sの「隠しキリ番景品」に実物カードを対象レート・キリ番つきで何個でも登録。下の表はv6からの共通部分を含みます。</p>
 <table class="t">
 <tr><th style="width:170px">項目</th><th>内容</th></tr>
 <tr><td>引き方</td><td>レートを選んで<b>1回の購入＝1回の抽選</b>。そのレートのBOXから<b>倍率の口を1つ</b>引く。<b>SCORE＝倍率×レート</b>（内部で何連も引く仕組みはなくなった）</td></tr>
@@ -302,7 +302,7 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <tr><td>倍率の表</td><td>還元率97.5%（ハイトレさんの理論値97〜98%に合わせる）。レート帯で切り替え：<b>5万以下＝1,000口・最大×30／10万〜30万＝100口・最大×10／50万以上＝50口・最大×5</b>（区切りは案）</td></tr>
 <tr><td>RUSH</td><td>毎回RUSH。<b>最低3連</b>（一番下の口×0.3＝紫7シングル3回）、最大20ゲーム。最後は7が揃わないハズレで終了。7の合計は<b>倍率ちょうど</b>で、<b>上乗せは出ない</b>（倍率を0.1刻みにしたため）</td></tr>
 <tr><td>7の額</td><td>レート×0.1（紫7S）／0.2（紫7W）／1（白7S）／2（白7W）で固定。7が揃うたびに獲得PTと累計SCOREを表示</td></tr>
-<tr><td>受け取り</td><td><b>2段階</b>：① SCOREがそのガチャの<b>目玉景品</b>（任意登録・実物）のPTと同じなら目玉を優先 ② それ以外・目玉が弾切れなら、SCOREが1万以上で<b>SCOREと同じPTのPSA景品</b>。<b>発送</b>か<b>ポイント（SCORE分）</b>を選ぶ（ハイトレ仕様）。在庫がなければ代替景品、それもなければポイントのみ（発送不可）。1万未満はポイントで自動付与</td></tr>
+<tr><td>受け取り</td><td>① 隠しキリ番の番目を引いたら<b>目玉景品</b>（実物）：受け取り か ポイント（SCORE分） ② それ以外は<b>何かのPSA</b>：SCOREを<b>キリのいいpt</b>に切り上げ（上振れ上限15%）。<b>カードを受け取る</b>か<b>そのptに交換</b>を選ぶ</td></tr>
 <tr><td>表示（B案）</td><td>還元率は<b>BOX全体の設計値</b>として表示し、注意書きで明記。<b>最大倍率と倍率の表は非公開</b>（入江さん 11/27）。BOXごとの残り口数・残り倍率・残り還元率は<b>出さない</b>。実績還元率は全レート合算・期間で公開。当たり速報（任意）</td></tr>
 <tr><td>操作ボタン</td><td>AUTO／一撃／スピード／スキップ／音量（v5と同じ。結果は変わらない）</td></tr>
 <tr><td>チャージ限定RUSH</td><td>v5と同じ入口・挑戦枠。BOXは別に持つ（プロト：<a href="?g=gold">チャージ限定版</a>）</td></tr>
@@ -414,9 +414,10 @@ footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(
 <table class="t">
 <tr><th style="width:230px">v7（1レート1オリパ）</th><th>v8（1オリパで全レート）</th></tr>
 <tr><td>レートごとにオリパを作る（15レートなら15個）</td><td><b>1オリパ</b>に「販売レート」をチェックで登録。BOXはレートごとに自動で作られる</td></tr>
-<tr><td>景品のPTをレートごとに入力</td><td>景品は<b>倍率</b>で登録（PTカード×30 など）。交換ポイントはレート×倍率で自動。1つの景品表が全レートに効く</td></tr>
+<tr><td>景品のPTをレートごとに入力</td><td>景品は<b>倍率</b>で登録（何かのPSA×30 など）。1つの景品表が全レートに効く</td></tr>
 <tr><td>口数＝そのオリパの個数の合計</td><td>個数は<b>レート帯ごとに3列</b>（〜5万／10万〜30万／50万〜）。高レートほど口数を少なくできる。帯の区切りは変更可</td></tr>
 <tr><td>S賞1つにキリ番</td><td>Sの<b>「隠しキリ番景品」に何個でも</b>（stgの既存項目を流用：カード・状態・キリ番・当たり演出・交換タイプ）。<b>対象レート</b>と<b>倍率</b>を追加。そのレートのBOXで同じ倍率の口1つと入れ替えるので還元率は変わらない。在庫0なら次の周からPTカードのまま</td></tr>
+<tr><td>A〜その他＝PTカード（ポイントで自動付与）</td><td><b>何かのPSA</b>（全RUSH共通のラインナップ）。SCOREをキリのいいptに切り上げたPSAを、受け取るか pt交換 を選ぶ。ラインナップは管理画面「何かのPSA」で全レートをカバーするよう自動作成</td></tr>
 <tr><td>完売で自動再販</td><td>同じ（レートごとのBOXが完売したら同じ内容で自動補充）</td></tr>
 </table>
 </div>
@@ -780,10 +781,11 @@ function compose0(u,V,si){
   return{games,si,score:Math.round(u*V.pS)}}
 // 払い出し：1万未満はポイント自動付与。1万以上はSCOREと同じPTのPSA景品 → 在庫がなければ代替景品 → それもなければポイントのみ
 function payout(score,t){
-  // 隠しキリ番景品の番目を引いた → 実物カード（発送かポイント）／それ以外 → PTカード（ポイントで自動付与）
+  // 隠しキリ番景品の番目を引いた → 実物カード（発送かポイント）／それ以外 → 何かのPSA（発送か、キリのいいptに交換）
   const g=GACHAS[GK].g;if(t&&t.kiri!=null){const k=g.kiri[t.kiri];return{kind:"feat",name:k.card+" "+k.cond,rank:"S",prize:k}}
   const m=Math.round(score/rate*10)/10,p=g.prizes.find(x=>Math.abs(x.m-m)<1e-9);
-  return{kind:"ptcard",rank:p?p.rank:"",name:`PTカード ${fmt(score)}PT`}}
+  const v=RS.psaFor(STATE,score);if(!v)return{kind:"ptonly",rank:p?p.rank:"",name:"ポイント"};
+  return{kind:"npsa",rank:p?p.rank:"",v,name:`${STATE.psa.name}（${fmt(v)}pt）`}}
 /* =============== プロトの操作 =============== */
 let rate=5000,last=null;
 {const qr=+new URLSearchParams(location.search).get("r");if(qr)rate=qr} // 管理画面の「プロトで遊ぶ」からレート指定で開く
@@ -812,13 +814,13 @@ function doDraw(forceTop,fixedU,quiet){const R=RATES.find(x=>x.r===rate);
   const c=compose(t.u,VALS[rate],si);const score=c.score;const po=payout(score,t);
   if(!t.demo&&t.u>=50)NEWS.unshift({r:rate,u:t.u,score,top:c.games.filter(g=>g.k==="wW").length,G:c.games.length,at:new Date()});
   last={R,t,score,c,po};
-  if(!t.demo){const h={at:Date.now(),gid:GACHAS[GK].g.id,r:rate,round:t.round,no:t.no,N:t.N,u:t.u,score,po:po.kind,pname:po.name,recv:po.kind==="ptcard"?"ポイント（自動）":"未選択",scn:SCN[c.si].n,G:c.games.length};STATE.hist.unshift(h);if(STATE.hist.length>300)STATE.hist.length=300;last.h=h;saveState()}
+  if(!t.demo){const h={at:Date.now(),gid:GACHAS[GK].g.id,r:rate,round:t.round,no:t.no,N:t.N,u:t.u,score,po:po.kind,pname:po.name,recv:po.kind==="ptonly"?"ポイント（自動）":"未選択",scn:SCN[c.si].n,G:c.games.length};STATE.hist.unshift(h);if(STATE.hist.length>300)STATE.hist.length=300;last.h=h;saveState()}
   build(last);renderBoxMon();renderNews();renderRet()}
 $("drawBtn").addEventListener("click",()=>doDraw(false));
 $("drawS").addEventListener("click",()=>doDraw(true,null,true));
 $("mulBtn").addEventListener("click",()=>doDraw(false,+$("mulSel").value,true));
 $("scnSel").addEventListener("change",()=>{if(last&&last.c){last.c=compose(last.t.u,VALS[rate],+$("scnSel").value<0?pickScn():+$("scnSel").value);build(last)}});
-function poTxt(po,score){return po.kind==="ptcard"?`${po.rank}賞 PTカード ${fmt(score)}PT（ポイントで自動付与）`:po.kind==="feat"?`<span class="mid">S賞</span> ${po.name}（${fmt(score)}PT）`:po.kind==="coin"?`ポイント ${fmt(score)}（1万未満のため自動で付与）`:po.kind==="ptonly"?`ポイント ${fmt(score)}（${man(po.tier)}帯の景品が在庫切れのため、ポイントのみ・発送不可）`:po.name}
+function poTxt(po,score){return po.kind==="npsa"?`${po.rank}賞 ${po.name}（発送 か ${fmt(po.v)}pt に交換）`:po.kind==="ptcard"?`${po.rank}賞 PTカード ${fmt(score)}PT（ポイントで自動付与）`:po.kind==="feat"?`<span class="mid">S賞</span> ${po.name}（${fmt(score)}PT）`:po.kind==="coin"?`ポイント ${fmt(score)}（1万未満のため自動で付与）`:po.kind==="ptonly"?`ポイント ${fmt(score)}（${man(po.tier)}帯の景品が在庫切れのため、ポイントのみ・発送不可）`:po.name}
 function build(L){const {R,t,score,c,po}=L;let PM;
   const steps=[];
   steps.push({k:"play",f:"freeze",l:"プチュン",sfx:[["puchun",0,.9]]},{k:"play",f:"op",l:"OP",bgm:true,vsfx:[["v_miseteyaru",0.05],["v_attack",1.97]]});
@@ -829,7 +831,8 @@ function build(L){const {R,t,score,c,po}=L;let PM;
   steps.push({k:"play",f:c.games[c.games.length-1].k==="wW"?"total":"total_green",l:"TOTAL",bgmOff:true,vsfx:[["jingle",0.0],["v_result",0.82]]});
   if(c.rev)steps.push({k:"rev",rev:c.rev,add:c.rev.ok?score-c.rev.base:0,l:(c.rev.type==="push"?"倍プッシュ":"輪廻転生")+"（"+LV[c.rev.lv].n+"）"+(c.rev.ok?"成功":"失敗")});
   const cnt={};c.games.forEach(g=>cnt[g.k]=(cnt[g.k]||0)+1);const mul=t.u/10;
-  const prize=po.kind==="ptcard"?`<div class="rw" style="font-size:15px"><span>${po.rank}賞 PTカード</span><b>${fmt(score)}PT</b></div><div style="font-size:11.5px;opacity:.85">ポイントで自動付与しました</div>`:po.kind==="coin"?`<div class="rw" style="font-size:15px"><span>ポイント</span><b>${fmt(score)}</b></div><div style="font-size:11.5px;opacity:.85">1万未満のため、ポイントを自動で付与しました</div>`:
+  const prize=po.kind==="npsa"?`<div class="prize" style="font-size:15px"><span>${po.rank}賞 ${STATE.psa.name}</span><b>${fmt(po.v)}pt</b></div><div style="font-size:11.5px;opacity:.85;margin-top:3px">SCORE ${fmt(score)} → ${fmt(po.v)}pt相当の${STATE.psa.name}。カードを受け取るか、ptに交換するかを選べます</div>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="closebtn" style="margin:0;background:#fff;color:#111" type="button" data-pick="ship">カードを受け取る</button><button class="closebtn" style="margin:0" type="button" data-pick="coin">${fmt(po.v)}pt に交換</button></div><div id="pickMsg" style="font-size:12px;margin-top:6px;text-align:center"></div>`:po.kind==="ptcard"?`<div class="rw" style="font-size:15px"><span>${po.rank}賞 PTカード</span><b>${fmt(score)}PT</b></div><div style="font-size:11.5px;opacity:.85">ポイントで自動付与しました</div>`:po.kind==="coin"?`<div class="rw" style="font-size:15px"><span>ポイント</span><b>${fmt(score)}</b></div><div style="font-size:11.5px;opacity:.85">1万未満のため、ポイントを自動で付与しました</div>`:
     po.kind==="ptonly"?`<div class="rw" style="font-size:15px"><span>ポイント</span><b>${fmt(score)}</b></div><div style="font-size:11.5px;opacity:.85">この価格帯の景品が在庫切れのため、ポイントで付与しました（発送不可）</div>`:
     `${po.kind==="feat"?'<div style="text-align:center;color:#ffd36b;font-weight:900;letter-spacing:.1em;margin-top:4px">★ S賞 ★</div>':""}<div class="prize" style="font-size:15px"><span>${po.name}</span><b>${fmt(score)}PT</b></div>
     <div style="display:flex;gap:8px;margin-top:8px"><button class="closebtn" style="margin:0;background:#fff;color:#111" type="button" data-pick="ship">発送する</button><button class="closebtn" style="margin:0" type="button" data-pick="coin">ポイントにする（${fmt(score)}）</button></div><div id="pickMsg" style="font-size:12px;margin-top:6px;text-align:center"></div>`;
@@ -840,11 +843,11 @@ function build(L){const {R,t,score,c,po}=L;let PM;
       <div style="margin-top:10px;font-weight:800">獲得景品</div>${prize}`};
   $("drawOut").innerHTML=`<b>レート ${fmt(R.r)}</b>（${TBL[tblKey(R.r)].name}）${t.demo?"・<span class='mid'>デモ（BOXは消費しない）</span>":`<br>BOX：第${t.round}周 ${t.no}／${t.N}口目`}<br>引いた口：<b>${mulTxt(mul)}</b> → SCORE <b>${fmt(score)}</b>（${mulTxt(mul)}×${fmt(R.r)}）→ シナリオ「${SCN[c.si].n}」${c.games.length}ゲーム${c.rev?`<br>逆転演出：${c.rev.type==="push"?"倍プッシュ":"輪廻転生"}（期待度 ${LV[c.rev.lv].n}）→ <b>${c.rev.ok?"成功：SCORE "+fmt(c.rev.base)+" → ×2":"失敗（ガセ）"}</b>`:""}${c.games.some((g,i)=>steps.find(x=>x.k==="win"&&x.freeze&&x.l.startsWith((i+1)+"G")))?"<br>ダブル揃いでフリーズ演出あり":""}
     <div class="chips">${c.games.map(g=>`<span class="chip k-${g.k}">${SYM[g.k].n} ${fmt(g.v)}</span>`).join("")}</div>
-    払い出し：<b>${poTxt(po,score)}</b>${po.kind==="psa"||po.kind==="alt"||po.kind==="feat"?"／ポイントなら "+fmt(score):""}`;
+    払い出し：<b>${poTxt(po,score)}</b>${po.kind==="feat"?"／ポイントなら "+fmt(score):""}`;
   idle(true)}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b||!last)return;const po=last.po;
-  if(b.dataset.pick==="ship"){if(po.kind==="feat"){po.prize.stock=Math.max(0,(po.prize.stock??1)-1);saveState()}else if(po.kind==="psa")TIERS[po.ti].stock--;else if(po.kind==="alt")TIERS[po.ti].alt--;renderStock();$("pickMsg").textContent=`${po.name} を発送します（在庫を1つ減らしました）`}
-  else $("pickMsg").textContent=`ポイント ${fmt(last.score)} を付与しました`;
+  if(b.dataset.pick==="ship"){if(po.kind==="feat"){po.prize.stock=Math.max(0,(po.prize.stock??1)-1);saveState()}renderStock();$("pickMsg").textContent=`${po.name} を発送します（在庫を1つ減らしました）`}
+  else $("pickMsg").textContent=`ポイント ${fmt(po.kind==="npsa"?po.v:last.score)} を付与しました`;
   if(last.h){last.h.recv=b.dataset.pick==="ship"?"発送":"ポイント"}saveState();$("res").querySelectorAll("[data-pick]").forEach(x=>x.disabled=true)});
 function renderStock(){const rows=STATE.gachas.flatMap(g=>g.kiri.map(p=>({g,p})));const h=`<table class="t"><tr><th>オリパ</th><th class="n">対象レート</th><th>隠しキリ番景品</th><th class="n">倍率（PT）</th><th class="n">キリ番</th><th class="n">実物の在庫</th></tr>${rows.map(({g,p},i)=>`<tr><td>${g.name}</td><td class="n">${fmt(p.rate)}</td><td>${p.card} ${p.cond}</td><td class="n">${mulTxt(p.m)}<div class="note">${fmt(p.rate*p.m)}PT</div></td><td class="n">${p.no}番目</td><td class="n"><input type="number" min="0" value="${p.stock??1}" data-ss="${i}" style="width:64px"></td></tr>`).join("")}</table>`;
   if($("stockBox")){$("stockBox").innerHTML=h;$("stockBox").onchange=e=>{const x=e.target;if(x.dataset.ss==null)return;rows[+x.dataset.ss].p.stock=Math.max(0,+x.value);saveState()}}}
@@ -872,13 +875,13 @@ function renderHow(){if(!RATES.find(x=>x.r===howRate))howRate=RATES[0].r;const V
   ${["wW","wS","pW","pS"].map(k=>`<div class="rw" style="display:flex;justify-content:space-between;border-bottom:1px solid #2d2442;padding:4px 0"><span><span class="chip k-${k}">${SYM[k].n}</span> <span style="font-size:10.5px;opacity:.7">（レート×${{wW:2,wS:1,pW:0.2,pS:0.1}[k]}）</span></span><b>${fmt(V[k])} PT</b></div>`).join("")}
 
   ${(GACHAS[GK].feat||[]).length?`<div style="font-weight:800;margin:12px 0 4px">目玉景品（各レートのBOXのどこかに入っています）</div><table style="width:100%;font-size:11.5px;border-collapse:collapse">${GACHAS[GK].feat.map(f=>`<tr style="border-bottom:1px solid #2d2442"><td style="padding:3px 0">${fmt(f.rate)}coin：${f.name}</td><td style="text-align:right">${fmt(f.pt)}PT</td><td style="text-align:right">${f.stock>0?"残り"+f.stock:'<span style="opacity:.6">終了</span>'}</td></tr>`).join("")}</table>`:""}
-  <div style="font-size:12px;line-height:1.8;margin-top:10px">・1回引くと必ずRUSH（最低3連）。<b>7が揃わなかったゲームで終了</b>します<br>・SCOREが目玉景品のPTと同じなら<b>目玉景品</b>（在庫がある間）。それ以外でSCOREが1万以上なら<b>SCOREと同じPTのPSA景品</b>。<b>発送</b>か<b>ポイント（SCORE分）</b>を選べます。1万未満はポイントで付与<br>・<b>AUTO</b>：押せ！を自動で押します　<b>一撃</b>：残りのゲームを飛ばしてTOTALへ　<b>スピード</b>：×1／×1.5／×2／×4（×4はボイスなし）</div>
+  <div style="font-size:12px;line-height:1.8;margin-top:10px">・1回引くと必ずRUSH（最低3連）。<b>7が揃わなかったゲームで終了</b>します<br>・獲得景品は<b>${STATE.psa.name}</b>。SCORE以上で一番近いキリのいいpt（例：SCORE 2,250 → 2,500pt）の${STATE.psa.name}になり、<b>カードを受け取る</b>か<b>そのptに交換</b>かを選べます。目玉景品（BOXのどこかに入っています）が当たった場合は目玉景品を受け取るかptかを選べます<br>・<b>AUTO</b>：押せ！を自動で押します　<b>一撃</b>：残りのゲームを飛ばしてTOTALへ　<b>スピード</b>：×1／×1.5／×2／×4（×4はボイスなし）</div>
   <div style="font-weight:800;margin:12px 0 4px">ご注意</div>
   <ul style="font-size:11px;opacity:.9;margin:0;padding-left:16px;line-height:1.7">
   <li><b style="color:#ffd36b">${NOTICE}</b></li>
   <li>結果（倍率・SCORE・獲得景品）は購入した時点で決まります。RUSHの演出・押せ！・AUTO・一撃・スピードによって結果は変わりません</li>
   <li>RUSHの7の並びは、決まったSCOREを見せるための演出です</li>
-  <li>PSA景品の在庫がない場合は同じ価格帯の代替景品、それもない場合はポイントでの付与（発送不可）となります</li>
+  <li>${STATE.psa.name}のカードの内容は当社が選定します。カードの銘柄・状態はお選びいただけません</li>
   <li>PTは当社が定める数値で、景品の市場価格を示すものではありません</li>
   ${GACHAS[GK].charge?"<li>挑戦枠はチャージ時に付与されます。付与の条件・有効期限は別途表示します</li>":""}</ul>
   <p style="font-size:10.5px;opacity:.7;margin:8px 0 0">※平均継続率は、倍率の表と演出シナリオから算出した平均値です。各ゲームは独立した抽選ではありません。</p>`}
