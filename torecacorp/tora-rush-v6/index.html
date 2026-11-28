@@ -587,15 +587,15 @@ const easeOutBack=p=>{const c1=1.15,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.
 const easeSlam=p=>{const c1=2.6,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
 // 1回転して止める（11/28）：一気に1周回ってから、少し行き過ぎて戻る
 const FULL_MS=600;
-function fullEase(p,D){return D*(1-Math.pow(1-p,4))} // 行き過ぎて戻る動きはなし（止まってから動いて見えるため 11/28）
-function spinStopAll(targets){const t0=performance.now();reels.forEach((r,i)=>{const tg=targets[i];const D=norm(tg-r.ang)+Math.PI*2;r.stop={a0:r.ang,D,t0,dur:FULL_MS/SPD,full:true};r.state="stopping"})}
+function fullEase(p,D,pw){return D*(1-Math.pow(1-p,pw||4))} // 行き過ぎて戻る動きはなし（止まってから動いて見えるため 11/28）
+function spinStopAll(targets,slowR){const t0=performance.now();reels.forEach((r,i)=>{const tg=targets[i];const D=norm(tg-r.ang)+Math.PI*2;const sl=slowR&&i===2;r.stop={a0:r.ang,D,t0,dur:(FULL_MS+(sl?380:0))/SPD,full:true,pw:sl?5:4};r.state="stopping"})} // slowR：右だけ勢いが余って、揃う位置を少し通り過ぎてから止まる
 let lastT=performance.now();
 function loop(t){const dt=Math.min(0.05,(t-lastT)/1000);lastT=t;
   if(ready){reels.forEach((r,i)=>{
     if(r.state==="accel"){r.w=Math.min(MAXW,r.w+MAXW*dt/0.25);if(r.w>=MAXW)r.state="spin";r.ang+=r.w*dt}
     else if(r.state==="spin"){r.ang+=r.w*dt}
     else if(r.state==="shake"){const e=(t-r.sh0)/1000;r.ang=r.base+Math.sin(e*62+i*1.7)*0.045+Math.sin(e*23+i)*0.025}
-    else if(r.state==="stopping"){const s=r.stop;const p=Math.min(1,(t-s.t0)/s.dur);r.ang=s.full?s.a0+fullEase(p,s.D):s.a0+s.D*(s.slam?easeSlam(p):easeOutBack(p));r.w=MAXW*(1-p);if(p>=1){r.state="stopped";r.w=0;r.ang=norm(r.ang);onStop(i)}}
+    else if(r.state==="stopping"){const s=r.stop;const p=Math.min(1,(t-s.t0)/s.dur);r.ang=s.full?s.a0+fullEase(p,s.D,s.pw):s.a0+s.D*(s.slam?easeSlam(p):easeOutBack(p));r.w=MAXW*(1-p);if(p>=1){r.state="stopped";r.w=0;r.ang=norm(r.ang);onStop(i)}}
     if(r.home){const p=Math.min(1,(t-r.home.t0)/320);const to=r.home.to||0;let d=((to-r.home.a0)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;r.ang=r.home.a0+d*(1-Math.pow(1-p,3));if(p>=1){r.ang=to;r.home=null}}
     r.g.rotation.x=r.ang;
     const fast=r.state==="spin"||(r.state==="accel"&&r.w>MAXW*0.5)||(r.state==="stopping"&&!r.stop.slam&&r.w>MAXW*0.55);const m=fast?r.tex.blur:r.tex.reel;if(r.mat.map!==m){r.mat.map=m;r.mat.needsUpdate=true}});
@@ -656,8 +656,7 @@ function timeline(){if(!running||!step)return;
   const vt=el.currentTime,C=CLIP[step.clip];
   if(!step.fist&&vt>=3.1){step.fist=true;sfx("devilrush",.8);sfx("punch",.9)} // 継続の拳突き上げ（7のあとに虎美が拳を上げる場面）
   if(!step.stops[0]&&vt>=C.flash-1.0){step.stops[0]=true;shakeAll(step.target);sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
-  if(C.miss){if(!step.stops[1]&&vt>=C.flash-FULL_MS/1000){step.stops[1]=true;spinStopAll(step.pre||step.target); /* 1回転してハズレ。「滑ってズレる」は一度揃う位置で止まり、1コマ滑る */
-    if(step.pre){const st=step;setTimeout(()=>{if(!running||step!==st)return;const r=reels[2];r.stop={a0:r.ang,D:norm(st.target[2]-r.ang),t0:performance.now(),dur:240/SPD,slam:false};r.state="stopping";sfx("reellock_t1",.5)},(FULL_MS+160)/SPD)}stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(!running)return;setLight("dark");$("dim").classList.add("on");callout("RUSH 終了<small>7揃わず</small>")},420+(FULL_MS+(step.pre?420:0))/SPD)}return}
+  if(C.miss){if(!step.stops[1]&&vt>=C.flash-FULL_MS/1000){step.stops[1]=true;spinStopAll(step.target,!!step.pre); /* 1回転してハズレ。「滑ってズレる」は右だけ回転しすぎた感じで、揃う位置をゆっくり通り過ぎて1コマ先で止まる */stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(!running)return;setLight("dark");$("dim").classList.add("on");callout("RUSH 終了<small>7揃わず</small>")},420+(FULL_MS+(step.pre?380:0))/SPD)}return}
   if(!step.stops[1]&&vt>=C.flash-FULL_MS/1000){step.stops[1]=true;spinStopAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(running)sfx("s777")},FULL_MS/SPD-40);
     if(step.clip==="rainbow")sfx("rainbow05",.9);else if(step.clip==="gold")setTimeout(()=>sfx("v_tempai"),500)}}
 function onStop(i){if(!running||!step)return;
