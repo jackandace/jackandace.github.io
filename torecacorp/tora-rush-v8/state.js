@@ -25,7 +25,13 @@ function niceCeil(x,cap){if(x<=0)return 0;cap=cap==null?15:cap;const d=Math.pow(
   for(const k of [d*5,d,d/10]){const v=Math.round(Math.ceil(x/k-1e-9)*k);if((v/x-1)*100<=cap+1e-9)return v}return x}
 // 全RUSHオリパ・全販売レートで出うるSCORE（レート×倍率、個数>0のもの）
 function allScores(gachas){const m=new Map();gachas.forEach(g=>g.rates.forEach(r=>{const bi=band(g,r);g.prizes.forEach(p=>{if((p.q[bi]||0)>0){const sc=Math.round(r*p.m);if(!m.has(sc))m.set(sc,[]);m.get(sc).push({g:g.id,r,m:p.m})}})}));return m}
-function genLineup(gachas,cap,min){min=min||0;return[...new Set([...allScores(gachas).keys()].filter(x=>x>=min).map(x=>niceCeil(x,cap)))].sort((a,b)=>a-b)}
+// 全部pt交換したときの還元率（レートごと）
+function exRet(vals,min,g,r){const bi=band(g,r);let N=0,E=0;g.prizes.forEach(p=>{const q=p.q[bi]||0;if(!q)return;const sc=Math.round(r*p.m),v=sc<min?sc:(vals.find(x=>x>=sc)||sc);N+=q;E+=q*v});return N?E/N/r:0}
+// ラインナップ自動作成：キリのいい数字に切り上げ → 全部交換でも還元率が上限（初期99%）を超えるレートは、そのレートのSCOREをぴったりで追加
+function genLineup(gachas,cap,min,maxRet){min=min||0;maxRet=maxRet||0.99;let vals=[...new Set([...allScores(gachas).keys()].filter(x=>x>=min).map(x=>niceCeil(x,cap)))].sort((a,b)=>a-b);
+  gachas.forEach(g=>g.rates.forEach(r=>{if(exRet(vals,min,g,r)<=maxRet+1e-9)return;const bi=band(g,r);
+    g.prizes.filter(p=>(p.q[bi]||0)>0).map(p=>Math.round(r*p.m)).filter(sc=>sc>=min).sort((a,b)=>b-a).forEach(sc=>{if(exRet(vals,min,g,r)>maxRet+1e-9&&!vals.includes(sc)){vals.push(sc);vals.sort((a,b)=>a-b)}})}));
+  return vals}
 // 景品の種類（交換ptの下限ごと）。名前が空＝ポイントのみ（自動付与）
 const TIERS=[[0,"何かのR"],[1000,"何かのAR"],[3000,"何かのSR"],[5000,"何かのSAR"],[10000,"何かのPSA"]];
 const tierMin=t=>{const x=t.find(r=>r[1]);return x?x[0]:Infinity};
@@ -39,5 +45,5 @@ function reset(){try{localStorage.removeItem(LS)}catch(e){}}
 const psaFor=(st,score)=>score<(st.psa.min||0)?null:(st.psa.vals.find(v=>v>=score)||null);
 // 交換pt → 景品名（何かのAR／SR／SAR／PSA）
 const psaName=(st,v)=>{let n="";st.psa.tiers.forEach(([f,nm])=>{if(v>=f)n=nm});return n};
-window.RS={tierMin,psaName,ALLR,LS,NOTICE,defState,load,save,reset,mkGacha,ROWS,band,niceCeil,allScores,genLineup,psaFor};
+window.RS={exRet,tierMin,psaName,ALLR,LS,NOTICE,defState,load,save,reset,mkGacha,ROWS,band,niceCeil,allScores,genLineup,psaFor};
 })();
