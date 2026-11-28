@@ -515,17 +515,19 @@ addEventListener("resize",resize);
 const tl=new THREE.TextureLoader();const loadTex=f=>new Promise((res,rej)=>tl.load("model/"+f,t=>{t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;res(t)},undefined,rej));
 const PIV={y:-18.206274,z:-28.074114},PITCH=Math.PI*2/21,REELX=[-55,0,55],W7=141.2*Math.PI/180;
 // リール帯（L/C/R・21コマ／ゆうぽんさん 11/27版をそのまま使用）。上段＝c-1、下段＝c+1
+// リール帯：old＝最初にもらった1本の絵（紫7・白7が1個ずつ）を3本に使う（11/28 じぇいさん：作り直しが届くまで）／new＝11/27のL・C・R（?reel=new）
+const REELSET=new URLSearchParams(location.search).get("reel")==="new"?"new":"old";
 const CELL_OFF=0;
 const CELL=c=>(13-CELL_OFF-c)*PITCH; // 21コマ：コマcを中段に止める角度
 // 7の位置：L＝紫0,1／白10,11　C＝紫3／白4　R＝紫1,2／白11,12（縦2連）
 // シングル＝中段1ラインだけ（L・Rは7が中段＋下段）。ダブル＝中段＋右下がり斜めの2ライン（Lは上段＋中段、Rは中段＋下段）
 // ハズレ＝L・Cは中段に7（テンパイ）。Lは上段＋中段、Rは7が上段（1コマ手前）→ 右上がり斜めも揃わない
-const TG={pS:[0,3,1],pW:[1,3,1],wS:[10,4,11],wW:[11,4,11],missP:[1,3,3],missW:[11,4,13]};
+const TG=REELSET==="new"?{pS:[0,3,1],pW:[1,3,1],wS:[10,4,11],wW:[11,4,11],missP:[1,3,3],missW:[11,4,13]}:{pS:[13,13,13],pW:[13,13,13],wS:[5,5,5],wW:[5,5,5],missP:[13,13,14],missW:[5,5,6]};
 Object.keys(TG).forEach(k=>TG[k]=TG[k].map(CELL));
-const HOME=[CELL(5),CELL(12),CELL(7)]; // 待機位置：3本ともコインの位置（7が見えない）
+const HOME=REELSET==="new"?[CELL(5),CELL(12),CELL(7)]:[CELL(9),CELL(1),CELL(17)]; // 待機位置：3本ともコインの位置（7が見えない）
 // 止まり方のパターン（11/28）：リール帯から「どのラインに何本揃うか」を全通り計算して、毎回ランダムに選ぶ
 //  シングル＝5ライン（上・中・下・右下がり・右上がり）のどれか1本、ダブル＝2本。ハズレ＝0本で、右リールの外れ方を数パターン
-const NC=21;const STRIP=[{P:[0,1],W:[6,7]},{P:[3],W:[4]},{P:[1,2],W:[7,8]}].map(o=>{const a=Array(NC).fill("-");o.P.forEach(c=>a[c]="P");o.W.forEach(c=>a[c]="W");return a});
+const NC=21;const STRIP=(REELSET==="new"?[{P:[0,1],W:[10,11]},{P:[3],W:[4]},{P:[1,2],W:[11,12]}]:[{P:[13],W:[5]},{P:[13],W:[5]},{P:[13],W:[5]}]).map(o=>{const a=Array(NC).fill("-");o.P.forEach(c=>a[c]="P");o.W.forEach(c=>a[c]="W");return a});
 const sym=(r,c)=>STRIP[r][((c%NC)+NC)%NC];
 const LINES=[[-1,-1,-1],[0,0,0],[1,1,1],[-1,0,1],[1,0,-1]]; // 上段・中段・下段・右下がり・右上がり
 const LNAME=["上段","中段","下段","右下がり","右上がり"];
@@ -544,13 +546,13 @@ for(let a=0;a<NC;a++)for(let b=0;b<NC;b++)for(let c=0;c<NC;c++){const cs=[a,b,c]
         const kind=sym(2,need-1)===X&&need-1>=c-1?"上段で止まる":sym(2,need+1)===X&&need+1<=c+1?"滑ってズレる":null;if(!kind)return;
         (PAT["miss"+X][kind]=PAT["miss"+X][kind]||[]).push({cs,line:li})})}}}
 const pickA=a=>a[Math.floor(Math.random()*a.length)];
-const toAng=cs=>cs.map(CELL);
+const toAng=cs=>cs.map((c,i)=>CELL(c)+(REELSET==="old"&&[-1,0,1].some(o=>sym(i,c+o)==="W")?W7-CELL(5):0)); // 最初の絵は白7だけ位置が少しずれているので補正
 const MISSW={"上段で止まる":50,"滑ってズレる":50}; // ハズレは必ずテンパイ。右リールの7は必ず見える（11/28）
-function pickWin(k){const X=k[0]==="p"?"P":"W",n=k[1]==="W"?2:1,p=pickA(PAT[X+n]);return{ang:toAng(p.cs),line:p.lines.map(i=>LNAME[i]).join("＋")}}
+function pickWin(k){const X=k[0]==="p"?"P":"W";let n=k[1]==="W"?2:1;if(!PAT[X+n].length)n=1; /* 7が1個のリールではダブル（2ライン）は作れないのでシングルの形 */const p=pickA(PAT[X+n]);return{ang:toAng(p.cs),line:p.lines.map(i=>LNAME[i]).join("＋")}}
 function pickMiss(X){const M=PAT["miss"+X];let tot=0;const ks=Object.keys(MISSW).filter(k=>M[k]&&M[k].length);ks.forEach(k=>tot+=MISSW[k]);let x=Math.random()*tot,kk=ks[0];for(const k of ks){if((x-=MISSW[k])<0){kk=k;break}}const p=pickA(M[kk]);const ang=toAng(p.cs);return{ang,kind:kk,line:LNAME[p.line],slideFrom:kk==="滑ってズレる"?ang[2]-PITCH:null}}
 let tex={},machineMat,reels=[],ready=false;
 async function init3d(){
-  const [dark,on,bright,rL,rC,rR,bL,bC,bR]=await Promise.all(["slot_dark.jpg","slot_on.jpg","slot_bright.jpg","reel_L.jpg","reel_C.jpg","reel_R.jpg","blur_L.jpg","blur_C.jpg","blur_R.jpg"].map(loadTex));
+  const [dark,on,bright,rL,rC,rR,bL,bC,bR]=await Promise.all(["slot_dark.jpg","slot_on.jpg","slot_bright.jpg",...(REELSET==="new"?["reel_L.jpg","reel_C.jpg","reel_R.jpg","blur_L.jpg","blur_C.jpg","blur_R.jpg"]:["reel.jpg","reel.jpg","reel.jpg","reel_blur.jpg","reel_blur.jpg","reel_blur.jpg"])].map(loadTex));
   tex={dark,on,bright,reels:[{reel:rL,blur:bL},{reel:rC,blur:bC},{reel:rR,blur:bR}]}; // リール帯はL／C／R別（ゆうぽんさん 11/27 版）
   const L=new OBJLoader();const [m,r]=await Promise.all([L.loadAsync("model/Slot_Machine.obj"),L.loadAsync("model/Reel.obj")]);
   machineMat=new THREE.MeshBasicMaterial({map:dark});m.traverse(o=>{if(o.isMesh)o.material=machineMat});scene.add(m);
