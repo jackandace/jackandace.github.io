@@ -582,7 +582,7 @@ const easeOutBack=p=>{const c1=1.15,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.
 const easeSlam=p=>{const c1=2.6,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
 // 1回転して止める（11/28）：一気に1周回ってから、少し行き過ぎて戻る
 const FULL_MS=600;
-function fullEase(p,D){const O=PITCH*0.14;if(p<0.84){const q=p/0.84;return(D+O)*(1-Math.pow(1-q,3))}const q=(p-0.84)/0.16;return D+O*(1-q*q*(3-2*q))}
+function fullEase(p,D){return D*(1-Math.pow(1-p,4))} // 行き過ぎて戻る動きはなし（止まってから動いて見えるため 11/28）
 function spinStopAll(targets){const t0=performance.now();reels.forEach((r,i)=>{const tg=targets[i];const D=norm(tg-r.ang)+Math.PI*2;r.stop={a0:r.ang,D,t0,dur:FULL_MS/SPD,full:true};r.state="stopping"})}
 let lastT=performance.now();
 function loop(t){const dt=Math.min(0.05,(t-lastT)/1000);lastT=t;
@@ -624,7 +624,7 @@ function callout(html){const c=$("callout");c.innerHTML=html;c.classList.remove(
 function banner(t){const b=$("banner");if(t){b.textContent=t;b.classList.add("on")}else b.classList.remove("on")}
 function prep(el,i){while(i<seq.length&&(!seq[i].f||seq[i].k==="chall"))i++;if(i>=seq.length){el.removeAttribute("src");return}el.loop=seq[i].k==="wait"||seq[i].k==="chall";el.src=`v/${seq[i].f}.mp4`;el.load()}
 function renderPlan(){const box=$("plan-"+activeTab);if(!box)return;box.innerHTML=(seq.length?seq:[]).map((s,i)=>s.l?`<span class="${i===idx?"cur":""}">${s.l}</span>`:"").join("")}
-function startAt(i){$("dim").classList.remove("on");$("puchun").classList.toggle("on",seq[i]&&seq[i].f==="freeze");if(seq[i]&&seq[i].f==="lead")homeReels();idx=i;step=seq[i];renderPlan();
+function startAt(i){$("dim").classList.remove("on");$("puchun").classList.toggle("on",seq[i]&&seq[i].f==="freeze");idx=i;step=seq[i];renderPlan();
   $("hud").textContent=step.l||"";setWait(step.k==="wait");banner(step.k==="wait"&&step.banner?step.banner:"");
   if(step.k==="wait"&&!step.keepLight)setLight("dark");
   if(step.bgm)bgm(true);if(step.bgmOff)bgm(false);
