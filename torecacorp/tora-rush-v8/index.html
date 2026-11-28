@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>TORAMI RUSH プロト v8（1オリパで全レート対応）</title>
+<style>
+:root{--bg:#fff;--fg:#1d1d1f;--mut:#6b6b70;--line:#e5e7eb;--soft:#f6f7f9;--ok:#067647;--oks:#e7f6ee;--warn:#b54708;--warns:#fdf3e7;--ng:#b42318;--ngs:#fdecea;--acc:#1f5fbf;--accs:#e8f0fc;--p1:#6d28d9;--p2:#c2410c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--fg);font:13.5px/1.7 "Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
+header .in{max-width:1240px;margin:0 auto;padding:10px 16px 0}
+h1{font-size:17px;margin:0}.meta{font-size:12px;color:var(--mut)}
+nav{display:flex;overflow-x:auto;margin-top:6px;scrollbar-width:none}
+nav a{white-space:nowrap;padding:8px 14px;font-size:13px;color:var(--mut);text-decoration:none;border-bottom:2px solid transparent}
+nav a.act{color:var(--fg);border-bottom-color:var(--fg);font-weight:700}
+main{max-width:1240px;margin:0 auto;padding:14px 16px 60px}
+.pane{display:none}.pane.act{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0}
+h2{font-size:16px;margin:2px 0 8px}h3{font-size:14px;margin:14px 0 6px}
+.note{font-size:12px;color:var(--mut)}
+table.t{border-collapse:collapse;width:100%;font-size:12.5px}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.t th{color:var(--mut);font-weight:600;background:var(--soft)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.good{color:var(--ok)}.bad{color:var(--ng)}.mid{color:var(--warn)}
+.tag{display:inline-block;border-radius:4px;padding:0 6px;font-size:11px;font-weight:700;color:#fff;vertical-align:1px}
+.t1{background:var(--p1)}.t2{background:var(--p2)}.tc{background:#374151}.tx{background:#9ca3af}
+.pill{display:inline-block;border-radius:999px;padding:0 8px;font-size:11px;font-weight:700}
+.pill.add{background:var(--accs);color:var(--acc)}.pill.mod{background:var(--warns);color:var(--warn)}.pill.no{background:var(--soft);color:var(--mut)}.pill.new{background:var(--oks);color:var(--ok)}
+.grid{display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:18px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.btn{font:inherit;font-size:12.5px;border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:6px;padding:5px 12px;cursor:pointer}
+.btn.pri{background:#1d1d1f;color:#fff;border-color:#1d1d1f}
+.btn:disabled{opacity:.5;cursor:default}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:12.5px;margin:6px 0}
+.ctl select,.ctl input{font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:3px 6px;background:#fff}
+.ctl input{width:110px}
+/* stage */
+.stage{position:relative;width:100%;aspect-ratio:9/16;background:#000;border-radius:18px;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.top{position:absolute;left:0;top:0;width:100%;height:64.06%;overflow:hidden;background:#000}
+.top video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.top video.show{opacity:1}
+.stage{background:#05030a}
+#gl{position:absolute;left:0;top:61.8%;width:100%;height:38.2%;display:block;background:transparent;z-index:2}
+.hud{position:absolute;top:8px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#fff;text-shadow:0 1px 2px #000;z-index:8;pointer-events:none;gap:6px}
+.hud b{font-size:13px}
+.hud button{pointer-events:auto;border:1px solid rgba(255,255,255,.7);background:rgba(0,0,0,.35);color:#fff;border-radius:4px;font:inherit;font-size:11px;padding:1px 9px;cursor:pointer}
+.stage.quake{animation:quake .32s linear}@keyframes quake{0%,100%{transform:none}15%{transform:translate(-5px,3px)}30%{transform:translate(5px,-4px)}45%{transform:translate(-4px,-2px)}60%{transform:translate(3px,4px)}80%{transform:translate(-2px,1px)}}
+.ov{position:absolute;inset:0;display:none;z-index:7}.ov.on{display:block}
+#oIdle{background:rgba(0,0,0,.6);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;font-size:13px}
+#oIdle.on{display:flex}
+#oWait{pointer-events:none}#oWait .oshi{pointer-events:auto}
+.cb{font:800 11.5px/1 "Hiragino Sans",sans-serif;color:#fff;background:rgba(20,14,36,.82);border:1.5px solid rgba(255,215,120,.75);border-radius:8px;padding:7px 9px;min-width:64px;cursor:pointer;letter-spacing:.03em}
+.cb.on{background:linear-gradient(#ffd36b,#e8a10b);color:#2a1600;border-color:#fff}
+.cb:disabled{opacity:.4;cursor:default}
+/* ===== ゲーム画面（11/25 承認版UI） ===== */
+#p-play.act{display:block}
+body.playmode>header{display:none}body.playmode main{padding-top:0}body.playmode footer{display:none}
+.game{--W:clamp(300px,calc((100vh - 300px)*.5625),410px);--side:clamp(208px,17vw,258px);position:relative;width:100vw;margin-left:calc(50% - 50vw);background:#07060c;color:#fff;font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;overflow:hidden}
+.game:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,6,14,.55),rgba(6,6,14,.15) 35%,rgba(6,6,14,.25) 70%,rgba(6,6,14,.7)),url(art/sanctuary.webp) center/cover no-repeat;z-index:0}
+.ghead{position:relative;z-index:5;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,46px);background:#0b0d18;border-bottom:1px solid rgba(214,172,123,.22)}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#f0d7a8;font:italic 900 19px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:-.01em}.brand svg{width:28px;height:22px}
+#howM{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.72);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:14px 10px}#howM.on{display:flex}#howM .in{position:relative;width:min(480px,100%);background:#0d0a18;color:#fff;border:1px solid #4a3f66;border-radius:12px;padding:16px 14px 18px;margin:auto 0}#howM .x{position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;font-size:22px;cursor:pointer}
+.gnav{display:flex;align-items:center;gap:22px;position:relative}.gnav a,.gnav button{display:flex;align-items:center;gap:7px;color:#fff;text-decoration:none;font:800 13.5px/1 inherit;background:none;border:0;cursor:pointer;padding:8px 0}
+.gnav .q{width:17px;height:17px;border:1.5px solid #fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+.gnav .hb{width:15px;height:9px;border-top:1.5px solid #fff;border-bottom:1.5px solid #fff}
+.gmenu{display:none;position:absolute;right:0;top:44px;background:#19171f;border:1px solid #d6ac7b;border-radius:10px;padding:6px;min-width:190px;box-shadow:0 10px 30px rgba(0,0,0,.6)}.gmenu.on{display:block}
+.gmenu a{padding:10px 12px;border-radius:6px;font-weight:700}.gmenu a:hover{background:#29262f}
+.gbody{position:relative;z-index:2;display:grid;grid-template-columns:var(--side) calc(var(--W) + 12px) var(--side);grid-template-rows:auto auto auto;column-gap:clamp(22px,2.6vw,46px);justify-content:center;padding:clamp(14px,2.2vh,24px) 16px clamp(16px,3vh,30px)}
+.lp{grid-column:1;grid-row:1/-1;align-self:center;background:linear-gradient(#29262f,#19171f);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 14px 12px;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.gname{font:italic 900 19px/1.1 "Helvetica Neue",Arial,sans-serif;color:#fff;letter-spacing:-.01em;margin-bottom:14px}
+.rlab{font-size:11.5px;font-weight:700;color:#cfc8d8;margin-bottom:8px}
+.rlist{display:flex;flex-direction:column;gap:3px}
+.rrow{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:10px;width:100%;min-height:31px;flex:none;padding:0 10px 0 12px;border-radius:7px;border:1px solid rgba(255,255,255,.14);background:rgba(10,9,14,.55);color:#fff;cursor:pointer;text-align:left;font:inherit}
+.rrow .rd{width:14px;height:14px;border-radius:50%;border:1.5px solid #cfc8d8;position:relative}
+.rrow.on{border:2px solid #d6ac7b;background:linear-gradient(#3a2a22,#241a17);box-shadow:inset 0 0 0 1px rgba(255,226,169,.18)}
+.rrow.on .rd{border-color:#d6ac7b}.rrow.on .rd:after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:#d6ac7b}
+.rrow .am{font:800 15px/1 "Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}.rrow .am small{font-size:11px;font-weight:700;margin-left:3px;opacity:.85}
+.rrow .ct{font-size:11px;font-weight:800;color:#e9e2f0;white-space:nowrap}
+.rrow:disabled{cursor:default;opacity:.82}
+.rsel{display:none}
+.waku{margin-top:12px;font-size:12px;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;white-space:nowrap}.waku b{font-size:18px;color:#ffe2a9;font-variant-numeric:tabular-nums}
+.waku button{margin-left:auto;font:700 11.5px/1 inherit;color:#fff;background:#3a3443;border:1px solid #d6ac7b;border-radius:6px;padding:8px 10px;cursor:pointer;min-height:34px}
+.plate{position:absolute;z-index:9;left:3%;top:1.1%;width:94%;aspect-ratio:1150/110;background:url(art/score-plate.webp) center/100% 100% no-repeat;display:flex;align-items:center;justify-content:center;gap:calc(var(--W)*.035);transition:filter .38s;pointer-events:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6))}
+.plate .pl{font:800 calc(var(--W)*.03)/1 "Hiragino Sans","Noto Sans JP",sans-serif;letter-spacing:.08em;color:#e8d8b4}
+.plate .pv{font:800 calc(var(--W)*.058)/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#ffe2a9;font-variant-numeric:tabular-nums;min-width:2ch;text-shadow:0 0 10px rgba(255,190,90,.35)}
+.plate.glow{filter:brightness(1.7) saturate(1.2) drop-shadow(0 3px 6px rgba(0,0,0,.6))}
+.frame{grid-column:2;grid-row:2;position:relative;width:calc(var(--W) + 12px);padding:5px 6px;border-radius:22px;background:linear-gradient(160deg,#6d6e76 0%,#1d1d22 18%,#3b3c43 40%,#0f0f13 62%,#4a4b52 82%,#16161a 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.6),0 18px 40px rgba(0,0,0,.65)}
+.frame:before,.frame:after{content:"";position:absolute;top:22px;bottom:22px;width:2px;background:linear-gradient(#b8342a,#d6ac7b 50%,#b8342a);border-radius:2px}.frame:before{left:2px}.frame:after{right:2px}
+.frame .stage{width:100%;aspect-ratio:9/16;border-radius:18px}
+.lcdidle{position:absolute;inset:0;z-index:3;background:url(art/torami.webp) center/cover no-repeat;transition:opacity .25s}.lcdidle.off{opacity:0;pointer-events:none}
+.lcdidle .ttl{position:absolute;width:76%;left:12%;bottom:5%}
+.stage .pill{position:absolute;left:10px;top:7.6%;z-index:8;display:flex;align-items:center;gap:6px;max-width:80%;background:rgba(10,8,16,.55);backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 9px;font-size:10.5px;font-weight:800;color:#fff;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage .pill i{width:6px;height:6px;border-radius:50%;background:#e3b25b;flex:none}
+.startw{grid-column:2;grid-row:3;display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:14px}
+.oshi{position:relative;width:min(240px,100%);min-height:58px;border-radius:6px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:linear-gradient(#e06152,#b32a2c 55%,#86142b);border:1.5px solid #f0b49a;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 0 1px #5a0d1a,0 6px 16px rgba(0,0,0,.5),0 0 18px rgba(255,214,140,.35);display:flex;align-items:center;justify-content:center;transition:transform .05s}
+.oshi:active{transform:translateY(1px)}
+.oshi .cap{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;color:#fff;text-shadow:0 1px 0 rgba(90,10,20,.8)}
+.oshi .en{font:italic 900 25px/1.05 "Helvetica Neue",Arial,sans-serif;letter-spacing:.02em}
+.oshi small{font-size:10.5px;font-weight:800;margin-top:3px}
+.oshi .jp{font:900 25px/1.15 "Hiragino Sans","Noto Sans JP",sans-serif;letter-spacing:.04em}
+.oshi.off{filter:saturate(.35) brightness(.55);cursor:default;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px #3a0a12}
+.oshi.hit{transform:translateY(1px)}
+.glinks{display:flex;gap:18px}.glinks a{color:#fff;font-size:12px;font-weight:700;text-decoration:none;opacity:.9}.glinks a:hover{text-decoration:underline}
+.ctlp{grid-column:3;grid-row:1/-1;align-self:center;position:relative;background:linear-gradient(#29262f,#19171f);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 14px 14px;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.ctlh{font-size:13px;font-weight:800;padding-bottom:12px;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12)}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cb{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 11px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#fff;font:800 12px/1 inherit;cursor:pointer;text-align:left}
+.cb i{font-style:normal;font-weight:900;font-size:13px;min-width:16px;text-align:center;color:#e8e0f0}
+.cb.wide{grid-column:1/-1}
+.cb.on{background:linear-gradient(#4a3a2a,#2c2119);border-color:#d6ac7b;color:#ffe2a9}.cb.on i{color:#ffe2a9}
+.cb:disabled{opacity:.38;cursor:default}
+.volpop{display:none;align-items:center;gap:10px;margin-top:8px;padding:10px;border-radius:8px;background:rgba(0,0,0,.35);border:1px solid rgba(214,172,123,.4)}.volpop.on{display:flex}
+.volpop button{min-width:48px;min-height:34px;border-radius:6px;border:1px solid #d6ac7b;background:#3a3443;color:#ffe2a9;font:800 12px/1 inherit;cursor:pointer}.volpop button.off{color:#aaa;border-color:#666}
+.volpop input{flex:1;accent-color:#d6ac7b;min-width:60px}.volpop span{font:700 12px/1 ui-monospace,Menlo,monospace;color:#ffe2a9;min-width:36px;text-align:right}
+.mpanel{display:none}
+.fly{position:fixed;left:0;top:0;z-index:60;pointer-events:none;text-align:center;transform-origin:50% 50%;will-change:transform,opacity}
+.fly b{display:block;font:900 clamp(32px,calc(var(--W,360px)*.14),58px)/1 "Helvetica Neue",Arial,sans-serif;color:#ffe2a9;font-variant-numeric:tabular-nums;-webkit-text-stroke:1.5px #2a1206;paint-order:stroke fill;text-shadow:0 2px 0 #3a1a06,0 0 18px rgba(255,170,60,.55),0 0 2px #000}
+.fly small{display:block;margin-top:4px;font-size:13px;font-weight:900;color:#fff;text-shadow:0 1px 3px #000,0 0 6px #000}
+.res{background:linear-gradient(rgba(41,38,47,.96),rgba(25,23,31,.96))!important;border-color:#d6ac7b!important}
+@media (max-width:980px){
+ .game{--W:min(calc(100vw - 16px),480px)}
+ .game:before{background:#07060c}
+ .ghead{height:52px}
+ .gbody{grid-template-columns:calc((var(--W) + 12px - 8px)*.528) calc((var(--W) + 12px - 8px)*.472);grid-template-rows:auto auto auto auto auto auto;column-gap:8px;padding:4px 0 10px}
+ .frame{grid-column:1/-1;grid-row:2}
+ .lp,.startw{display:contents}
+ .mpanel{display:block;grid-column:1/-1;grid-row:3/7;margin-top:6px;background:linear-gradient(#29262f,#19171f);border:1px solid rgba(255,255,255,.1);border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.55);z-index:0}
+ .gname{grid-column:1/-1;grid-row:3;z-index:1;margin:12px 12px 6px;font-size:14.5px}
+ .rlab,.rlist,.glinks{display:none}
+ .rsel{grid-column:1;grid-row:4;z-index:1;display:grid;grid-template-rows:auto auto;position:relative;margin-left:10px;padding:7px 26px 7px 10px;min-height:52px;border-radius:7px;border:1px solid rgba(255,255,255,.16);background:rgba(10,9,14,.6);cursor:pointer}
+ .rsel .r1{display:flex;justify-content:space-between;gap:6px;font-size:10.5px;font-weight:800;color:#e9e2f0;white-space:nowrap}
+ .rsel .r2{margin-top:4px;white-space:nowrap}.rsel .r2 b{font:900 clamp(15px,4.6vw,19px)/1 "Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums}.rsel .r2 small{font-size:10.5px;font-weight:700;margin-left:4px}
+ .rsel .chev{position:absolute;right:9px;top:50%;width:7px;height:7px;border-right:1.5px solid #ddd;border-bottom:1.5px solid #ddd;transform:translateY(-70%) rotate(45deg)}
+ .rsel select{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:16px}
+ .rsel.dis{opacity:.82}
+ .oshi{grid-column:2;grid-row:4;z-index:1;width:auto;margin-right:10px;min-height:52px;height:100%}
+ .oshi .en{font-size:22px}.oshi .jp{font-size:22px}
+ .waku{grid-column:1/-1;grid-row:5;z-index:1;margin:8px 10px 0}
+ .ctlp{grid-column:1/-1;grid-row:6;z-index:1;align-self:end;background:none;border:0;box-shadow:none;padding:0 6px 2px;margin-top:5px;border-top:1px solid rgba(255,255,255,.08)}
+ .ctlh{display:none}
+ .cg{grid-template-columns:repeat(5,1fr);gap:2px}
+ .cb,.cb.wide{grid-column:auto;flex-direction:column;justify-content:center;gap:4px;min-height:46px;padding:3px 2px;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;font-size:11px;text-align:center}
+ .cb.on{background:none;border-bottom-color:#d6ac7b}
+ .volpop{margin:6px 4px 0}
+}
+@media (max-width:600px){.ghead{height:46px}.brand{font-size:16px}.brand svg{width:22px;height:18px}.gnav{gap:14px}.gnav a,.gnav button{font-size:12.5px}}
+@media (prefers-reduced-motion:reduce){.plate{transition:none}}
+#oIdle{display:none!important}
+#startBtn{display:none!important}
+@media (max-width:980px){
+ .room{grid-template-columns:1fr;max-width:460px;margin:0 auto;padding:12px;gap:12px}
+ .center{order:1;width:min(100%,calc((100svh - 230px)*.5625));justify-self:center}.sl{order:2}.sr{order:3}
+ .room{scroll-margin-top:92px}
+ .side{align-self:stretch}
+ .rates{grid-template-columns:repeat(4,1fr)}
+}
+@media (max-width:600px){h1{font-size:14px}.meta{display:none}header .in{padding-top:6px}nav a{padding:6px 10px;font-size:12px}}
+
+@keyframes bob{50%{transform:translateY(3px)}}@keyframes rim{50%{transform:scale(1.08);opacity:.6}}
+.puchun{position:absolute;inset:0;z-index:7;background:#000;display:none;pointer-events:none}.puchun.on{display:block}
+.puchun i{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#fff;box-shadow:0 0 18px 8px #7fb4ff,0 0 60px 20px rgba(80,140,255,.7);opacity:0}
+.puchun.on i{animation:pc 1.1s ease-out .2s forwards}
+@keyframes pc{0%{opacity:0;transform:scale(30,.08)}12%{opacity:1;transform:scale(14,.1)}30%{opacity:1;transform:scale(1)}55%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:scale(.2)}}
+.led{position:absolute;left:8%;right:8%;top:63.5%;height:7.5%;z-index:3;pointer-events:none;border-radius:40%;background:radial-gradient(ellipse at 50% 55%,rgba(255,240,190,.95),rgba(255,150,40,.6) 40%,rgba(255,60,0,0) 72%);mix-blend-mode:screen;opacity:0}
+.led.on{animation:led 1.6s steps(1,end)}
+@keyframes led{0%{opacity:1}6%{opacity:.15}12%{opacity:1}18%{opacity:.2}24%{opacity:1}30%{opacity:.25}36%{opacity:1}44%{opacity:.4}52%{opacity:1}64%{opacity:.6}76%{opacity:.9}100%{opacity:0}}
+.dim{position:absolute;inset:0;z-index:6;background:rgba(0,0,0,.42);opacity:0;transition:opacity .6s;pointer-events:none}.dim.on{opacity:1}
+.callout{position:absolute;left:0;right:0;top:44%;text-align:center;font:900 30px/1.15 "Hiragino Sans",sans-serif;color:#fff;text-shadow:0 0 8px #ff6a00,0 3px 0 #6d0f09,0 0 22px rgba(255,120,0,.8);pointer-events:none;z-index:8;opacity:0}
+.callout small{display:block;font-size:17px;margin-top:4px}
+.revov{position:absolute;left:0;right:0;top:30%;text-align:center;opacity:0;pointer-events:none;z-index:9;font-family:"Hiragino Sans",sans-serif;color:#fff}
+.revov.on{opacity:1;animation:rv .5s ease-out}.revov i{display:inline-block;font-style:normal;font-size:12px;font-weight:800;padding:3px 10px;border-radius:12px;background:#000a;margin-bottom:8px}
+.revov b{display:block;font-size:44px;font-weight:900;line-height:1.1;text-shadow:0 0 14px var(--lc,#3b82f6),0 3px 0 #000,0 0 30px var(--lc,#3b82f6)}.revov small{display:block;font-size:15px;font-weight:800;margin-top:6px;text-shadow:0 2px 0 #000}
+.revov.lv-weak{--lc:#3b82f6}.revov.lv-mid{--lc:#22c55e}.revov.lv-strong{--lc:#ef4444}.revov.lv-pre b{background:linear-gradient(90deg,#ff3b3b,#ffd23b,#3bff6b,#3bb8ff,#c63bff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 10px #fff8)}
+.revov.lv-strong b{animation:rvs .12s infinite alternate}.revov.frz b{font-size:56px;letter-spacing:.2em}
+@keyframes rv{from{transform:scale(1.6);opacity:0}to{transform:scale(1);opacity:1}}@keyframes rvs{from{transform:translateX(-2px)}to{transform:translateX(2px)}}
+.stage.beat{animation:beat var(--bt,.75s) ease-out var(--bn,2)}@keyframes beat{0%,100%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1)}26%{transform:scale(1.015)}34%{transform:scale(1)}}
+.callout.on{animation:co 1.4s ease-out forwards}
+@keyframes co{0%{opacity:0;transform:scale(.4)}15%{opacity:1;transform:scale(1.08)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+.banner{position:absolute;left:0;right:0;top:30%;text-align:center;font:900 28px/1.2 "Hiragino Sans",sans-serif;color:#ffe27a;text-shadow:0 0 10px #ff3d00,0 3px 0 #5a1a00;z-index:8;pointer-events:none;display:none}
+.banner.on{display:block;animation:pulse .7s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.flash{position:absolute;left:0;top:58%;width:100%;height:42%;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(255,255,230,.9),rgba(255,190,60,.6) 35%,rgba(255,80,0,0) 70%);animation:fl .3s ease-out forwards;z-index:7}
+@keyframes fl{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+.res{position:absolute;left:5%;right:5%;top:8%;max-height:84%;overflow:auto;background:rgba(10,8,20,.9);border:1px solid rgba(255,215,120,.6);border-radius:12px;padding:14px;color:#fff;z-index:9;display:none;font-size:12.5px}
+.res.on{display:block;animation:up .35s ease-out}@keyframes up{from{transform:translateY(12px);opacity:0}}
+.res .big{font-size:24px;font-weight:900;text-align:center}
+.res.m-red{background:linear-gradient(160deg,rgba(120,14,20,.97),rgba(40,8,14,.97))!important;border-color:#ff7a6a!important}
+.res.m-gold{background:linear-gradient(160deg,rgba(130,92,14,.97),rgba(50,32,6,.97))!important;border-color:#ffd36b!important}
+.res.m-rainbow{background:linear-gradient(135deg,rgba(170,30,60,.96),rgba(170,120,10,.96) 25%,rgba(20,140,70,.96) 50%,rgba(20,90,170,.96) 75%,rgba(110,30,170,.96))!important;border-color:#fff!important}
+.res .mul{text-align:center;font-weight:800;font-size:13px;margin-top:2px;opacity:.9}
+.res .prize{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:4px 0}.res .prize span{flex:1;min-width:0}.res .prize b{white-space:nowrap}
+.res .rw{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.12);padding:3px 0}
+.res .closebtn{width:100%;margin-top:10px;border:1px solid rgba(255,255,255,.6);background:none;color:#fff;border-radius:8px;padding:6px;font:inherit;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.chip{font-size:11px;border-radius:4px;padding:1px 7px;color:#fff;font-weight:700}
+.k-pS{background:#8b5cf6}.k-pW{background:#5b21b6}.k-wS{background:#9ca3af;color:#111!important}.k-wW{background:#4b5563}.k-ds{background:#d97706}.k-df{background:transparent;color:#999!important;border:1px dashed #999}
+.c-g{background:#2e9e44}.c-r{background:#e0352b}.c-k{background:#c99a12}.c-n{background:linear-gradient(90deg,#ff4d4d,#ffb84d,#4dd97a,#4db8ff,#a64dff)}
+.plan{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.plan span{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;background:#fff}
+.plan span.cur{border-color:#111;font-weight:800}
+.slot{min-height:40px}
+.drawbox{border:1px dashed var(--line);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:12.5px;background:#fff}
+@media(max-width:820px){.rnote{display:none}}
+.rnote{font-size:10.5px;color:#e8d8b4;line-height:1.4;margin-top:6px}.rnote span{color:#b9b0c8}
+.sellg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 10px;font-size:12px}.ck2{display:flex;gap:6px;align-items:center}
+.bar{height:4px;background:#eceef1;border-radius:2px;margin-top:3px}.bar i{display:block;height:100%;background:#b8342a;border-radius:2px}
+.mock{border:1px solid #d6d9de;border-radius:8px;background:#fff;padding:10px 12px;margin:8px 0;font-size:12px}
+.mock .mh{font-weight:800;margin-bottom:6px}
+.mock .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:4px 0}
+.mock label{color:var(--mut);font-size:11.5px}
+.mock .f{border:1px solid #d6d9de;border-radius:5px;padding:2px 8px;background:#fff;min-width:90px;display:inline-block}
+.newb{border:2px solid var(--acc);border-radius:8px;padding:8px 10px;margin:8px 0;background:#f8fbff;position:relative}
+.newb .nt{position:absolute;top:-10px;left:10px;background:var(--acc);color:#fff;font-size:10.5px;font-weight:700;border-radius:4px;padding:0 6px}
+.copybox{white-space:pre-wrap;font-size:12px;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:10px;max-height:420px;overflow:auto}
+footer{margin-top:30px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+<header><div class="in">
+<h1>TORAMI RUSH プロト v8｜1オリパで全レート対応（既存の景品登録を流用・Sの隠しキリ番景品を何個でも）</h1>
+<div class="meta"><b style="color:#b42318">11/28 v8</b>（1つのオリパに販売レートをまとめて登録。景品は倍率で登録し、個数はレート帯ごと。BOXはレートごとに自動。ゲーム・演出・リールはv6/v7と同じ）｜<a href="admin.html" target="_blank"><b>管理画面モック</b></a>｜<a href="/torecacorp/tora-rush-v7/">v7（1レート1オリパ）</a>／<a href="/torecacorp/tora-rush-v6/">v6</a></div>
+<nav id="tabs"><a href="#play" data-t="play">▶ プロトで遊ぶ</a><a href="#spec" data-t="spec">確定仕様とロジック</a><a href="#howto" data-t="howto">遊び方画面（ユーザー向け）</a><a href="#admin" data-t="admin">管理画面</a><a href="#est" data-t="est">工数見積もり依頼</a></nav>
+</div></header>
+<main>
+
+<!-- ======== プロト ======== -->
+<section class="pane" id="p-play">
+<div class="game" id="game">
+ <div class="ghead"><a class="brand" href="#play"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M3 21 12 1h4L7 21zm8 0 9-20h4l-9 20zm8 0 6-13h3l-6 13z" fill="#d6ac7b"/></svg><span>TORAMI RUSH</span></a>
+  <nav class="gnav"><a href="#howto" data-howm="1"><span class="q">?</span>遊び方</a><button type="button" id="menuBtn"><span class="hb"></span>メニュー</button>
+   <div class="gmenu" id="gmenu"><a href="#howto" data-jump="howto">遊び方・注意事項</a><a href="#howto" data-jump="howto">実績還元率公開</a><a href="#spec" data-jump="spec">確定仕様とロジック（資料）</a><a href="#admin" data-jump="admin">管理画面（資料）</a><a href="#est" data-jump="est">工数見積もり依頼（資料）</a></div></nav></div>
+ <div class="gbody">
+  <div class="lp">
+   <div class="gname" id="gname">TORAMI RUSH</div>
+   <div class="rlab">購入レート</div>
+   <div class="rlist" id="rateBtns"></div>
+   <label class="rsel" id="rsel"><span class="r1"><span id="rsLab">購入レート</span><span id="rsCnt">10連</span></span><span class="r2"><b id="rsAmt">5,000</b><small>coin</small></span><span class="chev" aria-hidden="true"></span><select id="rateSel" aria-label="購入レート"></select></label>
+   <div class="rnote" id="rnote"></div>
+   <div id="wakuBox" class="waku" style="display:none">挑戦枠 <b id="wakuN">0</b> 回<button type="button" id="chargeBtn">チャージ（デモ）＋1</button></div>
+  </div>
+  <div class="frame" id="frame"><div class="slot" id="slot-play"></div></div>
+  <div class="startw">
+   <div class="oshi" id="oshi" role="button" tabindex="0"><div class="cap" id="mainLbl"><b class="en">START</b><small>抽選する</small></div></div>
+   <div class="glinks"><a href="#howto" data-jump="howto">遊び方・注意事項</a><a href="#howto" data-jump="howto">実績還元率</a></div>
+  </div>
+  <div class="ctlp">
+   <div class="ctlh">演出設定</div>
+   <div class="cg">
+    <button class="cb" type="button" id="autoBtn"><i>&#8635;</i><span>AUTO</span></button>
+    <button class="cb" type="button" id="oneBtn"><i><svg viewBox="0 0 12 16" width="11" height="15" aria-hidden="true"><path d="M7.5 0 0 9h4.5L3 16l9-10H7z" fill="currentColor"/></svg></i><span>一撃</span></button>
+    <button class="cb" type="button" id="spdBtn"><i id="spdX">&times;1</i><span>速度</span></button>
+    <button class="cb" type="button" id="skip"><i>&raquo;</i><span>スキップ</span></button>
+    <button class="cb wide" type="button" id="volBtn"><i>&#9835;</i><span>音量</span></button>
+   </div>
+   <div class="volpop" id="volPop"><button type="button" id="snd">ON</button><input type="range" id="volR" min="0" max="100" value="80" aria-label="音量"><span id="volPct">80%</span></div>
+  </div>
+  <div class="mpanel" aria-hidden="true"></div>
+ </div>
+</div>
+<div class="plan" id="plan-play" style="max-width:1240px;margin:8px auto"></div>
+<div class="card">
+<h2>テスト用（本番の画面には出ません）</h2>
+<div class="drawbox" id="drawOut" style="margin-bottom:8px">STARTを押すと、ここに引いた口（倍率）・SCORE・7の組み立て・払い出す景品が出ます。</div>
+<div class="ctl"><button class="btn" id="drawBtn" type="button">引くだけ（内容を確認）</button><label>シナリオ <select id="scnSel"></select></label>
+<button class="btn" id="drawS" type="button">最大倍率の結果を見る（デモ）</button>
+<span class="note">倍率を指定</span><select id="mulSel"></select><button class="btn" id="mulBtn" type="button">この倍率で（デモ）</button></div>
+<details style="margin-top:6px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700">在庫切れのテスト（PSA景品・代替景品の在庫を変える）</summary>
+<p class="note">在庫を0にすると、PSA景品 → 代替景品 → ポイントのみ（発送不可）の順になります。</p>
+<div id="stockBox"></div>
+</details>
+<p class="note" style="margin-top:6px">流れ：レートを選んで1回引く → そのレートのBOXから倍率の口を1つ（BOXは消費される・デモボタンは消費しない）→ SCORE＝倍率×レート → 7だけでSCOREぴったりまで連鎖（上乗せなし）→ SCOREと同じPTのPSA景品 →「発送」か「ポイント」。BOXの状況は「管理画面」タブのBOXモニターで見られます</p>
+</div>
+</section>
+
+<div id="stageHome" style="display:none">
+<div class="stage" id="stage">
+  <div class="plate" id="plate"><span class="pl">累計SCORE</span><span class="pv" id="plateVal">0</span></div>
+  <div class="top"><div class="lcdidle" id="lcdIdle"><img src="art/title.webp" alt="TORAMI RUSH" class="ttl"></div><video id="va" playsinline webkit-playsinline muted preload="auto"></video><video id="vb" playsinline webkit-playsinline muted preload="auto"></video></div>
+  <canvas id="gl"></canvas><div class="led" id="led"></div><div class="puchun" id="puchun"><i></i></div>
+  <div class="pill"><i></i><span id="hud">読み込み中</span><b id="hudR" hidden></b></div>
+  <div class="banner" id="banner"></div>
+  <div class="dim" id="dim"></div><div class="callout" id="callout"></div><div class="revov" id="revov"></div>
+  <div class="ov" id="oWait"></div>
+  <div class="ov on" id="oIdle"><div id="idleMsg">3Dモデルを読み込み中…</div><button class="btn" type="button" id="startBtn" style="margin-top:12px;background:none;color:#fff;border:2px solid #fff;border-radius:999px;padding:8px 28px;font-weight:800;display:none">START</button></div>
+  <div class="res" id="res"></div>
+</div>
+</div>
+
+
+<!-- ======== 確定仕様 ======== -->
+<section class="pane" id="p-spec">
+<div class="card">
+<h2>v8のルール（1オリパで全レート対応・11/28）</h2><p class="note" style="margin:0 0 6px">v7との違い：レートごとにオリパを作らず、<b>1つのオリパに販売レートをまとめて登録</b>。景品は S〜その他 のPTカードを<b>倍率</b>で登録（交換ポイント＝レート×倍率を自動計算）し、個数は<b>レート帯（〜5万／10万〜30万／50万〜）ごと</b>に入れる。Sの「隠しキリ番景品」に実物カードを対象レート・キリ番つきで何個でも登録。下の表はv6からの共通部分を含みます。</p>
+<table class="t">
+<tr><th style="width:170px">項目</th><th>内容</th></tr>
+<tr><td>引き方</td><td>レートを選んで<b>1回の購入＝1回の抽選</b>。そのレートのBOXから<b>倍率の口を1つ</b>引く。<b>SCORE＝倍率×レート</b>（内部で何連も引く仕組みはなくなった）</td></tr>
+<tr><td>BOX</td><td><b>レートごとに1つ</b>（全レート共有はしない）。全口をシャッフルして順に売る<b>固定BOX</b>。完売したら同じ表で即再販。最上位が出ても販売は止めない（止めると実際の還元率が100%を超え赤字）</td></tr>
+<tr><td>倍率の表</td><td>還元率97.5%（ハイトレさんの理論値97〜98%に合わせる）。レート帯で切り替え：<b>5万以下＝1,000口・最大×30／10万〜30万＝100口・最大×10／50万以上＝50口・最大×5</b>（区切りは案）</td></tr>
+<tr><td>RUSH</td><td>毎回RUSH。<b>最低3連</b>（一番下の口×0.3＝紫7シングル3回）、最大20ゲーム。最後は7が揃わないハズレで終了。7の合計は<b>倍率ちょうど</b>で、<b>上乗せは出ない</b>（倍率を0.1刻みにしたため）</td></tr>
+<tr><td>7の額</td><td>レート×0.1（紫7S）／0.2（紫7W）／1（白7S）／2（白7W）で固定。7が揃うたびに獲得PTと累計SCOREを表示</td></tr>
+<tr><td>受け取り</td><td><b>2段階</b>：① SCOREがそのガチャの<b>目玉景品</b>（任意登録・実物）のPTと同じなら目玉を優先 ② それ以外・目玉が弾切れなら、SCOREが1万以上で<b>SCOREと同じPTのPSA景品</b>。<b>発送</b>か<b>ポイント（SCORE分）</b>を選ぶ（ハイトレ仕様）。在庫がなければ代替景品、それもなければポイントのみ（発送不可）。1万未満はポイントで自動付与</td></tr>
+<tr><td>表示（B案）</td><td>還元率は<b>BOX全体の設計値</b>として表示し、注意書きで明記。<b>最大倍率と倍率の表は非公開</b>（入江さん 11/27）。BOXごとの残り口数・残り倍率・残り還元率は<b>出さない</b>。実績還元率は全レート合算・期間で公開。当たり速報（任意）</td></tr>
+<tr><td>操作ボタン</td><td>AUTO／一撃／スピード／スキップ／音量（v5と同じ。結果は変わらない）</td></tr>
+<tr><td>チャージ限定RUSH</td><td>v5と同じ入口・挑戦枠。BOXは別に持つ（プロト：<a href="?g=gold">チャージ限定版</a>）</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>ロジック</h2>
+<h3>1. 抽選</h3>
+<ol style="margin:0;padding-left:20px;font-size:12.5px"><li>購入したレートのBOXの「次の口」を1つ取る（BOXは生成時にシャッフル済み）。サーバーで決めて保存し、画面は再生するだけ</li><li>BOXの最後の口が売れたら、そのレートの倍率の表で次の周のBOXを作る</li></ol>
+<h3>2. 演出の組み立て（シナリオ）</h3>
+<ol style="margin:0;padding-left:20px;font-size:12.5px"><li>倍率を0.1単位の数（例：×3＝30）にする。7の単位は紫7S＝1・紫7W＝2・白7S＝10・白7W＝20</li><li>シナリオを出やすさで選び、ゲーム数を決める（最低3・最大20。倍率に合わせて調整）</li><li>1ゲームずつ、シナリオの出やすさに沿って7を選ぶ。<b>残りのゲームでぴったり作れる7だけ</b>を候補にするので、合計は必ず倍率ちょうど</li></ol>
+<h3>3. 払い出し</h3>
+<ol style="margin:0;padding-left:20px;font-size:12.5px"><li>そのガチャの目玉景品に、PTがSCOREと同じで在庫があるものがあれば、それを払い出す（発送を選んだら在庫を1つ減らす）</li><li>SCORE 1万未満 → ポイント自動付与</li><li>1万以上 → SCOREが入る価格帯のPSA景品（SCOREと同じPT）→ 在庫がなければ同じ価格帯の代替景品 → それもなければポイントのみ（発送不可）</li><li>ユーザーがポイントを選んだら、SCORE分のポイントを付与</li></ol>
+</div>
+<div class="card">
+<h2>シミュレーション（このページでその場で計算）</h2>
+<p class="note" style="margin:0 0 6px">各表の口ごとに演出を組み立てて、口数で重み付けした平均。管理画面で表を変えると再計算されます。</p>
+<div style="overflow:auto" id="specSim"></div>
+<ul style="font-size:12.5px;margin:6px 0 0;padding-left:18px">
+<li>完売した時点の還元率は必ず表どおり（BOXモニターの「全レートを1周分ずつ売る」で確認できる）</li>
+<li>確率だけで抽選する方式だと、1,000回売っても87〜111%にばらつき、28%の確率で赤字（還元率97.5%の表で試算）</li>
+<li>100万レート（50口・最大×5）の途中の持ち出しは99%で800万、理論上の上限1,300万</li>
+</ul>
+</div>
+<div class="card">
+<h2>要確認（残り）</h2>
+<ul style="font-size:12.5px;margin:0;padding-left:18px">
+<li><b>弁護士確認</b>：上位倍率が排出済みのBOXを個別に表示せず販売してよいか（注意書きで足りるか）／還元率を「BOX全体の設計値」と表示する書き方／ポイント受け取りの換金性</li>
+<li><b>レート帯の区切りと持ち出しの許容額</b>（入江さん）</li>
+<li><b>500で300万の「奇跡」</b>を入れるか（入れるなら×6,000の口と30倍を超える専用演出が必要）</li>
+<li><b>高額PSAの在庫</b>と「無在庫では？」の見え方（目玉景品を遊び方に在庫つきで出すのが対策の1つ。PSA景品マスタの在庫一覧も公開するか）</li>
+<li><b>目玉景品のPTの合わせ方</b>：今は「SCOREと同じPT」のときだけ出す。近い額でも出す（差額をポイントで返す）方式にするか</li>
+</ul>
+</div>
+<div class="card">
+<h2>パフォーマンス検証</h2>
+<div id="perfBox" style="font-size:12.5px"><p class="note" style="margin:0 0 6px">11/26 公開ページで計測（Chrome／PC 1920×1080）。過去のプロトv3の計測（Chrome・120Hz画面）も併記。</p>
+<table class="t"><tr><th>項目</th><th>結果</th><th>判定</th></tr>
+<tr><td>RUSH再生中の描画（AUTOで1回分・約28秒）</td><td>平均60.0fps（画面のリフレッシュレート上限）、フレーム間隔の中央値16.7ms・99%値18.5ms、50ms超のカクつき0回</td><td class="good">問題なし</td></tr>
+<tr><td>長い処理（50ms以上でメインの処理が止まる）</td><td>RUSH再生中 0回</td><td class="good">問題なし</td></tr>
+<tr><td>メモリ（JSヒープ）</td><td>約23MB（RUSH1回の前後で変化なし）</td><td class="good">問題なし</td></tr>
+<tr><td>初回表示</td><td>最初の描画 約0.3秒、読み込み完了 約0.3秒（2回目以降・キャッシュあり）</td><td class="good">問題なし</td></tr>
+<tr><td>押せ！→リールが回り始めるまで</td><td>6〜10ms（v3計測）</td><td class="good">問題なし</td></tr>
+<tr><td>映像の光とリール停止のずれ</td><td>+4〜11ms（v3計測）</td><td class="good">問題なし</td></tr>
+<tr><td>抽選と演出の組み立て（最大レート 1,000,000＝2000連）</td><td>1回あたり1ms未満</td><td class="good">問題なし（本番はサーバーで行う）</td></tr>
+<tr><td>素材の容量</td><td>映像11本 約22MB（1本0.5〜3MB・必要な分だけ順に読む）、3Dモデル約2.9MB、効果音・BGM約3.0MB、画像約0.5MB</td><td class="mid">本番は 3DモデルをGLB＋圧縮（目安1MB以下）、映像をCDN配信にする（工数表 C-7）</td></tr>
+</table>
+<p class="note" style="margin-top:6px">未確認：iPhone・Android実機での連続プレイ（発熱・電池）と、LINE/Xのアプリ内ブラウザ。工数表のテスト（C-8）で確認する。</p></div>
+</div>
+<div class="card">
+<h2>シナリオ（10種・たたき台）</h2>
+<table class="t" id="scnTable"></table>
+</div>
+
+
+
+<div class="card">
+<h2>素材（ゆうぽんさん見積もり 11/25）</h2>
+<p style="font-size:12.5px;margin:0">紫7ダブル揃い演出・白7揃い演出・白7ダブル揃い演出・リール修正・白7モデル・音4種（紫ダブル・白・白ダブル・虹ラッシュ）　<b>15万円＋税／約1週間</b>。倍チャレンジの素材は含まない。</p>
+<p class="note">このプロトの映像は本番映像No.09（緑・赤・金・虹）を仮に 紫S＝緑／紫W＝赤／白S＝金／白W＝虹 に割り当てたもの。白7は紫7の色替え。</p>
+</div>
+
+<div class="card">
+<h2>リールの動きと効果音</h2>
+<p style="margin:2px 0 6px;font-size:12.5px">回転を速く（毎秒3.6回転）／揃う前に約1秒ガタガタ／3本同時にガシャーン（跳ね返り＋画面の揺れ）</p>
+<table class="t">
+<tr><th>タイミング</th><th>音素材（Drive「音声」フォルダ）</th></tr>
+<tr><td>冒頭</td><td>Puchun_Rev2 → 見せてやる、虎拳の神髄を → OPの虎拳ATTACKのタイトルに合わせて「虎拳アタック」</td></tr>
+<tr><td>BGM</td><td>Bonus Battle Loop（OPのバトルスタートからTOTALの手前まで）</td></tr>
+<tr><td>押せ！</td><td>06_Punch_Kazekiri</td></tr>
+<tr><td>ガタガタ／ガシャーン</td><td>02_RealLock_Type1・Type2／03_777（金は＋よくやった、虹は＋05_RainbowDevil）</td></tr>
+<tr><td>継続の拳突き上げ</td><td>04_DevilRush+Pipipipi-n</td></tr>
+<tr><td>TOTAL</td><td>07_Jingle → 「TOTAL」の文字に合わせて「リザルトうりゃあ！」</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ======== 遊び方 ======== -->
+<section class="pane" id="p-howto">
+<div class="grid">
+<div>
+<div class="card" style="margin-top:0;background:#0d0a18;color:#fff;border-color:#2d2442" id="howCard"></div>
+</div>
+<div>
+<div class="card" style="margin-top:0">
+<h2>遊び方画面（ユーザー向け）のイメージ</h2>
+<p style="font-size:12.5px;margin:0">左はユーザーが見る遊び方の画面です。レートを切り替えると、<b>還元率（設計値）・平均継続率・7の価値</b>が切り替わります（最大倍率と倍率の表は非公開）。7の額はレート×0.1／0.2／1／2で固定です。注意書き（B案）を「ご注意」の先頭に出しています。</p>
+</div>
+<div class="card">
+<h2>実績還元率公開ページ（イメージ）</h2>
+<p class="note" style="margin:0 0 6px">B案：BOXごとではなく<b>全レート合算・期間</b>で公開する（1つのBOXの状態とは連動しない）。下の値はこのプロトで引いた分の実績。</p>
+<div class="ctl"><label>集計期間 <select><option>直近30日</option><option>直近1週間</option><option>全期間</option></select></label></div>
+<table class="t" id="retTable"></table>
+<p class="note" style="margin-top:6px">※実績還元率＝集計期間内の購入で獲得したSCOREの合計 ÷ 購入に使ったコインの合計（全レート合算）。PTは当社所定の数値で、景品の市場価格や換金価値を示すものではありません。将来の結果や個々の購入での獲得を保証するものではありません。</p>
+</div>
+<div class="card">
+<h2>当たり速報（イメージ）</h2>
+<div id="newsList"></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ======== 管理画面 ======== -->
+<section class="pane" id="p-admin">
+<div class="card">
+<h2>管理画面（v8：1オリパで全レート対応）</h2>
+<div class="alert" style="background:#faf5ff;border:1px solid #d6bcfa;border-radius:8px;padding:10px 12px;margin:0 0 10px;font-size:13px"><b>オリパの登録は管理画面モックで：</b> <a href="admin.html" target="_blank"><b>管理画面モックを開く →</b></a>（v8：<b>1つのオリパで全レート対応</b>。通常のオリパ編集と同じ S〜その他 の景品登録＋Sの「隠しキリ番景品」を何個でも。BOXはレートごとに自動で分かれます）</div>
+<table class="t">
+<tr><th style="width:230px">v7（1レート1オリパ）</th><th>v8（1オリパで全レート）</th></tr>
+<tr><td>レートごとにオリパを作る（15レートなら15個）</td><td><b>1オリパ</b>に「販売レート」をチェックで登録。BOXはレートごとに自動で作られる</td></tr>
+<tr><td>景品のPTをレートごとに入力</td><td>景品は<b>倍率</b>で登録（PTカード×30 など）。交換ポイントはレート×倍率で自動。1つの景品表が全レートに効く</td></tr>
+<tr><td>口数＝そのオリパの個数の合計</td><td>個数は<b>レート帯ごとに3列</b>（〜5万／10万〜30万／50万〜）。高レートほど口数を少なくできる。帯の区切りは変更可</td></tr>
+<tr><td>S賞1つにキリ番</td><td>Sの<b>「隠しキリ番景品」に何個でも</b>（stgの既存項目を流用：カード・状態・キリ番・当たり演出・交換タイプ）。<b>対象レート</b>と<b>倍率</b>を追加。そのレートのBOXで同じ倍率の口1つと入れ替えるので還元率は変わらない。在庫0なら次の周からPTカードのまま</td></tr>
+<tr><td>完売で自動再販</td><td>同じ（レートごとのBOXが完売したら同じ内容で自動補充）</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>BOXモニター（運営だけが見る）</h2>
+<p class="note" style="margin:0 0 6px">プロトで引くと、そのレートのBOXが1口進みます。隠しキリ番景品はキリ番の位置で出ます。完売した周はかならず登録どおりの還元率になります。</p>
+<div class="ctl"><button class="btn" id="simAll" type="button">全レートを1周分ずつ売る</button><span class="note" id="simMsg"></span></div>
+<div style="overflow:auto" id="boxMon"></div>
+</div>
+</section>
+
+
+<!-- ======== 工数 ======== -->
+<section class="pane" id="p-est">
+<div class="card">
+<h2>工数見積もり依頼</h2>
+<p style="margin:2px 0">v6（倍率BOX）のルールにもとづく項目です。項目ごとに工数（人日）を見積もってください。「参考」はこちらの仮置きです。</p>
+<div class="ctl"><button class="btn" id="copyCsv" type="button">表をコピー（スプレッドシートに貼れる形式）</button><span class="note" id="copyMsg"></span></div>
+<table class="t" id="wbs"></table>
+<div style="margin-top:8px;font-size:13px" id="wbsTot"></div>
+</div>
+<div class="card">
+<h2>依頼文（Slackに貼る用）</h2>
+<div class="ctl"><button class="btn pri" id="copyReq" type="button">依頼文をコピー</button><span class="note" id="copyMsg2"></span></div>
+<div class="copybox" id="reqText"></div>
+</div>
+</section>
+
+<footer>パレットグループ トレカ商事カンパニー｜TORAMI RUSH 倍率BOXプロト v6（2026-11-27）｜倍率の表・レート帯・在庫は案。3Dモデル・本番映像No.09・音素材は受領素材を検証用に縮小して使用。白7は仮の色替え</footer>
+</main>
+
+<div id="howM"><div class="in"><button class="x" type="button" id="howX" aria-label="閉じる">×</button><div id="howMB"></div></div></div>
+<script src="state.js"></script>
+<script type="module">
+import * as THREE from './lib/three.module.js';
+import {OBJLoader} from './lib/OBJLoader.js';
+const $=id=>document.getElementById(id);
+const fmt=v=>Math.round(v).toLocaleString();
+/* =============== 3D =============== */
+const canvas=$("gl");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:"high-performance"});renderer.setClearColor(0x000000,0);
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(24,1.5,10,3000);camera.position.set(0,2,345);camera.lookAt(0,2,0);
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;const tf=2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));camera.position.z=Math.max(196/camera.aspect/tf,146/tf);camera.updateProjectionMatrix()}
+addEventListener("resize",resize);
+const tl=new THREE.TextureLoader();const loadTex=f=>new Promise((res,rej)=>tl.load("model/"+f,t=>{t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;res(t)},undefined,rej));
+const PIV={y:-18.206274,z:-28.074114},PITCH=Math.PI*2/21,REELX=[-55,0,55],W7=141.2*Math.PI/180;
+// リール帯（L/C/R・21コマ／ゆうぽんさん 11/27版をそのまま使用）。上段＝c-1、下段＝c+1
+// リール帯：new＝11/27のL・C・R（21コマ・ダブル2ライン対応。標準）／old＝最初にもらった1本の絵（?reel=old）
+const REELSET=new URLSearchParams(location.search).get("reel")==="old"?"old":"new";
+const CELL_OFF=0;
+const CELL=c=>(13-CELL_OFF-c)*PITCH; // 旧：等間隔の近似（使わない）
+// コマcを中段に止める角度（リールごと・実測）：3DモデルのUVは1周＝画像の高さの96%（1度あたり0.002667）。
+// リール帯の21コマは画像の約97.7%に並んでいるので、等間隔(360/21)で計算すると端のコマほど枠の中心からずれる（11/28 じぇいさん指摘）
+// new：リール帯を「1周＝画像の96%」の周期で並べ直してあるので（つなぎ目の重なり対策 11/28）、コマは等間隔
+const GRID=REELSET==="new"?[[0.6311-13*0.96/21,0.96/21],[0.6311-13*0.96/21,0.96/21],[0.6311-13*0.96/21,0.96/21]]:[[.026061,.046538],[.026061,.046538],[.026061,.046538]];
+const CELLR=(i,c)=>{c=((c%21)+21)%21;const f=GRID[i][0]+c*GRID[i][1];return(0.6311-f)/0.002667*Math.PI/180};
+// 7の位置：L＝紫0,1／白10,11　C＝紫3／白4　R＝紫1,2／白11,12（縦2連）
+// シングル＝中段1ラインだけ（L・Rは7が中段＋下段）。ダブル＝中段＋右下がり斜めの2ライン（Lは上段＋中段、Rは中段＋下段）
+// ハズレ＝L・Cは中段に7（テンパイ）。Lは上段＋中段、Rは7が上段（1コマ手前）→ 右上がり斜めも揃わない
+const TG=REELSET==="new"?{pS:[0,3,1],pW:[1,3,1],wS:[10,4,11],wW:[11,4,11],missP:[1,3,3],missW:[11,4,13]}:{pS:[13,13,13],pW:[13,13,13],wS:[5,5,5],wW:[5,5,5],missP:[13,13,14],missW:[5,5,6]};
+Object.keys(TG).forEach(k=>TG[k]=TG[k].map((c,i)=>CELLR(i,c)));
+const HOME=(REELSET==="new"?[5,12,7]:[9,1,17]).map((c,i)=>CELLR(i,c)); // 待機位置：3本ともコインの位置（7が見えない）
+// 止まり方のパターン（11/28）：リール帯から「どのラインに何本揃うか」を全通り計算して、毎回ランダムに選ぶ
+//  シングル＝5ライン（上・中・下・右下がり・右上がり）のどれか1本、ダブル＝2本。ハズレ＝0本で、右リールの外れ方を数パターン
+const NC=21;const STRIP=(REELSET==="new"?[{P:[0,1],W:[10,11]},{P:[3],W:[4]},{P:[1,2],W:[11,12]}]:[{P:[13],W:[5]},{P:[13],W:[5]},{P:[13],W:[5]}]).map(o=>{const a=Array(NC).fill("-");o.P.forEach(c=>a[c]="P");o.W.forEach(c=>a[c]="W");return a});
+const sym=(r,c)=>STRIP[r][((c%NC)+NC)%NC];
+const LINES=[[-1,-1,-1],[0,0,0],[1,1,1],[-1,0,1],[1,0,-1]]; // 上段・中段・下段・右下がり・右上がり
+const LNAME=["上段","中段","下段","右下がり","右上がり"];
+function evalCells(cs){const hit={P:[],W:[]};LINES.forEach((L,li)=>{const a=sym(0,cs[0]+L[0]);if(a!=="-"&&a===sym(1,cs[1]+L[1])&&a===sym(2,cs[2]+L[2]))hit[a].push(li)});
+  const edge=[-2,2].some(o=>{const a=sym(0,cs[0]+o);return a!=="-"&&a===sym(1,cs[1]+o)&&a===sym(2,cs[2]+o)}); // 枠外の段（見える上下2段）にも揃って見えないように
+  return{hit,edge}}
+const PAT={P1:[],P2:[],W1:[],W2:[],missP:{},missW:{}};
+for(let a=0;a<NC;a++)for(let b=0;b<NC;b++)for(let c=0;c<NC;c++){const cs=[a,b,c],e=evalCells(cs);if(e.edge)continue;
+  for(const X of ["P","W"]){const Y=X==="P"?"W":"P";
+    if(e.hit[Y].length)continue;
+    if(!e.hit[X].includes(1)&&e.hit[X].length)continue; // 7は必ず中段（上下センター）で止める（11/28）。ダブルは中段＋斜め
+    if(e.hit[X].length===1)PAT[X+"1"].push({cs,lines:e.hit[X]});
+    if(e.hit[X].length===2)PAT[X+"2"].push({cs,lines:e.hit[X]});
+    if(e.hit[X].length===0&&!e.hit[Y].length){
+      // テンパイ：L・Cが同じラインに7。右リールの外れ方で分類
+      LINES.forEach((L,li)=>{if(li!==1)return; /* テンパイも中段 */if(sym(0,a+L[0])!==X||sym(1,b+L[1])!==X)return;const need=c+L[2];
+        const kind=sym(2,need-1)===X&&need-1>=c-1?"上段で止まる":sym(2,need+1)===X&&need+1<=c+1?"滑ってズレる":null;if(!kind)return;
+        (PAT["miss"+X][kind]=PAT["miss"+X][kind]||[]).push({cs,line:li})})}}}
+const pickA=a=>a[Math.floor(Math.random()*a.length)];
+const toAng=cs=>cs.map((c,i)=>CELLR(i,c));
+const MISSW={"上段で止まる":50,"滑ってズレる":50}; // ハズレは必ずテンパイ。右リールの7は必ず見える（11/28）
+function pickWin(k){const X=k[0]==="p"?"P":"W";let n=k[1]==="W"?2:1;if(!PAT[X+n].length)n=1; /* 7が1個のリールではダブル（2ライン）は作れないのでシングルの形 */const p=pickA(PAT[X+n]);return{ang:toAng(p.cs),line:p.lines.map(i=>LNAME[i]).join("＋")}}
+function pickMiss(X){const M=PAT["miss"+X];let tot=0;const ks=Object.keys(MISSW).filter(k=>M[k]&&M[k].length);ks.forEach(k=>tot+=MISSW[k]);let x=Math.random()*tot,kk=ks[0];for(const k of ks){if((x-=MISSW[k])<0){kk=k;break}}const p=pickA(M[kk]);const ang=toAng(p.cs);return{ang,kind:kk,line:LNAME[p.line],slideFrom:kk==="滑ってズレる"?CELLR(2,p.cs[2]+1):null}}
+let tex={},machineMat,reels=[],ready=false;
+async function init3d(){
+  const [dark,on,bright,rL,rC,rR,bL,bC,bR]=await Promise.all(["slot_dark.jpg","slot_on.jpg","slot_bright.jpg",...(REELSET==="new"?["reel_L.jpg","reel_C.jpg","reel_R.jpg","blur_L.jpg","blur_C.jpg","blur_R.jpg"]:["reel.jpg","reel.jpg","reel.jpg","reel_blur.jpg","reel_blur.jpg","reel_blur.jpg"])].map(loadTex));
+  tex={dark,on,bright,reels:[{reel:rL,blur:bL},{reel:rC,blur:bC},{reel:rR,blur:bR}]}; // リール帯はL／C／R別（ゆうぽんさん 11/27 版）
+  const L=new OBJLoader();const [m,r]=await Promise.all([L.loadAsync("model/Slot_Machine.obj"),L.loadAsync("model/Reel.obj")]);
+  machineMat=new THREE.MeshBasicMaterial({map:dark});m.traverse(o=>{if(o.isMesh)o.material=machineMat});scene.add(m);
+  REELX.forEach((x,ri)=>{const g=new THREE.Group();g.position.set(x,PIV.y,PIV.z);const mat=new THREE.MeshBasicMaterial({map:tex.reels[ri].reel});const c=r.clone();c.traverse(o=>{if(o.isMesh)o.material=mat});c.position.set(0,-PIV.y,-PIV.z);g.add(c);scene.add(g);reels.push({g,mat,tex:tex.reels[ri],ang:HOME[reels.length],w:0,state:"idle"});g.rotation.x=HOME[reels.length-1]});
+  resize();ready=true;window.RUSH_DBG={reels,PITCH,TG,HOME,PAT:()=>PAT,pickWin,pickMiss,toAng};idle();
+}
+init3d().catch(e=>{$("idleMsg").textContent="3Dの読み込みに失敗しました："+e.message});
+let lightSeq=null;
+// 3×3だけ見せる（11/28）：中段から±1.5コマより外側のリール面を暗くする（リールの奥に沈んで見える）
+function fade3x3(mat){mat.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace("#include <common>","#include <common>\nvarying vec3 vWp;").replace("#include <project_vertex>","#include <project_vertex>\nvWp=(modelMatrix*vec4(transformed,1.0)).xyz;");
+  sh.fragmentShader=sh.fragmentShader.replace("#include <common>","#include <common>\nvarying vec3 vWp;").replace("#include <map_fragment>",`#include <map_fragment>
+  float ang=atan(vWp.y-(${PIV.y.toFixed(5)}),vWp.z-(${PIV.z.toFixed(5)}));float f=smoothstep(${(PITCH*1.47).toFixed(5)},${(PITCH*1.6).toFixed(5)},abs(ang));diffuseColor.rgb*=1.0-0.985*f;`)}}
+function setLight(k){if(!machineMat)return;machineMat.map=tex[k];machineMat.needsUpdate=true}
+function flicker(){const t0=performance.now();const L=$("led");if(L){L.classList.remove("on");void L.offsetWidth;L.classList.add("on")}lightSeq=t=>{const e=t-t0;if(e>1600){setLight("bright");lightSeq=null;return}setLight(Math.floor(e/(e<900?70:140))%2?"dark":"bright")}}
+// 揃ったあとはリールを初期位置に戻す（次のゲームは毎回同じ位置から回す）
+function homeReels(){if(!ready)return;const t0=performance.now();reels.forEach((r,i)=>{r.state="idle";r.w=0;r.home={a0:norm(r.ang),t0,to:HOME[i]}})}
+const MAXW=Math.PI*2*3.6; // 速い回転（ゆうぽんさん指摘）
+const norm=a=>{a%=Math.PI*2;return a<0?a+Math.PI*2:a};
+function spin(i){const r=reels[i];r.home=null;r.ang=norm(r.ang);r.state="accel"}
+// ガタガタ：止まる直前に7の手前でリールを震わせる
+function shakeAll(target){const t0=performance.now();reels.forEach((r,i)=>{const tg=Array.isArray(target)?target[i]:target;r.base=tg-PITCH*(0.42+0.08*i);r.ang=r.base;r.w=0;r.state="shake";r.sh0=t0})}
+// ガシャーン：3本同時に一気に止める（強めのオーバーシュート）
+function slamAll(targets){const t0=performance.now();reels.forEach((r,i)=>{const tg=Array.isArray(targets)?targets[i]:targets;let D=((tg-r.ang)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;if(r.state!=="shake")D=norm(tg-r.ang)+Math.PI*2;r.stop={a0:r.ang,D,t0,dur:150,slam:true};r.state="stopping"});
+  const st=$("stage");st.classList.remove("quake");void st.offsetWidth;st.classList.add("quake")}
+function requestStop(i,target,dur){const r=reels[i];if(r.state==="idle"||r.state==="stopping"||r.state==="stopped")return;const w=Math.max(r.w,MAXW*0.6);let D=norm(target-r.ang);while(D<w*dur*0.55)D+=Math.PI*2;r.stop={a0:r.ang,D,t0:performance.now(),dur:dur*1000};r.state="stopping"}
+const easeOutBack=p=>{const c1=1.15,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
+const easeSlam=p=>{const c1=2.6,c3=c1+1;return 1+c3*Math.pow(p-1,3)+c1*Math.pow(p-1,2)};
+// 1回転して止める（11/28）：一気に1周回ってから、少し行き過ぎて戻る
+const FULL_MS=600;
+function fullEase(p,D,pw){return D*(1-Math.pow(1-p,pw||2))} // 回転の速さのまま減速に入る（途中で止まって見えないように） // 行き過ぎて戻る動きはなし（止まってから動いて見えるため 11/28）
+function spinStopAll(targets,slowR){const t0=performance.now();reels.forEach((r,i)=>{const tg=targets[i];const D=norm(tg-r.ang)+Math.PI*2;const sl=slowR&&i===2;r.stop={a0:r.ang,D,t0,dur:(FULL_MS+(sl?380:0))/SPD,full:true,pw:sl?3:2};r.state="stopping"})} // slowR：右だけ勢いが余って、揃う位置を少し通り過ぎてから止まる
+let lastT=performance.now();
+function loop(t){const dt=Math.min(0.05,(t-lastT)/1000);lastT=t;
+  if(ready){reels.forEach((r,i)=>{
+    if(r.state==="accel"){r.w=Math.min(MAXW,r.w+MAXW*dt/0.25);if(r.w>=MAXW)r.state="spin";r.ang+=r.w*dt}
+    else if(r.state==="spin"){r.ang+=r.w*dt}
+    else if(r.state==="shake"){const e=(t-r.sh0)/1000;r.ang=r.base+Math.sin(e*62+i*1.7)*0.045+Math.sin(e*23+i)*0.025}
+    else if(r.state==="stopping"){const s=r.stop;const p=Math.min(1,(t-s.t0)/s.dur);r.ang=s.full?s.a0+fullEase(p,s.D,s.pw):s.a0+s.D*(s.slam?easeSlam(p):easeOutBack(p));r.w=MAXW*(1-p);if(p>=1){r.state="stopped";r.w=0;r.ang=norm(r.ang);onStop(i)}}
+    if(r.home){const p=Math.min(1,(t-r.home.t0)/320);const to=r.home.to||0;let d=((to-r.home.a0)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;r.ang=r.home.a0+d*(1-Math.pow(1-p,3));if(p>=1){r.ang=to;r.home=null}}
+    r.g.rotation.x=r.ang;
+    const fast=r.state==="spin"||(r.state==="accel"&&r.w>MAXW*0.5)||(r.state==="stopping"&&!r.stop.slam&&r.w>MAXW*0.55);const m=fast?r.tex.blur:r.tex.reel;if(r.mat.map!==m){r.mat.map=m;r.mat.needsUpdate=true}});
+    if(lightSeq)lightSeq(t);timeline();renderer.render(scene,camera)}
+  requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+/* =============== sound =============== */
+const SE=["bgm","tempai","reellock_t1","reellock_t2","s777","devilrush","rainbow05","punch","jingle","voltageup","puchun","v_attack","v_madamada","v_miseteyaru","v_result","v_shinzui_rev","v_tempai"];
+let AC=null,buf={},live={},soundOn=true;
+// 音はページを開いた時点で全部読み込む（STARTを押してから読み込むと、最初のプチュンなどが間に合わず鳴らなかった）
+function audioInit(){if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();
+  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(_){} // iPhoneのマナーモードでも鳴らす
+  SE.forEach(n=>fetch(`se/${n}.mp3`).then(r=>r.arrayBuffer()).then(a=>new Promise((ok,ng)=>AC.decodeAudioData(a,ok,ng))).then(b=>{buf[n]=b;if(n==="bgm"&&bgmWant&&running)bgm(true)}).catch(()=>{}))}catch(_){}}
+function audioUnlock(){audioInit();try{if(AC&&AC.state!=="running")AC.resume()}catch(_){}}
+const SE_CORE=["puchun","v_miseteyaru","punch","reellock_t1","reellock_t2","s777","devilrush","v_attack"];
+const seReady=()=>!AC||SE_CORE.every(n=>buf[n]);
+audioInit();
+let MASTER=null,VOL=.8;function master(){if(!MASTER&&AC){MASTER=AC.createGain();MASTER.gain.value=VOL;MASTER.connect(AC.destination)}return MASTER}
+// ×4のときは音が重なって崩れる（ゆうぽんさん指摘）ので、ボイスと長い音は鳴らさず、同じ効果音は前の音を止めてから鳴らす（少し速めに再生）
+const FAST_SKIP=/^v_|^devilrush$|^jingle$|^rainbow05$|^voltageup$|^tempai$/;
+function sfx(n,vol=1){if(!soundOn||!AC||!buf[n])return;if(SPD>=4){if(FAST_SKIP.test(n))return;stopSfx(n)}const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=vol;s.buffer=buf[n];if(SPD>=4)s.playbackRate.value=1.25;s.connect(g).connect(master());s.start();(live[n]=live[n]||[]).push(s);s.onended=()=>{live[n]=(live[n]||[]).filter(x=>x!==s)}}
+function stopSfx(n){(live[n]||[]).forEach(s=>{try{s.stop()}catch(_){}});live[n]=[]}
+function stopAll(){Object.keys(live).forEach(stopSfx)}
+let bgmWant=false;
+function bgm(on){bgmWant=on;stopSfx("bgm");/* 読み込み前なら、読み込み完了時に鳴らす */if(!on||!soundOn||!AC||!buf.bgm)return;const s=AC.createBufferSource(),g=AC.createGain();g.gain.value=.38;s.buffer=buf.bgm;s.loop=true;s.connect(g).connect(master());s.start();live.bgm=[s]}
+/* =============== player =============== */
+const CLIP={miss:{f:"miss",flash:1.65,miss:true},green:{f:"win_green",flash:1.70},red:{f:"win_red",flash:1.60},gold:{f:"win_gold",flash:1.70},rainbow:{f:"win_rainbow",flash:1.70}}; // 本番映像 No.09（11/22受領）から切り出し
+const COLN={green:"緑",red:"赤",gold:"金",rainbow:"虹"};
+const els=[$("va"),$("vb")];let SPD=1,AUTO=false,JUMP=false;let cur=0,seq=[],idx=-1,running=false,step=null,plan=null,activeTab="play";
+function callout(html){const c=$("callout");c.innerHTML=html;c.classList.remove("on");void c.offsetWidth;c.classList.add("on")}
+function banner(t){const b=$("banner");if(t){b.textContent=t;b.classList.add("on")}else b.classList.remove("on")}
+function prep(el,i){while(i<seq.length&&(!seq[i].f||seq[i].k==="chall"))i++;if(i>=seq.length){el.removeAttribute("src");return}el.loop=seq[i].k==="wait"||seq[i].k==="chall";el.src=`v/${seq[i].f}.mp4`;el.load()}
+function renderPlan(){const box=$("plan-"+activeTab);if(!box)return;box.innerHTML=(seq.length?seq:[]).map((s,i)=>s.l?`<span class="${i===idx?"cur":""}">${s.l}</span>`:"").join("")}
+function startAt(i){$("dim").classList.remove("on");$("puchun").classList.toggle("on",seq[i]&&seq[i].f==="freeze");idx=i;step=seq[i];renderPlan();
+  $("hud").textContent=step.l||"";setWait(step.k==="wait");banner(step.k==="wait"&&step.banner?step.banner:"");
+  if(step.k==="wait"&&!step.keepLight)setLight("dark");
+  if(step.bgm)bgm(true);if(step.bgmOff)bgm(false);
+  if(step.sfx)step.sfx.forEach(([n,d,v])=>setTimeout(()=>{if(running)sfx(n,v)},(d||0)/SPD));
+  if(step.k==="wait"&&AUTO)setTimeout(()=>{if(running&&step&&step.k==="wait"&&AUTO)tap()},700/SPD);
+  if(step.k==="chall"){runChall(step);return}
+  if(step.k==="rev"){runRev(step);return}
+  if(step.freeze&&!step._fz){step._fz=true;runFreeze(i);return}
+  const el=els[cur],other=els[1-cur];
+  if(step.k==="win"){step.stops=[false,false,false]}
+  el.playbackRate=SPD;const p=el.play();const vis=()=>{el.classList.add("show");other.classList.remove("show");other.pause();prep(other,i+1)};
+  if(p&&p.then)p.then(vis).catch(()=>{$("hud").textContent="再生できませんでした。STARTを押し直してください";idle()});else vis();
+}
+function next(){if(!running||JUMP)return;
+  const nx=seq[idx+1];
+  if(!nx){finish();return}
+  if(nx.k==="chall"||nx.k==="rev"){idx++;startAt(idx);return} // chall/rev keeps current video
+  cur=1-cur;startAt(idx+1)}
+els.forEach(el=>el.addEventListener("ended",()=>{if(running&&el===els[cur]&&step&&(step.k==="play"||step.k==="win")){if(step.clip==="miss"){const st=step;setTimeout(()=>{if(running&&step===st)next()},1100/SPD)}else next()}}));
+function timeline(){if(!running||!step)return;
+  // 映像の再生位置に合わせて鳴らす音（虎拳アタックの声は、声の出だしをタイトルが出る瞬間 2.2秒 に合わせる）
+  if(step.vsfx){const ve=els[cur];if(ve.classList.contains("show"))step.vsfx.forEach(x=>{if(!x.done&&ve.currentTime>=x[1]){x.done=true;sfx(x[0])}})}
+  if(step.k!=="win")return;const el=els[cur];if(!el.classList.contains("show"))return;
+  const vt=el.currentTime,C=CLIP[step.clip];
+  if(!step.fist&&vt>=3.1){step.fist=true;sfx("devilrush",.8);sfx("punch",.9)} // 継続の拳突き上げ（7のあとに虎美が拳を上げる場面）
+  if(!step.stops[0]&&vt>=C.flash-1.0){step.stops[0]=true; /* ガタガタ（停止→震え）はなし：回ったまま1回転して止める（11/28） */sfx(Math.random()<.5?"reellock_t1":"reellock_t2")}
+  if(C.miss){if(!step.stops[1]&&vt>=C.flash-FULL_MS/1000){step.stops[1]=true;spinStopAll(step.target,!!step.pre); /* 1回転してハズレ。「滑ってズレる」は右だけ回転しすぎた感じで、揃う位置をゆっくり通り過ぎて1コマ先で止まる */stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(!running)return;setLight("dark");$("dim").classList.add("on");callout("RUSH 終了<small>7揃わず</small>")},420+(FULL_MS+(step.pre?380:0))/SPD)}return}
+  if(!step.stops[1]&&vt>=C.flash-FULL_MS/1000){step.stops[1]=true;spinStopAll(step.target);stopSfx("reellock_t1");stopSfx("reellock_t2");setTimeout(()=>{if(running)sfx("s777")},FULL_MS/SPD-40);
+    if(step.clip==="rainbow")sfx("rainbow05",.9);else if(step.clip==="gold")setTimeout(()=>sfx("v_tempai"),500)}}
+function onStop(i){if(!running||!step)return;
+  if(step.k==="win"&&i===2&&step.clip!=="miss"){flicker();if(step.add!=null){plan.total+=step.add;flyScore(step.add,step.lab||"",plan.total)}}
+  if(step.k==="chall"&&i===2){if(step.ok){flicker();sfx("voltageup",.8);callout(`倍チャレンジ成功！<small>×2　+${fmt(step.add)}</small>`);plan.total+=step.add;hudR()}else{setLight("dark");sfx("v_madamada");callout("まだまだ…<small>失敗</small>")}setTimeout(()=>{if(running&&step&&step.k==="chall")next()},1500)}}
+// 心音（どっくん）：WebAudioで低音を鳴らす＋画面をドクンと揺らす
+function heartbeat(n){try{if(AC&&soundOn){for(let i=0;i<n;i++)[0,.2].forEach(o=>{const t=AC.currentTime+i*.75/SPD+o,os=AC.createOscillator(),g=AC.createGain();os.frequency.setValueAtTime(75,t);os.frequency.exponentialRampToValueAtTime(38,t+.16);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(o?0.7:1,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.24);os.connect(g).connect(master());os.start(t);os.stop(t+.26)})}}catch(_){}
+  const st=$("stage");st.style.setProperty("--bt",(.75/SPD)+"s");st.style.setProperty("--bn",n);st.classList.remove("beat");void st.offsetWidth;st.classList.add("beat");try{navigator.vibrate&&navigator.vibrate([60,140,40,560,60,140,40])}catch(_){}}
+// ダブル揃いの前のフリーズ（どっくん）：映像を止めて暗転→心音→そのまま揃う
+function runFreeze(i){setWait(false);banner("");els.forEach(e=>e.pause());setLight("dark");$("dim").classList.add("on");const ov=$("revov");ov.className="revov on lv-pre frz";ov.innerHTML="<b>・・・</b>";heartbeat(3);
+  setTimeout(()=>{if(!running)return;ov.className="revov";$("dim").classList.remove("on");startAt(i)},2400/SPD)}
+// 最後の逆転（倍プッシュ／輪廻転生）：TOTALのあと暗転 → 期待度の色で煽る → 7を狙え → 揃えばSCORE×2
+function runRev(s){const R=s.rev,d=x=>x/SPD;setWait(false);banner("");setLight("dark");$("dim").classList.add("on");
+  const ov=$("revov"),T=R.type==="push"?["7を狙え！","揃えば SCORE ×2"]:["輪廻転生","復活すれば SCORE ×2"];
+  ov.className="revov on lv-"+LV[R.lv].k;ov.innerHTML=`<i>期待度 ${LV[R.lv].n}</i><b>${T[0]}</b><small>${T[1]}</small>`;heartbeat(R.lv>=2?3:2);
+  setTimeout(()=>{if(!running||step!==s)return;[0,1,2].forEach(spin);sfx("tempai")},d(1000));
+  const TW=R.ok?pickWin("wW").ang:pickMiss("W").ang;
+  setTimeout(()=>{if(!running||step!==s)return;sfx("reellock_t2")},d(2100));
+  setTimeout(()=>{if(!running||step!==s)return;stopSfx("reellock_t2");ov.className="revov";
+    spinStopAll(TW);
+    if(R.ok){setTimeout(()=>sfx("s777"),d(FULL_MS-40));setTimeout(()=>{if(!running)return;$("dim").classList.remove("on");flicker();sfx("voltageup",.8);callout(`${R.type==="push"?"倍プッシュ":"転生"}成功！<small>SCORE ×2</small>`);plan.total+=s.add;flyScore(s.add,R.type==="push"?"倍プッシュ":"輪廻転生",plan.total)},d(FULL_MS)+180)}
+    else{setTimeout(()=>{if(!running)return;sfx("v_madamada");callout("失敗…<small>SCORE そのまま</small>")},d(FULL_MS)+220)}
+    setTimeout(()=>{if(running&&step===s)next()},d(FULL_MS+(R.ok?2600:1800)))},d(3000))}
+function runChall(s){banner("");setWait(false);setLight("on");
+  // reels already spinning (tap). stop by wall clock
+  setTimeout(()=>{if(!running)return;shakeAll(s.target);sfx("reellock_t2")},900);
+  setTimeout(()=>{if(!running)return;stopSfx("reellock_t2");
+    if(s.ok){slamAll(s.target);sfx("s777")}else{slamAll([s.target,s.target,norm(s.target-PITCH)])}},2250)}
+function setWait(on){$("oWait").classList.toggle("on",on);paintMain()}
+function paintMain(){const o=$("oshi");if(!o)return;let t,off=false;
+  if(running){t='<b class="jp">押せ！</b>';off=!(step&&step.k==="wait")}
+  else{t=plan&&!plan.played?'<b class="en">START</b><small>演出を再生</small>':'<b class="en">START</b><small>抽選する</small>'}
+  if(!ready)off=true;
+  $("mainLbl").innerHTML=t;o.classList.toggle("off",off);$("oneBtn").disabled=!running;$("skip").disabled=!running;
+  $("lcdIdle").classList.toggle("off",running||!!(plan&&plan.played&&$("res").classList.contains("on")));try{paintRate()}catch(_){}}
+function hudR(){}
+/* 累計SCOREプレートと加点アニメーション */
+let DISP=0,FLY=[],CNT=null;const RM=matchMedia("(prefers-reduced-motion: reduce)");
+function setPlate(v){DISP=v;$("plateVal").textContent=fmt(v)}
+function countTo(to,ms){if(CNT)cancelAnimationFrame(CNT);const from=DISP,t0=performance.now();
+  const st=t=>{const p=Math.min(1,(t-t0)/ms);const v=Math.round(from+(to-from)*(1-Math.pow(1-p,3)));$("plateVal").textContent=fmt(v);if(p<1)CNT=requestAnimationFrame(st);else{DISP=to;CNT=null}};CNT=requestAnimationFrame(st)}
+function plateGlow(){const pl=$("plate");pl.classList.add("glow");setTimeout(()=>pl.classList.remove("glow"),380)}
+function clearFly(){FLY.forEach(f=>{try{f.a&&f.a.cancel()}catch(_){}f.el.remove()});FLY=[];if(CNT){cancelAnimationFrame(CNT);CNT=null}}
+function flyScore(add,label,newTotal){const st=$("stage").getBoundingClientRect(),pv=$("plateVal").getBoundingClientRect();
+  const el=document.createElement("div");el.className="fly";el.style.setProperty("--W",st.width+"px");el.innerHTML=`<b>+${fmt(add)}</b>${label?`<small>${label}</small>`:""}`;document.body.appendChild(el);
+  const w=el.offsetWidth,h=el.offsetHeight;const x0=st.left+st.width/2-w/2,y0=st.top+st.height*.35-h/2;const dx=(pv.left+pv.width/2)-(st.left+st.width/2),dy=(pv.top+pv.height/2)-(st.top+st.height*.35);
+  const f={el};FLY.push(f);const done=()=>{el.remove();FLY=FLY.filter(z=>z!==f);if(!running&&!FLY.length)return;plateGlow();countTo(newTotal,RM.matches?1:340/Math.sqrt(SPD))};
+  if(RM.matches){el.style.transform=`translate(${x0}px,${y0}px)`;setTimeout(done,380);return}
+  const hold=1200*.57/Math.sqrt(SPD),move=1200*.43/Math.sqrt(SPD),T=hold+move,o=v=>v/T;const base=`translate(${x0}px,${y0}px)`;
+  f.a=el.animate([{transform:base+" scale(.8)",opacity:0,offset:0},{transform:base+" scale(1.08)",opacity:1,offset:o(1200*.12)},{transform:base+" scale(1)",opacity:1,offset:o(1200*.23)},{transform:base+" scale(1)",opacity:1,offset:o(hold)},{transform:`translate(${x0+dx}px,${y0+dy}px) scale(.24)`,opacity:0,offset:1}],{duration:T,easing:"linear",fill:"forwards"});
+  f.a.onfinish=done}
+function finish(){running=false;$("dim").classList.remove("on");$("revov").className="revov";bgm(false);setTimeout(()=>{if(!FLY.length&&plan)setPlate(plan.total);paintMain()},0);setWait(false);banner("");setLight("on");const mu=plan.mul||0;$("res").classList.remove("m-red","m-gold","m-rainbow");if(mu>=10)$("res").classList.add("m-rainbow");else if(mu>=5)$("res").classList.add("m-gold");else if(mu>=2)$("res").classList.add("m-red");$("res").innerHTML=plan.result()+`<button class="closebtn" type="button" id="again">もう一度見る</button>`;$("res").classList.add("on");$("again").addEventListener("click",()=>{idle(true)});$("hud").textContent="リザルト";idx=-1;renderPlan()}
+function idle(keepPlan){running=false;JUMP=false;stopAll();$("res").classList.remove("on");banner("");els.forEach(e=>{e.pause();e.classList.remove("show")});setWait(false);
+  if(ready){setLight("dark");reels.forEach((r,i)=>{r.state="idle";r.w=0;r.home=null;r.ang=HOME[i];r.g.rotation.x=HOME[i];r.mat.map=r.tex.reel})}
+  $("oIdle").classList.add("on");const can=ready&&plan;$("startBtn").style.display=can?"inline-block":"none";
+  $("idleMsg").innerHTML=!ready?"3Dモデルを読み込み中…":plan?plan.idleText:"レートを選んで、下の START を押してください";
+  $("hud").textContent=plan&&!plan.played?"準備OK：STARTで演出を再生":"レートを選んで START";if(plan)plan.total=0;clearFly();setPlate(0);seq=[];idx=-1;renderPlan();paintMain()}
+$("startBtn").addEventListener("click",async()=>{if(!ready||!plan)return;audioUnlock();
+  if(!seReady()){$("idleMsg").innerHTML="音を読み込み中…";for(let k=0;k<40&&!seReady();k++)await new Promise(r=>setTimeout(r,100))}$("oIdle").classList.remove("on");$("res").classList.remove("on");try{if(innerWidth<981)$("frame").scrollIntoView({behavior:"smooth",block:"start"})}catch(_){}
+  if(!plan.steps.length){plan.total=0;finish();return}
+  plan.played=true;$("lcdIdle").classList.add("off");clearFly();setPlate(0);audioUnlock();seq=plan.steps.map(s=>({...s,vsfx:s.vsfx&&s.vsfx.map(x=>[...x])}));plan.total=0;hudR();running=true;cur=0;prep(els[0],0);prep(els[1],1);const u=els[1].play();if(u&&u.then)u.then(()=>els[1].pause()).catch(()=>{});setLight("dark");startAt(0)});
+function tap(){if(!running||JUMP||!step||step.k!=="wait")return;const o=$("oshi");o.classList.add("hit");setTimeout(()=>o.classList.remove("hit"),140);try{navigator.vibrate&&navigator.vibrate(25)}catch(_){}
+  const f=document.createElement("div");f.className="flash";$("stage").appendChild(f);setTimeout(()=>f.remove(),320);audioUnlock();setLight("on");sfx("punch",1);[0,1,2].forEach(spin);setWait(false);next()}
+$("oshi").addEventListener("pointerdown",e=>{e.preventDefault();if(running){tap();return}
+  if(!ready)return;if(!plan||plan.played){$("drawBtn").click();if(!plan||!plan.steps)return}$("startBtn").click()});
+$("skip").addEventListener("click",()=>{if(!running)return;els.forEach(e=>e.pause());reels.forEach((r,i)=>{r.state="stopped";r.w=0;r.ang=HOME[i];r.g.rotation.x=HOME[i];r.mat.map=r.tex.reel});if(plan)plan.total=plan.fullTotal||0;clearFly();setPlate(plan?plan.total:0);finish()});
+$("snd").addEventListener("click",()=>{soundOn=!soundOn;if(!soundOn)stopAll();else{audioUnlock();if(running)bgm(true)}$("snd").textContent=soundOn?"ON":"OFF";$("snd").classList.toggle("off",!soundOn);$("volBtn").classList.toggle("on",$("volPop").classList.contains("on"))});
+/* AUTO・一撃・スピード・音量 */
+$("volR").addEventListener("input",e=>{VOL=+e.target.value/100;if(MASTER)MASTER.gain.value=VOL;$("volPct").textContent=e.target.value+"%"});
+$("volBtn").addEventListener("click",()=>{const on=!$("volPop").classList.contains("on");$("volPop").classList.toggle("on",on);$("volBtn").classList.toggle("on",on)});
+$("menuBtn").addEventListener("click",e=>{e.stopPropagation();$("gmenu").classList.toggle("on")});document.addEventListener("click",()=>$("gmenu").classList.remove("on"));
+$("autoBtn").addEventListener("click",()=>{AUTO=!AUTO;$("autoBtn").classList.toggle("on",AUTO);if(AUTO&&running&&step&&step.k==="wait")tap()});
+$("spdBtn").addEventListener("click",()=>{SPD=SPD===1?1.5:SPD===1.5?2:SPD===2?4:1;if(SPD>=4){["v_miseteyaru","v_attack","v_result","v_tempai","v_madamada","devilrush","jingle","rainbow05"].forEach(stopSfx)}$("spdX").textContent="×"+SPD;$("spdBtn").classList.toggle("on",SPD>1);els.forEach(e=>e.playbackRate=SPD)});
+function ichigeki(){if(!running||!plan||JUMP)return;const ti=seq.findIndex(x=>x.l==="TOTAL");if(ti<0||idx>=ti)return;
+  els.forEach(e=>e.pause());reels.forEach(r=>{r.state="stopped";r.w=0;r.ang=(plan.lastTarget||HOME)[reels.indexOf(r)];r.g.rotation.x=r.ang;r.mat.map=r.tex.reel});
+  stopSfx("reellock_t1");stopSfx("reellock_t2");sfx("s777");flicker();plan.total=plan.fullTotal||0;clearFly();setPlate(plan.total);
+  callout(`一撃！<small>SCORE ${fmt(plan.total)}</small>`);setWait(false);banner("");
+  JUMP=true;cur=1-cur;prep(els[cur],ti);setTimeout(()=>{JUMP=false;if(running)startAt(ti)},900)}
+$("oneBtn").addEventListener("click",ichigeki);
+/* move stage between tabs */
+function mountStage(t){const slot=$("slot-"+t);if(slot&&$("stage").parentElement!==slot){slot.appendChild($("stage"));setTimeout(resize,30)}}
+
+/* =============== v8：1オリパで全レート対応（景品は倍率で登録・個数はレート帯ごと・Sは隠しキリ番景品を何個でも） =============== */
+// 設定とBOXの状態は state.js（管理画面モック admin.html と共有・localStorage）から読む
+const STATE=RS.load();const ALLR=RS.ALLR;
+function saveState(){RS.save(STATE)}
+const mulTxt=m=>"×"+(Math.round(m*10)/10);
+// v8：1オリパ＝全レート対応。景品（倍率）×レート帯ごとの個数 → レートごとの倍率表
+const TBL={};const tk=(g,r)=>g.id+":"+r;
+const bandQ=(g,r)=>{const bi=RS.band(g,r);return g.prizes.map(p=>[p.m,p.q[bi]||0,p.rank])};
+STATE.gachas.forEach(g=>g.rates.forEach(r=>{TBL[tk(g,r)]={get rows(){const m={};bandQ(g,r).forEach(([k,q])=>{m[k]=(m[k]||0)+q});return Object.entries(m).map(([k,q])=>[+k,q]).filter(x=>x[1]>0).sort((a,b)=>b[0]-a[0])},get name(){const s=tStat(tk(g,r));return fmt(s.N)+"口・最大"+mulTxt(s.max)}}}));
+function tStat(k,rows){rows=rows||TBL[k].rows;const N=rows.reduce((a,b)=>a+b[1],0),S=rows.reduce((a,b)=>a+b[0]*b[1],0);return{N,ret:N?S/N:0,w7:N?rows.filter(x=>x[0]>=1).reduce((a,b)=>a+b[1],0)/N:0,max:Math.max(...rows.filter(x=>x[1]>0).map(x=>x[0])),min:Math.min(...rows.filter(x=>x[1]>0).map(x=>x[0])),ceil:rows.reduce((a,b)=>a+Math.max(0,b[0]-1)*b[1],0)}}
+// シリーズ：通常／GOLD（チャージ限定）。レートを選ぶ＝そのレートのオリパを選ぶ
+const GACHAS={normal:{name:"TORAMI RUSH",charge:false},gold:{name:"TORAMI RUSH GOLD",charge:true}};
+Object.values(GACHAS).forEach(G=>{G.g=STATE.gachas.find(g=>!!g.charge===G.charge&&g.pub!==false);if(G.g)G.name=G.g.name;G.feat=G.g?G.g.kiri.filter(k=>G.g.rates.includes(k.rate)).map(k=>({name:k.card+" "+k.cond,pt:k.rate*k.m,rate:k.rate,no:k.no,stock:k.stock??1})):[]});
+let GK="",RATES=[];const VALS={};
+ALLR.forEach(r=>VALS[r]={pS:r*0.1,pW:r*0.2,wS:r,wW:r*2}); // 7の額＝レート×0.1／0.2／1／2（固定）
+const boxOf=r=>{const g=GACHAS[GK].g;return{id:tk(g,r),rate:r,g,name:g.name+"（"+fmt(r)+"）"}};
+const tblKey=r=>tk(GACHAS[GK].g,r);
+function mkRates(){const g=GACHAS[GK].g;RATES=(g?g.rates.slice().sort((a,b)=>a-b):[]).map(r=>({r,t:tk(g,r),id:tk(g,r),l:GACHAS[GK].charge?"挑戦枠1回":""}))}
+function useGacha(k){GK=k;mkRates()}
+{const q=new URLSearchParams(location.search).get("g");useGacha(q==="gold"?"gold":"normal")}
+let WAKU=0; // チャージ限定の挑戦枠（デモ）
+// BOX：オリパごとに1つ。景品を個数ぶん並べてシャッフル。Sはキリ番が設定されていればその番目に置く。完売したら同じ内容で自動補充（再販）
+const BOXES=STATE.boxes;const NEWS=[];const HIST=STATE.rounds;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+// BOX：レートごとに自動で1つ。景品を個数ぶん並べてシャッフル → 隠しキリ番景品は同じ倍率の口1つと入れ替えて、その番目に置く
+function newBox(r,prev){const g=boxOf(r).g;const items=[];
+  bandQ(g,r).forEach(([m,q])=>{for(let i=0;i<q;i++)items.push(Math.round(m*10))});
+  const ks=g.kiri.map((k,i)=>({...k,i})).filter(k=>k.rate===r&&(k.stock??1)>0).sort((a,b)=>a.no-b.no),put=[];
+  ks.forEach(k=>{const j=items.indexOf(Math.round(k.m*10));if(j>=0&&k.no>=1&&k.no<=items.length){items.splice(j,1);put.push(k)}});
+  shuffle(items);const kmap={};put.forEach(k=>{items.splice(k.no-1,0,Math.round(k.m*10));kmap[k.no]=k.i});
+  return{r,k:tk(g,r),gid:tk(g,r),round:prev?prev.round+1:1,items,pos:0,sold:0,paid:0,worst:0,topOut:false,max:Math.max(...items),done:prev?prev.done+1:0,start:Date.now(),kiri:put.map(k=>k.no),kmap}}
+function boxId(r){return boxOf(r).id}
+function getBox(r){const id=boxId(r);if(!BOXES[id])BOXES[id]=newBox(r);return BOXES[id]}
+function drawTicket(r){const id=boxId(r);let b=getBox(r);
+  const u=b.items[b.pos++];b.sold+=10;b.paid+=u;b.worst=Math.max(b.worst,b.paid-b.sold);if(u===b.max)b.topOut=true;
+  {const a=GKSUM();a.s+=r;a.p+=u*r/10;a.n++}
+  const no=b.pos,N=b.items.length,round=b.round,kiri=b.kmap?b.kmap[no]:undefined;
+  if(b.pos>=b.items.length){HIST.unshift({gid:b.gid,r,round:b.round,k:b.k,ret:b.paid/b.sold,worst:b.worst/10,at:Date.now()});if(HIST.length>500)HIST.length=500;BOXES[id]=newBox(r,b)} // 完売したら自動補充
+  return{u,round,no,N,kiri}}
+const man=v=>v>=10000?(v/10000).toLocaleString()+"万":fmt(v);
+// 管理画面（別タブ）で設定が変わったら、演出中でなければ読み込み直す
+addEventListener("storage",e=>{if(e.key===RS.LS&&!running){const n=document.createElement("div");n.textContent="管理画面の設定が更新されたので読み込み直します…";n.style.cssText="position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#2b6cb0;color:#fff;padding:8px 14px;border-radius:6px;z-index:99;font-size:13px";document.body.appendChild(n);setTimeout(()=>location.reload(),700)}});
+/* =============== シナリオ =============== */
+const S4=(a,b,c,d)=>({pS:a,pW:b,wS:c,wW:d});
+const SCN=[
+ {n:"白7多めで長く続く",g:[8,12],sym:p=>S4(1,1,3,1),ex:p=>1},
+ {n:"後半爆発",g:[6,10],sym:p=>p<.6?S4(4,1,.2,0):S4(.3,1,2,3),ex:p=>p<.6?.05:1+3*p},
+ {n:"序盤ダブル連発",g:[5,8],sym:p=>p<.4?S4(.3,3,.3,2):S4(2,1,1,.3),ex:p=>p<.4?2:.5},
+ {n:"紫7コツコツ",g:[8,12],sym:p=>S4(5,2,.3,.1),ex:p=>1},
+ {n:"序盤に白7ダブル",g:[4,6],sym:p=>p<.3?S4(.1,.1,1,5):S4(3,1,.5,.2),ex:p=>p<.3?1:.15},
+ {n:"最後に白7ダブル",g:[4,7],sym:p=>p>=.999?S4(0,0,0,1):S4(2,2,1,.3),ex:p=>1},
+ {n:"じわじわ加速",g:[6,10],sym:p=>S4(3*(1-p)+.2,1,3*p+.2,2*p*p),ex:p=>p+.1},
+ {n:"紫→白の昇格",g:[5,8],sym:p=>p<.5?S4(3,2,0,0):S4(0,0,3,2),ex:p=>p<.5?.2:1},
+ {n:"紫と白が交互",g:[6,10],sym:(p,i)=>i%2?S4(0,0,2,1):S4(2,1,0,0),ex:p=>1},
+ {n:"短く決着",g:[3,5],sym:p=>S4(.5,1,2,3),ex:p=>1.1-p},
+ // 逆転系（11/28 入江さん・ゆうぽんさん・じぇいさん案）：RUSHはSCOREの半分で終わり、最後の逆転演出で×2。SCOREは購入時に決まっていて、見せ方だけが違う
+ {n:"最後に倍プッシュ（7を狙え）",g:[4,10],rev:"push",sym:p=>S4(1,1,1,1),ex:p=>1},
+ {n:"輪廻転生（終了後に復活して×2）",g:[4,10],rev:"tensei",sym:p=>S4(1,1,1,1),ex:p=>1}
+];
+const SCNW=STATE.scnw; // 出やすさ（%）・管理画面のシナリオ設定と共有
+const SYM={pS:{n:"紫7シングル",clip:"green",t:TG.pS,d:false},pW:{n:"紫7ダブル",clip:"red",t:TG.pW,d:true},wS:{n:"白7シングル",clip:"gold",t:TG.wS,d:false},wW:{n:"白7ダブル",clip:"rainbow",t:TG.wW,d:true}};
+function pickScn(normalOnly){const w=SCN.map((s,i)=>normalOnly&&s.rev?0:(SCNW[i]||0));let x=Math.random()*w.reduce((a,b)=>a+b,0);for(let i=0;i<SCN.length;i++){if((x-=w[i])<0)return i}return 0}
+// 逆転演出の期待度（弱・中・強・プレミア）：成功のときと、ガセ（失敗）のときで出やすさを変える
+const LV=[{k:"weak",n:"弱"},{k:"mid",n:"中"},{k:"strong",n:"強"},{k:"pre",n:"プレミア"}];
+const LV_OK=[10,30,40,20],LV_NG=[60,32,8,0];
+function pickLv(ok){const w=ok?LV_OK:LV_NG;let x=Math.random()*100;for(let i=0;i<4;i++){if((x-=w[i])<0)return i}return 0}
+function wpick(w){const ks=Object.keys(w).filter(k=>w[k]>0);if(!ks.length)return null;let x=Math.random()*ks.reduce((a,k)=>a+w[k],0);for(const k of ks){if((x-=w[k])<0)return k}return ks[ks.length-1]}
+// SCORE（＝倍率×レート）を7だけでぴったり表現する：7の単位は紫7S=1・紫7W=2・白7S=10・白7W=20（倍率0.1刻みの「口」と一致）
+const U7={pS:1,pW:2,wS:10,wW:20};
+const REACH=(()=>{const M=420,R=[new Uint8Array(M+1)];R[0][0]=1;for(let L=1;L<=20;L++){const a=new Uint8Array(M+1),p=R[L-1];for(let s=0;s<=M;s++)if(p[s])for(const v of [1,2,10,20])if(s+v<=M)a[s+v]=1;R.push(a)}return R})();
+function compose(u,V,si){
+  const sc0=SCN[si];
+  if(sc0&&sc0.rev){if(u%2===0&&u/2>=3){const b=compose0(u/2,V,pickScn(true));return{...b,si,rev:{type:sc0.rev,ok:true,lv:pickLv(true),base:b.score},score:Math.round(u*V.pS)}}si=pickScn(true)}
+  const c=compose0(u,V,si);
+  if(Math.random()*100<(STATE.revFake??12))c.rev={type:Math.random()<.5?"push":"tensei",ok:false,lv:pickLv(false),base:c.score};
+  return c}
+function compose0(u,V,si){
+  const sc=SCN[si];const gmin=Math.max(3,Math.ceil(u/20)),gmax=Math.min(20,u); // 最低3連（×0.3＝紫7シングル3回）・最大20ゲーム
+  let G=sc.g[0]+Math.floor(Math.random()*(sc.g[1]-sc.g[0]+1));G=Math.min(Math.max(G,gmin),gmax);
+  if(gmin>sc.g[1])G=Math.min(gmax,gmin+2+Math.floor(Math.random()*4)); // 倍率が大きいときは長めにして7の種類を混ぜる
+  if(!REACH[G][u]){let best=null;for(let d=1;d<=20&&best==null;d++){for(const g of [G+d,G-d])if(g>=gmin&&g<=gmax&&REACH[g][u]){best=g;break}}G=best==null?gmax:best}
+  const games=[];let R=u;
+  for(let i=0;i<G;i++){const p=G>1?i/(G-1):1,left=G-i-1;const w=sc.sym(p,i);const ok={},any={};
+    for(const k of ["pS","pW","wS","wW"]){const v=U7[k];if(v<=R&&REACH[left][R-v]){any[k]=1;ok[k]=w[k]||0}}
+    const k=wpick(ok)||wpick(any);games.push({k,v:V[k],up:0,p});R-=U7[k]}
+  return{games,si,score:Math.round(u*V.pS)}}
+// 払い出し：1万未満はポイント自動付与。1万以上はSCOREと同じPTのPSA景品 → 在庫がなければ代替景品 → それもなければポイントのみ
+function payout(score,t){
+  // 隠しキリ番景品の番目を引いた → 実物カード（発送かポイント）／それ以外 → PTカード（ポイントで自動付与）
+  const g=GACHAS[GK].g;if(t&&t.kiri!=null){const k=g.kiri[t.kiri];return{kind:"feat",name:k.card+" "+k.cond,rank:"S",prize:k}}
+  const m=Math.round(score/rate*10)/10,p=g.prizes.find(x=>Math.abs(x.m-m)<1e-9);
+  return{kind:"ptcard",rank:p?p.rank:"",name:`PTカード ${fmt(score)}PT`}}
+/* =============== プロトの操作 =============== */
+let rate=5000,last=null;
+{const qr=+new URLSearchParams(location.search).get("r");if(qr)rate=qr} // 管理画面の「プロトで遊ぶ」からレート指定で開く
+function rateLabel(x){const g=GACHAS[GK];return g.charge?{amt:"0",unit:"coin",cnt:x.l,lab:"挑戦枠"}:{amt:fmt(x.r),unit:"coin",cnt:x.l,lab:"購入レート"}}
+function renderRates(){if(!RATES.find(x=>x.r===rate))rate=(RATES[0]||{r:5000}).r;
+  $("rateBtns").innerHTML=RATES.map(x=>{const L=rateLabel(x);return`<button class="rrow" type="button" data-r="${x.r}"><span class="rd"></span><span class="am">${L.amt}<small>${L.unit}</small></span><span class="ct">${L.cnt}</span></button>`}).join("");
+  $("rateSel").innerHTML=RATES.map(x=>{const L=rateLabel(x);return`<option value="${x.r}">${L.amt} coin${L.cnt?`（${L.cnt}）`:""}</option>`}).join("")}
+renderRates();
+function paintRate(){$("rateBtns").querySelectorAll("button").forEach(b=>{b.classList.toggle("on",+b.dataset.r===rate);b.disabled=running});
+  const x=RATES.find(v=>v.r===rate)||RATES[0],L=rateLabel(x);$("rsLab").textContent=L.lab;$("rsCnt").textContent=L.cnt;$("rsAmt").textContent=L.amt;$("rateSel").value=String(x.r);$("rateSel").disabled=running;$("rsel").classList.toggle("dis",running);
+  $("rnote").innerHTML=`還元率 ${(tStat(x.t).ret*100).toFixed(1)}%<br><span>BOX全体の設計値です</span>`}
+$("rateSel").addEventListener("change",e=>{if(running)return;rate=+e.target.value;paintRate();plan=null;$("drawOut").textContent="レートを変えました。";idle()});
+$("rateBtns").addEventListener("click",e=>{const b=e.target.closest("button");if(!b||running)return;rate=+b.dataset.r;paintRate();plan=null;$("drawOut").textContent="レートを変えました。もう一度引いてください。";idle()});
+paintRate();
+function renderWaku(){if(!$("wakuBox"))return;$("wakuBox").style.display=GACHAS[GK].charge?"flex":"none";$("wakuN").textContent=WAKU}
+if(GACHAS[GK].charge){rate=RATES[0].r;renderRates();paintRate()}
+$("gname").textContent=GACHAS[GK].name;
+$("chargeBtn").addEventListener("click",()=>{WAKU++;renderWaku();$("drawOut").textContent="10,000円チャージ（デモ）で挑戦枠が1回分増えました。"});
+renderWaku();
+$("scnSel").innerHTML=`<option value="-1">おまかせ（出やすさの設定どおり）</option>`+SCN.map((s,i)=>`<option value="${i}">${i+1}. ${s.n}（${s.g[0]}〜${s.g[1]}ゲーム）</option>`).join("");
+function fillMulSel(){const k=tblKey(rate);$("mulSel").innerHTML=TBL[k].rows.map(([m,c])=>`<option value="${Math.round(m*10)}">${mulTxt(m)}（${c}口）</option>`).join("")}
+function doDraw(forceTop,fixedU,quiet){const R=RATES.find(x=>x.r===rate);
+  if(GACHAS[GK].charge&&!quiet&&fixedU==null){if(WAKU<=0){$("drawOut").innerHTML=$("idleMsg").innerHTML="挑戦枠がありません。チャージすると挑戦枠がもらえます（デモ）。";plan=null;return}WAKU--;renderWaku()}
+  let t;if(forceTop)t={u:Math.round(tStat(R.t).max*10),demo:true};else if(fixedU!=null)t={u:fixedU,demo:true};else t=drawTicket(rate);
+  const si=+$("scnSel").value<0?pickScn():+$("scnSel").value;
+  const c=compose(t.u,VALS[rate],si);const score=c.score;const po=payout(score,t);
+  if(!t.demo&&t.u>=50)NEWS.unshift({r:rate,u:t.u,score,top:c.games.filter(g=>g.k==="wW").length,G:c.games.length,at:new Date()});
+  last={R,t,score,c,po};
+  if(!t.demo){const h={at:Date.now(),gid:GACHAS[GK].g.id,r:rate,round:t.round,no:t.no,N:t.N,u:t.u,score,po:po.kind,pname:po.name,recv:po.kind==="ptcard"?"ポイント（自動）":"未選択",scn:SCN[c.si].n,G:c.games.length};STATE.hist.unshift(h);if(STATE.hist.length>300)STATE.hist.length=300;last.h=h;saveState()}
+  build(last);renderBoxMon();renderNews();renderRet()}
+$("drawBtn").addEventListener("click",()=>doDraw(false));
+$("drawS").addEventListener("click",()=>doDraw(true,null,true));
+$("mulBtn").addEventListener("click",()=>doDraw(false,+$("mulSel").value,true));
+$("scnSel").addEventListener("change",()=>{if(last&&last.c){last.c=compose(last.t.u,VALS[rate],+$("scnSel").value<0?pickScn():+$("scnSel").value);build(last)}});
+function poTxt(po,score){return po.kind==="ptcard"?`${po.rank}賞 PTカード ${fmt(score)}PT（ポイントで自動付与）`:po.kind==="feat"?`<span class="mid">S賞</span> ${po.name}（${fmt(score)}PT）`:po.kind==="coin"?`ポイント ${fmt(score)}（1万未満のため自動で付与）`:po.kind==="ptonly"?`ポイント ${fmt(score)}（${man(po.tier)}帯の景品が在庫切れのため、ポイントのみ・発送不可）`:po.name}
+function build(L){const {R,t,score,c,po}=L;let PM;
+  const steps=[];
+  steps.push({k:"play",f:"freeze",l:"プチュン",sfx:[["puchun",0,.9]]},{k:"play",f:"op",l:"OP",bgm:true,vsfx:[["v_miseteyaru",0.05],["v_attack",1.97]]});
+  c.games.forEach((g,i)=>{const s=SYM[g.k];
+    steps.push({k:"play",f:"lead",l:`${i+1}ゲーム目 導入`},{k:"wait",f:"loop",l:`${i+1}ゲーム目 押せ！`});
+    const pw=pickWin(g.k);steps.push({k:"win",f:CLIP[s.clip].f,clip:s.clip,target:pw.ang,line:pw.line,add:g.v,lab:s.n,l:`${i+1}G ${s.n}（${pw.line}）`,freeze:s.d&&Math.random()*100<(STATE.freezeP??25)})});
+  const nE=c.games.length+1;steps.push({k:"play",f:"lead",l:`${nE}ゲーム目 導入`},{k:"wait",f:"loop",l:`${nE}ゲーム目 押せ！`},{k:"win",f:"miss",clip:"miss",target:(PM=pickMiss(Math.random()<.5?"P":"W")).ang,pre:PM.slideFrom!=null?[PM.ang[0],PM.ang[1],PM.slideFrom]:null,l:`${nE}G ハズレ（右リール${PM.kind}）→ 終了`});
+  steps.push({k:"play",f:c.games[c.games.length-1].k==="wW"?"total":"total_green",l:"TOTAL",bgmOff:true,vsfx:[["jingle",0.0],["v_result",0.82]]});
+  if(c.rev)steps.push({k:"rev",rev:c.rev,add:c.rev.ok?score-c.rev.base:0,l:(c.rev.type==="push"?"倍プッシュ":"輪廻転生")+"（"+LV[c.rev.lv].n+"）"+(c.rev.ok?"成功":"失敗")});
+  const cnt={};c.games.forEach(g=>cnt[g.k]=(cnt[g.k]||0)+1);const mul=t.u/10;
+  const prize=po.kind==="ptcard"?`<div class="rw" style="font-size:15px"><span>${po.rank}賞 PTカード</span><b>${fmt(score)}PT</b></div><div style="font-size:11.5px;opacity:.85">ポイントで自動付与しました</div>`:po.kind==="coin"?`<div class="rw" style="font-size:15px"><span>ポイント</span><b>${fmt(score)}</b></div><div style="font-size:11.5px;opacity:.85">1万未満のため、ポイントを自動で付与しました</div>`:
+    po.kind==="ptonly"?`<div class="rw" style="font-size:15px"><span>ポイント</span><b>${fmt(score)}</b></div><div style="font-size:11.5px;opacity:.85">この価格帯の景品が在庫切れのため、ポイントで付与しました（発送不可）</div>`:
+    `${po.kind==="feat"?'<div style="text-align:center;color:#ffd36b;font-weight:900;letter-spacing:.1em;margin-top:4px">★ S賞 ★</div>':""}<div class="prize" style="font-size:15px"><span>${po.name}</span><b>${fmt(score)}PT</b></div>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="closebtn" style="margin:0;background:#fff;color:#111" type="button" data-pick="ship">発送する</button><button class="closebtn" style="margin:0" type="button" data-pick="coin">ポイントにする（${fmt(score)}）</button></div><div id="pickMsg" style="font-size:12px;margin-top:6px;text-align:center"></div>`;
+  plan={steps,total:0,fullTotal:c.rev&&c.rev.ok?c.rev.base:score,mul,lastTarget:steps.filter(x=>x.k==="win"&&x.clip!=="miss").pop().target,hud:()=>`SCORE ${fmt(plan.total)}`,
+    idleText:`<b>レート ${fmt(R.r)}</b><br>SCORE ${fmt(score)}（${mulTxt(mul)}）<br>${SCN[c.si].n}・${c.games.length}ゲーム<br><span style="font-size:11px;opacity:.8">STARTで再生</span>`,
+    result:()=>`<div style="text-align:center;opacity:.8">TORAMI RUSH 結果</div><div class="big">SCORE ${fmt(score)}</div><div class="mul">購入 ${fmt(R.r)} coin の ${mulTxt(mul)}</div>
+      ${["pS","pW","wS","wW"].filter(k=>cnt[k]).map(k=>`<div class="rw"><span>${SYM[k].n}</span><span>×${cnt[k]}</span></div>`).join("")}${c.rev&&c.rev.ok?`<div class="rw" style="color:#ffd36b;font-weight:900"><span>${c.rev.type==="push"?"倍プッシュ":"輪廻転生"}</span><span>SCORE ×2</span></div>`:""}
+      <div style="margin-top:10px;font-weight:800">獲得景品</div>${prize}`};
+  $("drawOut").innerHTML=`<b>レート ${fmt(R.r)}</b>（${TBL[tblKey(R.r)].name}）${t.demo?"・<span class='mid'>デモ（BOXは消費しない）</span>":`<br>BOX：第${t.round}周 ${t.no}／${t.N}口目`}<br>引いた口：<b>${mulTxt(mul)}</b> → SCORE <b>${fmt(score)}</b>（${mulTxt(mul)}×${fmt(R.r)}）→ シナリオ「${SCN[c.si].n}」${c.games.length}ゲーム${c.rev?`<br>逆転演出：${c.rev.type==="push"?"倍プッシュ":"輪廻転生"}（期待度 ${LV[c.rev.lv].n}）→ <b>${c.rev.ok?"成功：SCORE "+fmt(c.rev.base)+" → ×2":"失敗（ガセ）"}</b>`:""}${c.games.some((g,i)=>steps.find(x=>x.k==="win"&&x.freeze&&x.l.startsWith((i+1)+"G")))?"<br>ダブル揃いでフリーズ演出あり":""}
+    <div class="chips">${c.games.map(g=>`<span class="chip k-${g.k}">${SYM[g.k].n} ${fmt(g.v)}</span>`).join("")}</div>
+    払い出し：<b>${poTxt(po,score)}</b>${po.kind==="psa"||po.kind==="alt"||po.kind==="feat"?"／ポイントなら "+fmt(score):""}`;
+  idle(true)}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b||!last)return;const po=last.po;
+  if(b.dataset.pick==="ship"){if(po.kind==="feat"){po.prize.stock=Math.max(0,(po.prize.stock??1)-1);saveState()}else if(po.kind==="psa")TIERS[po.ti].stock--;else if(po.kind==="alt")TIERS[po.ti].alt--;renderStock();$("pickMsg").textContent=`${po.name} を発送します（在庫を1つ減らしました）`}
+  else $("pickMsg").textContent=`ポイント ${fmt(last.score)} を付与しました`;
+  if(last.h){last.h.recv=b.dataset.pick==="ship"?"発送":"ポイント"}saveState();$("res").querySelectorAll("[data-pick]").forEach(x=>x.disabled=true)});
+function renderStock(){const rows=STATE.gachas.flatMap(g=>g.kiri.map(p=>({g,p})));const h=`<table class="t"><tr><th>オリパ</th><th class="n">対象レート</th><th>隠しキリ番景品</th><th class="n">倍率（PT）</th><th class="n">キリ番</th><th class="n">実物の在庫</th></tr>${rows.map(({g,p},i)=>`<tr><td>${g.name}</td><td class="n">${fmt(p.rate)}</td><td>${p.card} ${p.cond}</td><td class="n">${mulTxt(p.m)}<div class="note">${fmt(p.rate*p.m)}PT</div></td><td class="n">${p.no}番目</td><td class="n"><input type="number" min="0" value="${p.stock??1}" data-ss="${i}" style="width:64px"></td></tr>`).join("")}</table>`;
+  if($("stockBox")){$("stockBox").innerHTML=h;$("stockBox").onchange=e=>{const x=e.target;if(x.dataset.ss==null)return;rows[+x.dataset.ss].p.stock=Math.max(0,+x.value);saveState()}}}
+renderStock();fillMulSel();window.__t={get RATES(){return RATES},TBL,getBox};
+$("rateBtns").addEventListener("click",()=>setTimeout(fillMulSel,0));$("rateSel").addEventListener("change",()=>setTimeout(fillMulSel,0));
+/* =============== シナリオ表 =============== */
+$("scnTable").innerHTML=`<tr><th>#</th><th>シナリオ</th><th>ゲーム数</th><th>7の出方</th><th class="n">出やすさ</th></tr>`+[
+ "白7が多めに出て長く続く","前半は紫7シングル中心、後半に白7・白7ダブル","序盤に紫7ダブル・白7ダブルが続く","紫7シングル中心で少しずつ積む","最初の数ゲームで白7ダブル、そのあと紫7で続く","最後のゲームで白7ダブル","紫7から白7へ少しずつ移る","前半は紫7、後半は白7","紫7と白7が1ゲームごとに入れ替わる","短く決着","RUSHはSCOREの半分で終了 → TOTALのあと暗転「7を狙え」→ 揃ってSCORE×2（期待度：弱・中・強・プレミア）","RUSHはSCOREの半分で終了 → 輪廻転生で復活 → SCORE×2"].map((d,i)=>`<tr><td>${i+1}</td><td><b>${SCN[i].n}</b></td><td>${SCN[i].g[0]}〜${SCN[i].g[1]}</td><td>${d}</td><td class="n">${SCNW[i]}%</td></tr>`).join("")+`<tr><td colspan="5" class="note">ゲーム数は倍率に合わせて自動で調整（最低3・最大20）。7の合計は必ず倍率ちょうど（上乗せなし）</td></tr>`;
+/* =============== 遊び方・統計 =============== */
+const STAT={};let howRate=5000;
+function simTable(k,r){const rows=TBL[k].rows,N=rows.reduce((a,b)=>a+b[1],0);let g=0;const d=[0,0,0,0],n=30;
+  for(const [m,c] of rows){const u=Math.round(m*10);for(let i=0;i<n;i++){const G=compose(u,VALS[r],pickScn()).games.length;g+=G*c/N/n;d[G<=3?0:G<=6?1:G<=10?2:3]+=c/N/n}}
+  return{avgG:g,cont:g/(g+1),dist:d}}
+function calcAll(){const seen={};RATES.forEach(x=>{STAT[x.r]=seen[x.t]||(seen[x.t]=simTable(x.t,x.r))});renderHow();renderRet();renderSpecSim()}
+const NOTICE=STATE.notice||"表示している還元率は、BOX全体（1周分）の設計値です。BOXは販売開始時に全口をシャッフルしており、販売中のBOXでは上位の倍率がすでに排出されている場合があります。完売したBOXは同じ内容で自動的に再販されます。";
+function renderHow(){if(!RATES.find(x=>x.r===howRate))howRate=RATES[0].r;const V=VALS[howRate],st=STAT[howRate]||{},R=RATES.find(x=>x.r===howRate),k=R.t,ts=tStat(k),rows=TBL[k].rows;
+  $("howCard").innerHTML=`<div style="text-align:center;font-weight:900;font-size:17px;letter-spacing:.05em">${GACHAS[GK].name} の遊び方</div>${GACHAS[GK].charge?`<div style="text-align:center;font-size:11.5px;color:#ffd36b;margin-top:4px">チャージ限定：チャージでもらえる挑戦枠で遊べます（購入は0コイン）</div>`:""}
+  <p style="font-size:12px;opacity:.85;margin:6px 0 10px">レートを選んで1回引くと、BOXから倍率の口を1つ引きます。<b>SCORE＝倍率×レート</b>。SCOREまで7が連鎖し、7が揃うたびに獲得PTと累計SCOREが増えていきます。</p>
+  <div style="background:#1b1530;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.7;margin-bottom:10px"><b style="color:#ffd36b">ゲームのルール</b><br>① レートを選んでSTART → 必ずRUSHスタート<br>② 押せ！でリールが止まり、7が揃うと7の価値ぶんPTを獲得（累計SCOREに加算）<br>③ 7が揃い続ける限りRUSH継続（最低3連）<br>④ 7が揃わなかったゲームでRUSH終了 → TOTAL表示<br>⑤ SCOREと同じPTの景品を獲得 →「発送」か「ポイント」を選ぶ<br><span style="opacity:.85">※RUSH終了後に「7を狙え」「輪廻転生」などの逆転演出が起きることがあります。成功・失敗を含め、SCOREは購入時に決まっています</span></div>
+  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${RATES.map(x=>`<button type="button" data-hr="${x.r}" style="flex:1 0 18%;border:1px solid ${x.r===howRate?"#ffd36b":"#4a3f66"};background:${x.r===howRate?"#ffd36b":"transparent"};color:${x.r===howRate?"#111":"#fff"};border-radius:6px;padding:4px;font:inherit;font-size:11.5px;cursor:pointer">${man(x.r)}</button>`).join("")}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0 12px;text-align:center">
+   <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">還元率（設計値）</div><div style="font-size:19px;font-weight:900;color:#ffd36b">${(ts.ret*100).toFixed(1)}%</div></div>
+   <div style="background:#1b1530;border-radius:8px;padding:6px"><div style="font-size:10.5px;opacity:.8">平均継続率</div><div style="font-size:19px;font-weight:900">${st.cont!=null?(st.cont*100).toFixed(1)+"%":"…"}</div></div></div>
+  <div style="font-weight:800;margin-bottom:4px">7の価値（レート ${fmt(R.r)}）</div>
+  ${["wW","wS","pW","pS"].map(k=>`<div class="rw" style="display:flex;justify-content:space-between;border-bottom:1px solid #2d2442;padding:4px 0"><span><span class="chip k-${k}">${SYM[k].n}</span> <span style="font-size:10.5px;opacity:.7">（レート×${{wW:2,wS:1,pW:0.2,pS:0.1}[k]}）</span></span><b>${fmt(V[k])} PT</b></div>`).join("")}
+
+  ${(GACHAS[GK].feat||[]).length?`<div style="font-weight:800;margin:12px 0 4px">目玉景品（各レートのBOXのどこかに入っています）</div><table style="width:100%;font-size:11.5px;border-collapse:collapse">${GACHAS[GK].feat.map(f=>`<tr style="border-bottom:1px solid #2d2442"><td style="padding:3px 0">${fmt(f.rate)}coin：${f.name}</td><td style="text-align:right">${fmt(f.pt)}PT</td><td style="text-align:right">${f.stock>0?"残り"+f.stock:'<span style="opacity:.6">終了</span>'}</td></tr>`).join("")}</table>`:""}
+  <div style="font-size:12px;line-height:1.8;margin-top:10px">・1回引くと必ずRUSH（最低3連）。<b>7が揃わなかったゲームで終了</b>します<br>・SCOREが目玉景品のPTと同じなら<b>目玉景品</b>（在庫がある間）。それ以外でSCOREが1万以上なら<b>SCOREと同じPTのPSA景品</b>。<b>発送</b>か<b>ポイント（SCORE分）</b>を選べます。1万未満はポイントで付与<br>・<b>AUTO</b>：押せ！を自動で押します　<b>一撃</b>：残りのゲームを飛ばしてTOTALへ　<b>スピード</b>：×1／×1.5／×2／×4（×4はボイスなし）</div>
+  <div style="font-weight:800;margin:12px 0 4px">ご注意</div>
+  <ul style="font-size:11px;opacity:.9;margin:0;padding-left:16px;line-height:1.7">
+  <li><b style="color:#ffd36b">${NOTICE}</b></li>
+  <li>結果（倍率・SCORE・獲得景品）は購入した時点で決まります。RUSHの演出・押せ！・AUTO・一撃・スピードによって結果は変わりません</li>
+  <li>RUSHの7の並びは、決まったSCOREを見せるための演出です</li>
+  <li>PSA景品の在庫がない場合は同じ価格帯の代替景品、それもない場合はポイントでの付与（発送不可）となります</li>
+  <li>PTは当社が定める数値で、景品の市場価格を示すものではありません</li>
+  ${GACHAS[GK].charge?"<li>挑戦枠はチャージ時に付与されます。付与の条件・有効期限は別途表示します</li>":""}</ul>
+  <p style="font-size:10.5px;opacity:.7;margin:8px 0 0">※平均継続率は、倍率の表と演出シナリオから算出した平均値です。各ゲームは独立した抽選ではありません。</p>`}
+$("howCard").addEventListener("click",e=>{const b=e.target.closest("[data-hr]");if(!b)return;howRate=+b.dataset.hr;renderHow()});
+// ゲーム画面の「遊び方」：画面を離れずにルール（取扱説明書）をその場で開く
+function openHow(){howRate=rate;renderHow();$("howMB").innerHTML=$("howCard").innerHTML;$("howM").classList.add("on")}
+document.querySelectorAll("[data-howm]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();openHow()}));
+$("howX").addEventListener("click",()=>$("howM").classList.remove("on"));
+$("howM").addEventListener("click",e=>{if(e.target.id==="howM"){$("howM").classList.remove("on");return}const b=e.target.closest("[data-hr]");if(!b)return;howRate=+b.dataset.hr;renderHow();$("howMB").innerHTML=$("howCard").innerHTML});
+function renderRet(){const st=GKSUM();$("retTable").innerHTML=`<tr><th>対象</th><th class="n">購入回数</th><th class="n">実績還元率</th></tr><tr><td><b>${GACHAS[GK].name}（全レート合算）</b></td><td class="n">（本番は集計値）</td><td class="n">${st.n?(st.p/st.s*100).toFixed(1)+"%（このプロトでの実績）":"—"}</td></tr>`}
+const ACC=STATE.acc;function GKSUM(){return ACC[GK]||(ACC[GK]={s:0,p:0,n:0})}
+function renderNews(){const el=$("newsList");if(!el)return;el.innerHTML=NEWS.length?NEWS.slice(0,8).map(n=>`<div class="rw" style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:4px 0;font-size:12.5px"><span>${n.at.toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}　レート${man(n.r)}　<b>${mulTxt(n.u/10)}</b>${n.top?`　白7ダブル${n.top}回`:""}　${n.G}連</span><b>${fmt(n.score)}PT 獲得</b></div>`).join(""):`<p class="note" style="margin:0">×5以上が出ると、ここに流れます（プロトでSTARTを押すと追加されます）</p>`}
+/* =============== 管理画面（v8）：BOXモニターだけプロト内に残す（登録は admin.html） =============== */
+function renderBoxMon(){const el=$("boxMon");if(!el)return;
+  el.innerHTML=`<table class="t" style="font-size:12px;min-width:860px"><tr><th>オリパ</th><th class="n">レート</th><th class="n">周</th><th class="n">売れた口</th><th class="n">この周の還元率</th><th>S賞</th><th class="n">この周の最大持ち出し</th><th class="n">完売した周</th><th></th></tr>${RATES.map(x=>{const g=boxOf(x.r),b=getBox(x.r);const h=HIST.filter(q=>String(q.gid)===String(g.id));
+    if(!b)return`<tr><td>${g.name}</td><td class="n">${fmt(x.r)}</td><td class="n">—</td><td class="n">未販売</td><td class="n">—</td><td>—</td><td class="n">—</td><td class="n">0</td><td><button class="btn" data-sim="${x.r}" type="button">100回売る</button></td></tr>`;
+    return`<tr><td>${g.name}</td><td class="n">${fmt(x.r)}</td><td class="n">${b.round}</td><td class="n">${fmt(b.pos)}／${fmt(b.items.length)}<div class="bar"><i style="width:${b.pos/b.items.length*100}%"></i></div></td><td class="n">${b.sold?(b.paid/b.sold*100).toFixed(1)+"%":"—"}</td><td>${b.topOut?'<span class="mid">排出済み</span>':"残り"}${b.kiri&&b.kiri.length?`<div class="note">キリ番 ${b.kiri.join("・")}番目</div>`:""}</td><td class="n">${fmt(b.worst/10)}口<div class="note">${fmt(b.worst/10*x.r)}PT</div></td><td class="n">${b.done}${b.done?`<div class="note">直近 ${(h[0]?h[0].ret*100:0).toFixed(1)}%</div>`:""}</td><td><button class="btn" data-sim="${x.r}" type="button">100回売る</button></td></tr>`}).join("")}</table>`}
+$("boxMon").addEventListener("click",e=>{const r=+e.target.dataset.sim;if(!r)return;for(let i=0;i<100;i++)drawTicket(r);saveState();renderBoxMon();renderRet()});
+$("simAll").addEventListener("click",()=>{RATES.forEach(x=>{const n=getBox(x.r).items.length;for(let i=0;i<n;i++)drawTicket(x.r)});saveState();renderBoxMon();renderRet();$("simMsg").textContent="全レートを1周分ずつ売りました（完売した周は同じ内容で自動補充）"});
+function renderFeat(){}
+renderBoxMon();renderNews();
+/* =============== 仕様タブ：シミュレーション（その場で計算） =============== */
+function renderSpecSim(){const el=$("specSim");if(!el)return;
+  el.innerHTML=`<table class="t" style="font-size:12px;min-width:860px"><tr><th>オリパ（レート）</th><th class="n">口数</th><th class="n">還元率</th><th class="n">白7率</th><th class="n">最大</th><th class="n">平均ゲーム数</th><th class="n">平均継続率</th><th class="n">3連</th><th class="n">4〜6連</th><th class="n">7〜10連</th><th class="n">11連以上</th></tr>${RATES.map(x=>{const k=x.t,st=tStat(k),s2=simTable(k,x.r);return`<tr><td><b>${boxOf(x.r).name}</b></td><td class="n">${fmt(st.N)}</td><td class="n">${(st.ret*100).toFixed(1)}%</td><td class="n">${(st.w7*100).toFixed(0)}%</td><td class="n">${mulTxt(st.max)}</td><td class="n">${s2.avgG.toFixed(2)}</td><td class="n">${(s2.cont*100).toFixed(1)}%</td>${s2.dist.map(v=>`<td class="n">${(v*100).toFixed(1)}%</td>`).join("")}</tr>`}).join("")}</table>`}
+renderHow();setTimeout(calcAll,300);
+/* =============== tabs =============== */
+function show(t){if(!["play","spec","howto","admin","est"].includes(t))t="play";document.body.classList.toggle("playmode",t==="play");
+  document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("act",p.id==="p-"+t));document.querySelectorAll("#tabs a").forEach(a=>a.classList.toggle("act",a.dataset.t===t));
+  if(t==="play"){mountStage("play");if(!running)idle()}else if(running)idle()}
+document.querySelectorAll("[data-jump]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();history.replaceState(null,"","#"+a.dataset.jump);show(a.dataset.jump);scrollTo(0,0)}));
+$("tabs").addEventListener("click",e=>{const a=e.target.closest("a");if(!a)return;e.preventDefault();history.replaceState(null,"","#"+a.dataset.t);show(a.dataset.t)});
+/* =============== 工数 =============== */
+const WBS=[
+["C-1","画面","RUSH専用のガチャ画面","レート選択→1回引く→演出→結果の画面。スキップ・中断からの復帰","2〜3"],
+["C-2","演出","演出プレイヤー：上の映像","映像パーツ（プチュン・OP・導入・待機ループ・7ごとの本編・TOTAL）を2つの動画で交互に先読み・切り替え","2〜3"],
+["C-3","演出","演出プレイヤー：下の3D筐体","筐体・リール3本の描画、高速回転→ガタガタ→3本同時停止、点灯切り替え、映像の再生位置に合わせた停止","3〜4"],
+["C-4","演出","押せ！・効果音・BGM","押せ！ボタン、効果音（映像の再生位置に合わせて鳴らす）、BGM、ミュート、iPhoneのマナーモード対策","1〜1.5"],
+["C-5","演出","7ごとの当選PT・累計SCOREの表示","7が揃うたびに当選PT・上乗せ・累計SCOREを表示","0.5〜1"],
+["F-1","抽選","倍率BOXの抽選","1回の購入で、そのレートのBOXの次の口（倍率）を1つ取る。SCORE＝倍率×レート。同時購入の排他制御（同じ口を二重に売らない）","1.5〜2"],
+["F-2","抽選","BOX生成・周回管理","レートごとにBOXを自動生成（全口シャッフル）、完売で同じ表から次の周を即生成。周ごとの売上・払い出し・最大持ち出しを記録","1.5〜2"],
+["F-3","演出","演出の組み立て（シナリオ）","倍率を7（紫7S=1・紫7W=2・白7S=10・白7W=20）の並びにぴったり分解。最低3・最大20ゲーム、シナリオの出やすさに沿う。最後はハズレ1ゲーム。結果をサーバーで保存してAPIで返す","1.5〜2"],
+["F-4","払い出し","PSA景品の割り当てと発送／ポイント","SCORE→価格帯のPSA景品→代替景品→ポイントのみ（発送不可）、1万未満はポイント自動付与。リザルトで発送かポイントを選び、既存の発送・ポイントの流れにつなぐ","2〜2.5"],
+["F-5","管理画面","RUSH設定（オリパ編集）","演出タイプ・ガチャ種別、販売するレートのチェック、シナリオの出やすさ","1〜1.5"],
+["F-6","管理画面","倍率の表・レート帯（全体設定）","倍率×口数のテンプレート編集、レート帯の区切り、保存時の自動チェック（還元率・白7率・最低3連・最大×30・0.1刻み）。変更は次の周から反映","1.5〜2"],
+["F-7","管理画面","BOXモニター","レートごとの周・売れた口・この周の還元率・最上位の残り・最大持ち出し、完売した周の履歴（運営のみ）","1〜1.5"],
+["F-15","管理画面","目玉景品（ガチャごと）","目玉の実物景品（名前・画像・PT・在庫）の登録、出る組み合わせ（レート×倍率）の表示、SCOREが同じPTのとき優先払い出し・弾切れでマスタへ、遊び方への在庫つき表示","1〜1.5"],
+["F-8","管理画面","PSA景品マスタ（全体設定）","価格帯ごとのPSA景品・代替景品の在庫と通知のしきい値。在庫が少ないときの通知","1.5〜2"],
+["F-9","管理画面","シナリオマスタ（全体設定）","10種のシナリオの初期データと編集画面","1〜1.5"],
+["F-10","画面","遊び方画面と注意書き","レートで還元率（設計値）・平均継続率・7の価値が切り替わる遊び方（最大倍率・倍率の表は非公開）。注意書き（B案）を購入ボタンの近くと遊び方に表示","1〜1.5"],
+["F-11","管理画面","当選履歴・発送管理の改修","レート・周・何口目・倍率・SCORE・払い出し（PSA／代替／ポイント）・発送／ポイントを記録","1〜1.5"],
+["F-12","演出","AUTO・一撃・スピード","AUTO（押せ！の自動化）、一撃（残りを飛ばしてTOTALへ）、スピード3段階","1〜1.5"],
+["F-13","抽選","課金チャージ限定RUSH","チャージ時の挑戦枠の付与（条件・期限・上限）、挑戦枠での0コイン購入、専用BOX、付与／消費の履歴","2〜3"],
+["F-14","画面","実績還元率（全レート合算）・当たり速報","全レート合算・期間の実績還元率の定期集計と公開ページ、当たり速報（×5以上など）","1〜1.5"],
+["C-6","管理画面","RUSH演出素材","映像パーツ・リール帯・3Dモデル・効果音・BGMの登録","1.5〜2"],
+["C-7","共通","素材の組み込み・最適化","受領素材の変換（GLB化・テクスチャ圧縮・映像の書き出し）、CDN配信","1〜1.5"],
+["C-8","共通","テスト","stg確認、実機テスト（iPhone・Android・LINE/Xのアプリ内ブラウザ）、払い出し・在庫切れのテスト","2.5〜3.5"],
+["O-1","オプション","倍チャレンジ（素材がそろってから）","継続失敗→リザルト→プチュン「まだまだ」→最終チャレンジ→7が倍に増殖","1.5〜2"]
+];
+const tagc={"画面":"tc","演出":"tc","共通":"tc","抽選":"t1","払い出し":"t1","管理画面":"t2","オプション":"tx"};
+$("wbs").innerHTML=`<tr><th>ID</th><th>区分</th><th>項目</th><th>内容・完了条件</th><th class="n">参考（人日）</th><th class="n" style="min-width:90px">見積（人日）</th><th>備考</th></tr>`+WBS.map(r=>`<tr><td>${r[0]}</td><td><span class="tag ${tagc[r[1]]}">${r[1]}</span></td><td><b>${r[2]}</b></td><td>${r[3]}</td><td class="n">${r[4]}</td><td class="n"></td><td></td></tr>`).join("");
+const sumR=f=>WBS.filter(f).reduce((a,r)=>{const [lo,hi]=r[4].split("〜").map(Number);return[a[0]+lo,a[1]+(hi||lo)]},[0,0]);
+const sMain=sumR(r=>r[1]!=="オプション"),sAll=sumR(()=>true);
+$("wbsTot").innerHTML=`参考の合計：<b>${sMain[0]}〜${sMain[1]}人日</b>（倍チャレンジを入れると ${sAll[0]}〜${sAll[1]}人日）<br><span class="note">素材費：ゆうぽんさん見積もり 15万円＋税（約1週間）は別途</span>`;
+$("copyCsv").addEventListener("click",async()=>{const txt=["ID\t区分\t項目\t内容・完了条件\t参考（人日）\t見積（人日）\t備考"].concat(WBS.map(r=>[r[0],r[1],r[2],r[3],r[4],"",""].join("\t"))).join("\n");
+  try{await navigator.clipboard.writeText(txt);$("copyMsg").textContent="コピーしました"}catch(e){$("copyMsg").textContent="コピーできませんでした（表を選択してコピーしてください）"}});
+const url=location.href.split("#")[0];
+const req=`睦宮さん
+お疲れさまです、鈴木です。
+TORAオリパの新機能「TORAMI RUSH（虎巻ATTACK）」のルールが「倍率BOX」で固まってきたので、工数見積もりをお願いしたいです。
+
+■ 資料（ルール・プロト・管理画面・見積もり項目）
+${url}
+・「確定仕様とロジック」タブにルールと各ロジックの説明があります
+・「管理画面」タブは画面イメージで、プロトと連動して動きます（BOXモニターで周回の様子も見られます）
+・「工数見積もり依頼」タブに項目一覧があります（「表をコピー」でスプレッドシートに貼れます）
+
+■ 概要
+・RUSH専用ガチャ。レート（500〜1,000,000の15段階）を選んで1回引く → そのレートのBOXから倍率の口を1つ → SCORE＝倍率×レート
+・BOXはレートごとの固定BOX（全口シャッフル・完売で即再販）。還元率97.5%、レート帯で表を切替（1,000口×30／100口×10／50口×5）
+・7だけでSCOREぴったりまで連鎖（上乗せなし・最低3連）、7が揃わないゲームで終了
+・景品はSCOREと同じPTの景品を1個（ガチャごとの目玉景品を優先、弾切れならPSA景品マスタ）。発送かポイントを選ぶ。在庫切れは代替景品→ポイントのみ
+・表示はBOX全体の設計値（残り状況は出さない）、実績還元率は全レート合算で公開
+・AUTO・一撃・スピード、課金チャージ限定RUSH（挑戦枠）
+・演出（上は映像・下は3D筐体）はプロトで検証済み（PCで60fps・カクつき0）
+
+■ お願いしたいこと
+1. 項目ごとの工数（人日）
+2. 抜けている作業・気になる点の追加（特にBOXの同時購入の排他制御）
+3. 着手できる時期とリリース可能日の目安
+
+■ 前提
+・RUSHのガチャには実物の景品を登録しない（PSA景品マスタから払い出す）
+・素材（映像パーツ・リール帯・3Dモデル・効果音・BGM）は映像チームから受け取る
+・対象端末：iPhone（Safari/Chrome）、Android（Chrome）、LINE/Xのアプリ内ブラウザ
+・注意書きの文言は弁護士確認後に確定
+
+○月○日（○）までにご回答いただけると助かります。よろしくお願いします。`;
+$("reqText").textContent=req;
+$("copyReq").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(req);$("copyMsg2").textContent="コピーしました"}catch(e){$("copyMsg2").textContent="コピーできませんでした（文を選択してコピーしてください）"}});
+show(location.hash.slice(1));
+
+</script>
+</body>
+</html>
