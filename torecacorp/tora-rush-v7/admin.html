@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>v7 TORAMI RUSH 管理画面モック（tora-oripa console 組み込み案）</title>
+<style>
+:root{--tx:#1a202c;--mut:#718096;--sub:#4a5568;--line:#e2e8f0;--bg:#f7fafc;--blue:#3182ce;--blue2:#2b6cb0;--green:#38a169;--red:#e53e3e;--ora:#dd6b20;--new:#805ad5}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"system-ui","Segoe UI",Helvetica,Arial,"Hiragino Sans","Noto Sans JP",sans-serif;color:var(--tx);background:var(--bg);font-size:14px}
+.top{position:fixed;left:0;right:0;top:0;height:39px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;z-index:5}
+.logo{width:184px;white-space:nowrap;padding-left:10px;font-weight:700;font-size:11.5px;display:flex;gap:5px;align-items:center}
+.logo i{width:14px;height:14px;border-radius:3px;background:var(--blue);display:inline-block}
+.top .user{margin-left:auto;padding-right:12px;font-weight:600;font-size:12.5px}
+.side{position:fixed;top:39px;bottom:0;left:0;width:184px;background:#fff;border-right:1px solid var(--line);overflow:auto;padding:8px 0;font-size:12px}
+.side a{display:block;overflow:hidden;text-overflow:ellipsis;padding:7px 12px;color:var(--tx);text-decoration:none;cursor:pointer;white-space:nowrap}
+.side a.sub{padding-left:22px;font-size:11.5px}.side a.act{background:#ebf8ff;border-right:3px solid var(--blue);color:var(--blue2)}
+.side .grp{padding:7px 12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;white-space:nowrap}
+.side .rush{border-top:1px dashed #d6bcfa;border-bottom:1px dashed #d6bcfa;background:#faf5ff;margin:4px 0;padding-bottom:4px}
+.side .rush .grp{color:var(--new)}
+.nb{font-size:9px;line-height:14px;background:var(--new);color:#fff;border-radius:3px;padding:0 4px;margin-left:6px;flex:none}
+main{margin:39px 0 0 184px;padding:12px}
+.panel{background:#fff;border-radius:6px;padding:12px 10px 40px;min-height:calc(100vh - 64px)}
+.bc{font-size:11.5px;color:var(--sub);margin-bottom:6px}.bc span{margin:0 4px}
+h1{font-size:21px;margin:0 0 14px;display:flex;align-items:center;gap:8px}h1 .bk{font-size:18px;color:var(--sub)}
+h2{font-size:16px;margin:26px 0 4px}h3{font-size:13.5px;margin:16px 0 6px}
+.desc{font-size:11.5px;color:var(--sub);margin:0 0 8px}.hint{font-size:11px;color:var(--mut)}
+label.l{display:block;font-size:13px;margin:14px 0 4px}
+input,select,textarea{font:inherit;font-size:14px;color:var(--tx);border:1px solid var(--line);border-radius:6px;height:34px;padding:0 12px;background:#fff;width:100%}
+textarea{height:auto;padding:8px 12px}
+input.s,select.s{width:auto;min-width:90px;height:30px;font-size:13px;padding:0 8px}
+.btn{font:inherit;font-weight:600;font-size:13.5px;border:0;border-radius:6px;height:34px;padding:0 14px;cursor:pointer;color:#fff;background:var(--green)}
+.btn.blue{background:var(--blue)}.btn.gray{background:#edf2f7;color:var(--tx)}.btn.sm{height:28px;font-size:12px;padding:0 10px}.btn:disabled{opacity:.45;cursor:not-allowed}
+table{border-collapse:collapse;width:100%}th{font-size:11px;font-weight:700;color:var(--sub);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}td.n,th.n{text-align:right}
+.sw{width:30px;height:16px;border-radius:8px;background:#cbd5e0;position:relative;display:inline-block;vertical-align:middle;cursor:pointer}.sw:after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:.15s}.sw.on{background:var(--blue)}.sw.on:after{left:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0}
+.alert{border-radius:6px;padding:10px 12px;font-size:12.5px;margin:8px 0}.alert.g{background:#f0fff4;border:1px solid #9ae6b4}.alert.o{background:#fffaf0;border:1px solid #fbd38d;color:#7b341e;font-weight:600}.alert.p{background:#faf5ff;border:1px solid #d6bcfa}
+.new{outline:2px dashed var(--new);outline-offset:6px;border-radius:4px;position:relative;margin:22px 0 14px}
+.new>.tag{position:absolute;top:-17px;left:-2px;background:var(--new);color:#fff;font-size:10px;font-weight:700;border-radius:3px;padding:1px 5px}
+.hide{opacity:.35;position:relative}.hide>.tag{position:absolute;top:-2px;right:0;background:#a0aec0;color:#fff;font-size:10px;font-weight:700;border-radius:3px;padding:1px 5px}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;border-radius:3px;padding:1px 6px;background:#c6f6d5;color:#22543d}.badge.p{background:#e9d8fd;color:#44337a}.badge.o{background:#feebc8;color:#7b341e}.badge.r{background:#fed7d7;color:#822727}.badge.g{background:#edf2f7;color:#4a5568}
+.ok{color:var(--green);font-weight:700}.ng{color:var(--red);font-weight:700}.warn{color:var(--ora);font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+.rates{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:6px 14px}
+.rates label{display:flex;gap:6px;align-items:center;font-size:13px}.rates input{width:auto;height:auto}
+.bar{height:5px;background:#edf2f7;border-radius:3px;margin-top:3px;min-width:90px}.bar i{display:block;height:100%;background:var(--blue);border-radius:3px}
+.note-box{background:#fffff0;border:1px solid #faf089;border-radius:6px;padding:10px 12px;font-size:12px;margin:10px 0}
+.ac{position:relative}.acl{position:absolute;top:34px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.08);z-index:3;font-size:12.5px}
+.acl div{padding:6px 10px;cursor:pointer}.acl div:hover{background:#ebf8ff}
+.legend{position:fixed;right:12px;bottom:12px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.08);z-index:6;max-width:300px}
+.legend b{color:var(--new)}
+.thumb{width:54px;height:34px;border-radius:3px;background:linear-gradient(135deg,#bee3f8,#e9d8fd);display:inline-block}
+</style></head><body>
+<div class="top"><div class="logo"><i></i>tora-oripa console</div><div class="user">test@torecacorp.jp</div></div>
+<nav class="side" id="side">
+ <div class="grp">オリパ <span>⌃</span></div>
+ <a class="sub" data-p="list">一覧</a><a class="sub">カテゴリー</a>
+ <a>カードデータベース</a><a>配送</a><a>イベント</a><a>宝箱</a><a>課金アイテム</a><a>ポイント利用ログ</a><a>決済ログ</a><a>ユーザー</a><a>お知らせ</a><a>バナー</a><a>ガチャ演出</a>
+ <div class="rush"><div class="grp">TORAMI RUSH<span class="nb">NEW</span></div>
+  <a class="sub" data-p="monitor">BOXモニター</a><a class="sub" data-p="hist">当選履歴</a><a class="sub" data-p="scn">シナリオ</a><a class="sub" data-p="disp">表示設定</a></div>
+ <a>友達招待報酬</a><a>ユーザーランク</a><a>クーポン</a><a>アフィリコード</a><a>メンテナンスモード</a><a>設定</a>
+</nav>
+<main><div class="panel" id="pg"></div></main>
+<div class="legend" id="lg"><a onclick="this.parentNode.style.display='none'" style="float:right;cursor:pointer;color:#718096;margin-left:6px">✕</a><b>紫の点線</b>＝今回追加する部分／<span style="color:#a0aec0;font-weight:700">グレー</span>＝RUSHのときは使わない既存項目。<br>ここで作った・変えたRUSHガチャは、オリパ一覧の<b>「プロトで遊ぶ」</b>でそのまま遊べます（設定とBOXはこのブラウザに保存）。<a href="./">プロトv7</a>／<a href="/torecacorp/tora-rush-v6/admin.html">v6の管理画面</a></div>
+<style>.toast{position:fixed;top:48px;left:50%;transform:translateX(-50%);background:#2f855a;color:#fff;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;z-index:20;box-shadow:0 4px 12px rgba(0,0,0,.15)}.toast a{color:#fff;text-decoration:underline;margin-left:8px}.btn.pur{background:#805ad5}</style>
+<script src="state.js"></script>
+<script>
+const $=id=>document.getElementById(id);const fmt=v=>Math.round(v).toLocaleString();const man=v=>v>=10000?(v/10000).toLocaleString()+"万":fmt(v);const mt=m=>"×"+(Math.round(m*10)/10);
+const ALLR=RS.ALLR;let S=RS.load();const RANKS=["S","A","B","C","D","その他"];
+function save(msg,g){RS.save(S);if(msg)toast(msg,g)}
+function toast(msg,g){const t=document.createElement("div");t.className="toast";t.innerHTML=msg+(g?`<a href="index.html?${g.charge?"g=gold&":""}r=${g.rate}#play" target="_blank">プロトで遊ぶ →</a>`:"");document.body.appendChild(t);setTimeout(()=>t.remove(),g?4500:2200)}
+const G=id=>S.gachas.find(g=>String(g.id)===String(id));
+const sw=on=>`<span class="sw ${on?"on":""}"></span>`;
+const NEWB=(t,h)=>`<div class="new"><span class="tag">${t}</span>${h}</div>`;
+const HIDE=h=>`<div class="hide"><span class="tag">RUSHでは非表示</span>${h}</div>`;
+const playBtn=(g,sm)=>`<a class="btn pur ${sm?"sm":""}" style="display:inline-flex;align-items:center;text-decoration:none" href="index.html?${g.charge?"g=gold&":""}r=${g.rate}#play" target="_blank">▶ プロトで遊ぶ</a>`;
+// 景品の集計とチェック（倍率＝PT÷レート。7だけでSCOREぴったりにするため 0.1刻み・×0.3〜×30）
+function stat(g){const N=g.prizes.reduce((a,p)=>a+(+p.qty||0),0),T=g.prizes.reduce((a,p)=>a+(+p.qty||0)*p.pt,0);const ms=g.prizes.filter(p=>p.qty>0).map(p=>p.pt/g.rate);
+  const bad=g.prizes.filter(p=>{const m=p.pt/g.rate;return Math.abs(m*10-Math.round(m*10))>1e-9||m<0.3-1e-9||m>30+1e-9});
+  const s=g.prizes.filter(p=>p.rank==="S");const sMax=s.length&&ms.length?Math.max(...s.map(p=>p.pt))>=Math.max(...g.prizes.map(p=>p.pt)):false;
+  const kiriBad=s.some(p=>p.kiri&&(p.kiri<1||p.kiri+(p.qty-1)>N));
+  return{N,ret:N?T/N/g.rate:0,w7:N?g.prizes.filter(p=>p.pt>=g.rate).reduce((a,p)=>a+(+p.qty||0),0)/N:0,max:ms.length?Math.max(...ms):0,min:ms.length?Math.min(...ms):0,bad,sMax,kiriBad,
+    ceil:g.prizes.reduce((a,p)=>a+Math.max(0,p.pt/g.rate-1)*(+p.qty||0),0)}}
+function checks(g){const s=stat(g);return[["口数（景品の合計個数）",fmt(s.N)+"口",s.N>0,""],["還元率",(s.ret*100).toFixed(1)+"%",s.ret>=.95&&s.ret<=.99,"95〜99%（ハイトレさん水準 97〜98%）"],["白7率（PT≧レート）",(s.w7*100).toFixed(0)+"%",s.w7>=.3,"30%以上"],["PTの刻み・範囲",s.bad.length?s.bad.map(p=>fmt(p.pt)).join("・")+" がNG":"OK",!s.bad.length,"レート×0.1刻み、レート×0.3〜×30"],["S賞＝一番高いPT",s.sMax?"OK":"NG",s.sMax,"最大倍率の排出カードをS賞に"],["キリ番の位置",s.kiriBad?"口数の範囲外":"OK",!s.kiriBad,"1〜口数"],["持ち出しの理論上限",fmt(s.ceil)+"口（"+man(s.ceil*g.rate)+"PT）",true,"×1を超える景品が全部先に出た場合"]]}
+/* ---------- オリパ一覧 ---------- */
+function pList(){return`<div class="bc">オリパ<span>/</span>一覧</div><div class="row" style="justify-content:space-between"><h1 style="margin:0">オリパ一覧</h1><div><button class="btn blue" id="newRush">＋ 新規作成</button> <button class="btn blue">表示順の変更</button></div></div>
+<table style="margin-top:10px"><tr><th>ID</th><th>ヘッダー画像</th><th>名前</th><th>${NEWB("新規","演出タイプ").replace('class="new"','class="new" style="margin:0;outline-offset:3px"')}</th><th>消費タイプ</th><th class="n">ポイント消費量</th><th class="n">口数</th><th class="n">還元率</th><th>S賞（キリ番）</th><th>公開/非公開</th><th></th></tr>
+${S.gachas.map(g=>{const s=stat(g),sp=g.prizes.find(p=>p.rank==="S");return`<tr style="background:#faf5ff"><td>${g.id}</td><td><span class="thumb"></span></td><td><a href="#edit/${g.id}" style="color:var(--blue2);font-weight:600">${g.name}</a></td><td><span class="badge p">TORAMI RUSH</span>${g.charge?' <span class="badge o">チャージ限定</span>':""}</td><td>${g.charge?"課金額消費":"ポイント"}</td><td class="n">${fmt(g.rate)}</td><td class="n">${fmt(s.N)}</td><td class="n">${(s.ret*100).toFixed(1)}%</td><td>${sp?`${sp.card}<div class="hint">${fmt(sp.pt)}PT・${sp.kiri?sp.kiri+"番目":"キリ番なし"}</div>`:"—"}</td><td>${sw(g.pub!==false)}</td><td style="white-space:nowrap"><a class="btn blue sm" style="display:inline-flex;align-items:center;text-decoration:none" href="#edit/${g.id}">編集</a> ${playBtn(g,1)}</td></tr>`}).join("")}
+<tr><td>1072</td><td><span class="thumb"></span></td><td>gifテスト</td><td><span class="badge g">通常</span></td><td>ポイント</td><td class="n">10</td><td class="n">—</td><td class="n">—</td><td>—</td><td>${sw(1)}</td><td><button class="btn blue sm">編集</button></td></tr></table>
+<p class="desc" style="margin-top:8px">v7は<b>1オリパ＝1レート</b>（通常のガチャと同じく、ポイント消費量がレート）。同じ演出タイプ（TORAMI RUSH）の公開中のオリパが、ゲーム画面のレート選択にまとめて並びます。</p>`}
+/* ---------- オリパ編集 ---------- */
+let EDIT=null;
+function pEdit(id){const g0=G(id)||S.gachas[0];if(!EDIT||String(EDIT.id)!==String(g0.id))EDIT=JSON.parse(JSON.stringify(g0));const g=EDIT,st=stat(g),ck=checks(g);
+return`<div class="bc">オリパ<span>/</span>一覧<span>/</span>編集</div><h1><a class="bk" href="#list" style="text-decoration:none">←</a>オリパ編集 <span class="hint" style="font-weight:400">ID ${g.id}</span></h1>
+${NEWB("新規：演出タイプ",`<label class="l" style="margin-top:0">演出タイプ</label><select style="max-width:420px" disabled><option>TORAMI RUSH</option></select><div class="hint">TORAMI RUSHにすると、景品を引いたあとRUSH演出（SCORE＝景品のPT）で見せます。景品登録は通常と同じです</div>`)}
+<label class="l">オリパ名</label><input id="gName" value="${g.name.replace(/"/g,"&quot;")}">
+<label class="l">カテゴリ名</label><select><option>ホビー</option><option>ポケモン</option></select>
+<label class="l">ヘッダー画像名</label><input type="file" style="padding-top:4px">
+<label class="l">消費タイプ</label><select id="gCharge"><option value="0" ${g.charge?"":"selected"}>ポイント</option><option value="1" ${g.charge?"selected":""}>課金額消費（チャージ限定・挑戦枠）</option></select>
+${NEWB("意味が変わる",`<label class="l" style="margin-top:0">ポイント消費量（＝RUSHのレート）</label><select id="gRate" style="max-width:240px">${ALLR.map(r=>`<option value="${r}" ${r===g.rate?"selected":""}>${fmt(r)}</option>`).join("")}</select><button class="btn gray sm" id="gScale" style="margin-left:8px">景品のPTをこのレートの初期値で作り直す</button><div class="hint">7の価値はレート×0.1／0.2／1／2で自動。景品のPTはレート×0.1刻み・×0.3〜×30にする（7だけでSCOREぴったりに見せるため）</div>`)}
+<label class="l">ガチャ条件</label><select><option>条件無し</option></select>
+<div class="row" style="margin-top:14px">宝箱ゲージ対象 ${sw(1)}</div>
+${HIDE(`<div class="row">残数表示（総口・残数・ゲージ） ${sw(0)} <span class="hint">RUSHは常にOFF</span></div>`)}
+<label class="l">公開/非公開</label><span class="sw ${g.pub!==false?"on":""}" id="gPub"></span>
+${HIDE(`<label class="l">ガチャボタンの有効化</label><div class="row">1回 ${sw(1)} 10連 ${sw(0)} 100連 ${sw(0)} <span class="hint">RUSHは1回ずつ</span></div>`)}
+<h2>景品</h2><p class="desc">ランクごとに景品を設定出来ます。「S」〜「その他」までの景品の合計がユーザーがガチャを口数になります。<b>RUSHでは、S＝最大倍率の排出カード（実物）、A〜その他＝PTカード（オート補充）</b>にして、PTで賞分けします。</p>
+${RANKS.map(rk=>{const list=g.prizes.map((p,i)=>({p,i})).filter(x=>x.p.rank===rk);const sub=list.reduce((a,x)=>a+(+x.p.qty||0),0);
+ return`<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:6px"><h3 style="font-size:18px;color:#4a5568">${rk}</h3><div class="row" style="font-size:12.5px">当たり演出 <span class="badge g">標準${rk} 100%</span></div>
+ ${rk==="S"?NEWB("Sだけキリ番（既存機能）",`<p class="desc" style="margin:0">最大倍率の排出カード。キリ番を入れると、その番目で排出（空欄ならランダム）。序盤に出て持ち出しが大きくなるのを防ぐ</p>`):""}
+ <table><tr><th>カード</th><th>状態</th><th class="n">交換ポイント</th><th class="n">倍率</th><th class="n">個数</th>${rk==="S"?'<th class="n">キリ番</th><th class="n">実物の在庫</th>':'<th>オート補充</th>'}<th>カード表示</th><th>個数表示</th><th></th></tr>
+ ${list.map(({p,i})=>{const m=p.pt/g.rate,ok=Math.abs(m*10-Math.round(m*10))<1e-9&&m>=0.3-1e-9&&m<=30+1e-9;return`<tr><td>${rk==="S"?`<input class="s" value="${p.card}" data-pf="${i}" data-k="card" style="width:200px">`:`<b>PTカード</b>`}</td><td>${rk==="S"?p.cond:"—"}</td><td class="n"><input class="s" type="number" step="${g.rate/10}" value="${p.pt}" data-pf="${i}" data-k="pt" style="width:120px"></td><td class="n ${ok?"":"ng"}">${mt(m)}${ok?"":"（NG）"}</td><td class="n"><input class="s" type="number" min="0" value="${p.qty}" data-pf="${i}" data-k="qty" style="width:80px;min-width:0"></td>${rk==="S"?`<td class="n"><input class="s" type="number" min="1" value="${p.kiri||""}" placeholder="なし" data-pf="${i}" data-k="kiri" style="width:80px;min-width:0"></td><td class="n"><input class="s" type="number" min="0" value="${p.stock??1}" data-pf="${i}" data-k="stock" style="width:70px;min-width:0"></td>`:`<td>${sw(1)} <span class="hint">完売で自動補充</span></td>`}<td>${sw(0)}</td><td>${sw(0)}</td><td><button class="btn gray sm" data-pd="${i}">削除</button></td></tr>`}).join("")}
+ <tr><td colspan="${rk==="S"?10:9}"><button class="btn sm" data-add="${rk}">追加</button><span class="hint" style="margin-left:8px">合計 ${fmt(sub)} 枚</span></td></tr></table></div>`}).join("")}
+${NEWB("新規：保存時の自動チェック",`<table style="max-width:820px"><tr><th>チェック</th><th class="n">値</th><th>判定</th></tr>${ck.map(c=>`<tr><td>${c[0]}<div class="hint">${c[3]}</div></td><td class="n">${c[1]}</td><td>${c[2]?'<span class="ok">OK</span>':'<span class="ng">NG</span>'}</td></tr>`).join("")}</table><div class="hint">カード表示・個数表示はRUSHでは初期値OFF（最大倍率は非公開・入江さん 11/27）</div>`)}
+<div class="row" style="margin-top:22px"><button class="btn" id="gSave" ${ck.every(c=>c[2])?"":"disabled"}>保存</button>${playBtn(g)}<span class="hint">保存すると、プロト（別タブ）にもすぐ反映されます。BOXは次の周から新しい内容</span></div>`}
+/* ---------- BOXモニター ---------- */
+function pMon(){return`<div class="bc">TORAMI RUSH<span>/</span>BOXモニター</div><h1>BOXモニター <span class="badge g">閲覧のみ</span></h1>
+<p class="desc">運営だけが見る画面です。プロトで引いた結果がそのまま入ります。完売した周は必ず登録どおりの還元率で着地し、同じ内容で自動補充されます。</p>
+<div class="row"><span class="hint">持ち出しの通知：1周の売上の <input class="s" value="10" style="width:56px;min-width:0">% を超えたら Slack に通知</span><span style="margin-left:auto"></span><button class="btn gray sm" id="monReset">テスト用：全オリパのBOXと履歴を初期化</button></div>
+<table style="margin-top:8px"><tr><th>オリパ</th><th class="n">レート</th><th class="n">周</th><th>売れた口</th><th class="n">この周の還元率</th><th>S賞</th><th class="n">この周の最大持ち出し</th><th class="n">完売した周</th><th></th></tr>
+${S.gachas.map(g=>{const b=S.boxes[String(g.id)];const done=S.rounds.filter(q=>String(q.gid)===String(g.id));
+ if(!b)return`<tr><td>${g.name}</td><td class="n">${fmt(g.rate)}</td><td class="n">—</td><td class="hint">未販売</td><td class="n">—</td><td>—</td><td class="n">—</td><td class="n">0</td><td>${playBtn(g,1)}</td></tr>`;
+ const N=b.items.length;return`<tr><td>${g.name}</td><td class="n">${fmt(g.rate)}</td><td class="n">第${b.round}周</td><td>${fmt(b.pos)}／${fmt(N)}口<div class="bar"><i style="width:${b.pos/N*100}%"></i></div></td><td class="n">${b.sold?(b.paid/b.sold*100).toFixed(1)+"%":"—"}</td><td>${b.topOut?'<span class="badge o">排出済み</span>':'<span class="badge g">残り</span>'}${b.kiri&&b.kiri.length?`<div class="hint">キリ番 ${b.kiri.join("・")}番目</div>`:""}</td><td class="n">${fmt(b.worst/10)}口<div class="hint">${fmt(b.worst/10*g.rate)}PT</div></td><td class="n">${done.length}${done.length?`<div class="hint">直近 ${(done[0].ret*100).toFixed(1)}%</div>`:""}</td><td>${playBtn(g,1)}</td></tr>`}).join("")}</table>`}
+/* ---------- 当選履歴 ---------- */
+function pHist(){const H=S.hist;const pl={feat:"S賞",ptcard:"PTカード"};
+return`<div class="bc">TORAMI RUSH<span>/</span>当選履歴</div><h1>当選履歴</h1><div class="row"><input class="s" placeholder="ユーザーID" style="width:180px"><button class="btn gray sm">CSV出力</button><span class="hint">プロトで引いた結果が入ります（最新300件）</span></div>
+<table style="margin-top:8px"><tr><th>日時</th><th>オリパ</th><th class="n">レート</th><th>BOX</th><th class="n">倍率</th><th class="n">SCORE</th><th>演出</th><th>払い出し</th><th>受け取り</th></tr>
+${H.length?H.map(h=>{const g=G(h.gid);return`<tr><td>${new Date(h.at).toLocaleString("ja-JP")}</td><td>${g?g.name:h.gid}</td><td class="n">${fmt(h.r)}</td><td>第${h.round}周 ${fmt(h.no)}／${fmt(h.N)}口目</td><td class="n">${mt(h.u/10)}</td><td class="n">${fmt(h.score)}</td><td>${h.scn}・${h.G}連</td><td><span class="badge ${h.po==="feat"?"p":"g"}">${pl[h.po]||h.po}</span> ${h.pname||""}</td><td>${h.recv==="発送"?'<span class="badge">発送</span>':`<span class="badge g">${h.recv}</span>`}</td></tr>`}).join(""):`<tr><td colspan="9" class="hint">まだありません。「プロトで遊ぶ」から引くと、ここに入ります</td></tr>`}</table>`}
+/* ---------- シナリオ・表示設定（v6と同じ） ---------- */
+const SN=[["白7多めで長く続く","8〜12"],["後半爆発","6〜10"],["序盤ダブル連発","5〜8"],["紫7コツコツ","8〜12"],["序盤に白7ダブル","4〜6"],["最後に白7ダブル","4〜7"],["じわじわ加速","6〜10"],["紫→白の昇格","5〜8"],["紫と白が交互","6〜10"],["短く決着","3〜5"],["最後に倍プッシュ（7を狙え）","4〜10"],["輪廻転生","4〜10"]];
+function pScn(){return`<div class="bc">TORAMI RUSH<span>/</span>シナリオ</div><h1>シナリオ <span class="badge p">全オリパ共通</span></h1><p class="desc">7の出方のパターン。結果（景品・SCORE）には影響しません。</p>
+<table><tr><th>#</th><th>シナリオ名</th><th>ゲーム数</th><th class="n">出やすさ</th></tr>${SN.map((x,i)=>`<tr><td>${i+1}</td><td><b>${x[0]}</b></td><td>${x[1]}</td><td class="n"><input class="s" type="number" min="0" value="${S.scnw[i]??6}" data-sw="${i}" style="width:70px;min-width:0"></td></tr>`).join("")}</table>
+<div class="row"><label>ガセ（失敗する逆転演出）</label><input class="s" type="number" id="revFake" value="${S.revFake??12}" style="width:70px;min-width:0">%<label style="margin-left:16px">ダブル前のフリーズ</label><input class="s" type="number" id="freezeP" value="${S.freezeP??25}" style="width:70px;min-width:0">%</div>
+<div class="row" style="margin-top:14px"><button class="btn" id="scnSave">保存</button></div>`}
+function pDisp(){return`<div class="bc">TORAMI RUSH<span>/</span>表示設定</div><h1>表示設定 <span class="badge p">全オリパ共通</span></h1>
+<label class="l">注意書き（購入ボタンの近くと遊び方に表示）</label><textarea rows="5" id="nTxt">${S.notice}</textarea>
+<div class="hint">キリ番がある旨の一文を追加（弁護士確認の対象）。最大倍率・景品ラインナップは非公開</div>
+<div class="row" style="margin-top:18px"><button class="btn" id="dSave">保存</button><span style="margin-left:auto"></span><button class="btn gray sm" id="allReset">テスト用：すべての設定・BOX・履歴を初期状態に戻す</button></div>`}
+/* ---------- ルーター ---------- */
+const P={list:pList,edit:pEdit,monitor:pMon,hist:pHist,scn:pScn,disp:pDisp};
+function cur(){const [p,a]=(location.hash.slice(1)||"list").split("/");return{p:P[p]?p:"list",a}}
+function go(h){location.hash=h}
+function render(){const {p,a}=cur();$("pg").innerHTML=P[p](a);document.querySelectorAll(".side a").forEach(x=>x.classList.toggle("act",x.dataset.p===p||(p==="edit"&&x.dataset.p==="list")));bind(p,a)}
+window.addEventListener("hashchange",()=>{render();scrollTo(0,0)});
+$("side").addEventListener("click",e=>{const x=e.target.closest("a[data-p]");if(x)go(x.dataset.p)});
+addEventListener("storage",e=>{if(e.key!==RS.LS)return;S=RS.load();const {p}=cur();if(["list","monitor","hist"].includes(p))render()});
+function bind(p,a){
+ if(p==="list")$("newRush").onclick=()=>{const id=Math.max(...S.gachas.map(g=>g.id))+1;const g=RS.mkBox(id,5000);g.name="TORAMI RUSH 新規"+id;g.pub=false;S.gachas.unshift(g);save("RUSHのオリパを作成しました（ID "+id+"・レート5,000の初期値）");EDIT=null;go("edit/"+id)};
+ if(p==="edit"){const g=EDIT;
+  $("gName").oninput=e=>g.name=e.target.value;
+  $("gCharge").onchange=e=>{g.charge=e.target.value==="1";render()};
+  $("gPub").onclick=()=>{g.pub=!(g.pub!==false);$("gPub").classList.toggle("on",g.pub)};
+  $("gRate").onchange=e=>{const r=+e.target.value,k=r/g.rate;g.prizes.forEach(p=>p.pt=Math.round(p.pt*k));g.rate=r;render()};
+  $("gScale").onclick=()=>{const t=RS.mkBox(g.id,g.rate,g.charge);g.prizes=t.prizes;render()};
+  document.querySelectorAll("[data-pf]").forEach(x=>x.onchange=()=>{const pr=g.prizes[+x.dataset.pf],k=x.dataset.k;pr[k]=k==="card"?x.value:k==="kiri"?(x.value?Math.max(1,+x.value):null):Math.max(0,+x.value);render()});
+  document.querySelectorAll("[data-pd]").forEach(x=>x.onclick=()=>{g.prizes.splice(+x.dataset.pd,1);render()});
+  document.querySelectorAll("[data-add]").forEach(x=>x.onclick=()=>{const rk=x.dataset.add;g.prizes.push(rk==="S"?{rank:"S",card:"カード名を入力",cond:"PSA10",pt:g.rate*30,qty:1,kiri:null,stock:1}:{rank:rk,card:"PTカード",cond:"",pt:g.rate,qty:1,auto:true});render()});
+  $("gSave").onclick=()=>{const i=S.gachas.findIndex(x=>String(x.id)===String(g.id));const changed=JSON.stringify(S.gachas[i].prizes)!==JSON.stringify(g.prizes)||S.gachas[i].rate!==g.rate;S.gachas[i]=JSON.parse(JSON.stringify(g));if(changed)delete S.boxes[String(g.id)];save("保存しました"+(changed?"（BOXは新しい内容で作り直し）":""),g)}}
+ if(p==="monitor")$("monReset").onclick=()=>{S.boxes={};S.rounds=[];S.hist=[];S.acc={};save("BOXと履歴を初期化しました");render()};
+ if(p==="scn"){document.querySelectorAll("[data-sw]").forEach(x=>x.onchange=()=>{S.scnw[+x.dataset.sw]=Math.max(0,+x.value||0)});$("scnSave").onclick=()=>{S.revFake=Math.max(0,+$("revFake").value||0);S.freezeP=Math.max(0,+$("freezeP").value||0);save("シナリオを保存しました")}}
+ if(p==="disp"){$("dSave").onclick=()=>{S.notice=$("nTxt").value;save("表示設定を保存しました")};$("allReset").onclick=()=>{RS.reset();S=RS.load();RS.save(S);EDIT=null;toast("初期状態に戻しました");render()}}
+}
+render();
+</script></body></html>

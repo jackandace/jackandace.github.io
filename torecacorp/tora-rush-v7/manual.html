@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TORAMI RUSH 説明書（倍率BOX・管理画面・ゲームの流れ）</title>
+<style>
+:root{--tx:#1a202c;--sub:#4a5568;--mut:#718096;--line:#e2e8f0;--bg:#f7fafc;--pur:#6b46c1;--pur2:#faf5ff;--red:#c53030;--grn:#2f855a;--org:#c05621}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"system-ui","Hiragino Sans","Noto Sans JP","Noto Sans CJK JP",sans-serif;font-size:15px;line-height:1.75}
+.wrap{max-width:860px;margin:0 auto;padding:22px 16px 60px}
+header{background:linear-gradient(135deg,#2d1b4e,#5b2a86);color:#fff;border-radius:14px;padding:22px 20px;margin-bottom:18px}
+header h1{margin:0 0 6px;font-size:23px;line-height:1.4}header p{margin:0;opacity:.85;font-size:13px}
+.toc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:14px}.toc a{color:var(--pur);text-decoration:none}.toc ol{margin:4px 0 0;padding-left:20px}
+section{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 18px 14px;margin-bottom:16px}
+h2{font-size:19px;margin:0 0 10px;display:flex;gap:8px;align-items:center}h2 .n{background:var(--pur);color:#fff;border-radius:6px;font-size:13px;padding:1px 8px}
+h3{font-size:15.5px;margin:16px 0 6px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:6px 0}th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}th{background:#f7fafc;font-size:12.5px;color:var(--sub)}td.n,th.n{text-align:right}
+.key{background:var(--pur2);border:1px solid #d6bcfa;border-radius:10px;padding:12px 14px;margin:10px 0}
+.key b{color:var(--pur)}
+.warn{background:#fffaf0;border:1px solid #fbd38d;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:8px 0}.steps li{counter-increment:s;position:relative;padding:8px 0 8px 40px;border-bottom:1px dashed var(--line)}.steps li:before{content:counter(s);position:absolute;left:0;top:8px;width:28px;height:28px;border-radius:50%;background:var(--pur);color:#fff;text-align:center;font-weight:700;line-height:28px;font-size:14px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0;font-size:13px}.flow span{background:#edf2f7;border-radius:6px;padding:4px 8px}.flow i{color:var(--mut);font-style:normal}
+.qa dt{font-weight:700;margin-top:12px}.qa dt:before{content:"Q. ";color:var(--pur)}.qa dd{margin:2px 0 0 0;color:var(--sub)}.qa dd:before{content:"A. ";font-weight:700;color:var(--tx)}
+a.btn{display:inline-block;background:var(--pur);color:#fff;text-decoration:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:14px;margin:4px 6px 4px 0}
+.small{font-size:12.5px;color:var(--mut)}
+footer{text-align:center;font-size:12px;color:var(--mut);margin-top:24px}
+svg text{font-family:inherit}
+@media print{body{background:#fff}table,svg,.key,.warn,.steps li{break-inside:avoid}h2,h3{break-after:avoid}a.btn{display:none}}
+</style></head><body><div class="wrap">
+<header><h1>TORAMI RUSH 説明書</h1><p>倍率BOXのしくみ・管理画面での作り方・ゲームの流れ（v6／2026年11月27日時点）</p></header>
+<div class="toc"><b>目次</b><ol>
+<li><a href="#s1">ひとことで言うと</a></li><li><a href="#s2">口数の考え方（指定しないけど、口数はある）</a></li><li><a href="#s3">ユーザーから見たゲームの流れ</a></li><li><a href="#s4">景品の払い出し</a></li><li><a href="#s5">管理画面：RUSHガチャの作り方</a></li><li><a href="#s6">管理画面：全体設定と見る画面</a></li><li><a href="#s7">表示するもの・しないもの</a></li><li><a href="#s8">よくある質問</a></li><li><a href="#s9">まだ決まっていないこと</a></li></ol>
+<div style="margin-top:8px"><a class="btn" href="./#play">プロトで遊ぶ</a><a class="btn" href="admin.html#list" style="background:#2b6cb0">管理画面モック</a></div></div>
+
+<section id="s1"><h2><span class="n">1</span>ひとことで言うと</h2>
+<div class="key">レートを選んで1回買う → そのレートの<b>BOXから「倍率の口」を1つ引く</b> → <b>SCORE＝倍率×レート</b> → SCOREぴったりまで7が連鎖する演出 → <b>SCOREと同じPTの景品</b>を1つ受け取る（発送かポイント）</div>
+<ul style="margin:6px 0 0;padding-left:20px">
+<li>1回の購入＝1回の抽選。RUSHは毎回必ず起き、<b>最低3連</b>してから終わる</li>
+<li>BOXは<b>レートごとに1つ</b>。完売したら同じ中身で<b>自動的に再販</b></li>
+<li>還元率は<b>97.5%</b>（ハイトレさんの理論値97〜98%に合わせた）。BOXを1周売り切ると必ずこの値に着地する</li>
+</ul></section>
+
+<section id="s2"><h2><span class="n">2</span>口数の考え方（指定しないけど、口数はある）</h2>
+<p style="margin-top:0">入江さんのご質問「口数は指定するわけじゃないけど、口数の概念がある感じ？」への答えは、<b>そのとおり</b>です。</p>
+<div class="key"><b>運営が口数を入力することはありません。</b>ただしシステムの中では、レートごとに「何口の中に、どの倍率が何口入っているか」が決まったBOXがあり、それを1口ずつ売っています。</div>
+<svg viewBox="0 0 820 230" width="100%" role="img" aria-label="レートごとのBOXの図">
+<rect x="0" y="0" width="820" height="230" rx="12" fill="#faf5ff"/>
+<text x="20" y="30" font-size="14" font-weight="700" fill="#44337a">レートごとにBOXが1つずつある（例）</text>
+<g font-size="13">
+<rect x="20" y="45" width="240" height="160" rx="10" fill="#fff" stroke="#b794f4"/><text x="36" y="70" font-weight="700">5,000のBOX（1,000口）</text>
+<text x="36" y="94" fill="#4a5568">×30 …… 1口</text><text x="36" y="114" fill="#4a5568">×10 …… 6口</text><text x="36" y="134" fill="#4a5568">×5 / ×3 / ×2 …… 145口</text><text x="36" y="154" fill="#4a5568">×1 …… 280口</text><text x="36" y="174" fill="#4a5568">×0.5 / ×0.3 …… 568口</text><text x="36" y="196" fill="#6b46c1" font-weight="700">完売すると必ず還元率97.5%</text>
+<rect x="290" y="45" width="240" height="160" rx="10" fill="#fff" stroke="#b794f4"/><text x="306" y="70" font-weight="700">10万のBOX（100口）</text>
+<text x="306" y="94" fill="#4a5568">×10 …… 1口</text><text x="306" y="114" fill="#4a5568">×5 / ×3 / ×2 …… 13口</text><text x="306" y="134" fill="#4a5568">×1 …… 33口</text><text x="306" y="154" fill="#4a5568">×0.5 / ×0.3 …… 53口</text><text x="306" y="196" fill="#6b46c1" font-weight="700">完売すると必ず還元率97.5%</text>
+<rect x="560" y="45" width="240" height="160" rx="10" fill="#fff" stroke="#b794f4"/><text x="576" y="70" font-weight="700">100万のBOX（50口）</text>
+<text x="576" y="94" fill="#4a5568">×5 …… 1口</text><text x="576" y="114" fill="#4a5568">×3 / ×2 …… 7口</text><text x="576" y="134" fill="#4a5568">×1 …… 18口</text><text x="576" y="154" fill="#4a5568">×0.5 / ×0.3 …… 24口</text><text x="576" y="196" fill="#6b46c1" font-weight="700">完売すると必ず還元率98.0%</text>
+</g></svg>
+<h3>なぜ口数（BOX）が必要か</h3>
+<table><tr><th>方式</th><th>1,000回売ったときの還元率</th><th class="n">赤字になる確率</th></tr>
+<tr><td><b>口数あり（今回の方式）</b></td><td>完売時点で<b>必ず97.5%</b></td><td class="n" style="color:var(--grn);font-weight:700">0%</td></tr>
+<tr><td>口数なし（確率だけで抽選）</td><td>87〜111%にばらつく</td><td class="n" style="color:var(--red);font-weight:700">28%</td></tr></table>
+<p class="small">還元率97.5%だと利幅は2.5%しかないので、確率だけで抽選すると上振れでそのまま赤字になります。口数があるから「必ず着地する」ことが保証されます。</p>
+<h3>レートによって口数が違う理由</h3>
+<table><tr><th>レート帯（案）</th><th>BOXの大きさ</th><th>理由</th></tr>
+<tr><td>500〜5万</td><td>1,000口</td><td>購入回数が多いのですぐ1周する。最大の当たりも大きくできる</td></tr>
+<tr><td>10万〜30万</td><td>100口</td><td rowspan="2">1回の金額が大きいので、口数が多いと1周に何年もかかり、途中の持ち出し（資金繰り）も大きくなる。口数を減らして早く1周させ、持ち出しの上限も下げる（100万で最悪1,300万）</td></tr>
+<tr><td>50万〜100万</td><td>50口</td></tr></table>
+<div class="warn">BOXの中身（倍率×口数の表）は、全オリパ共通の<b>「倍率の表・レート帯」</b>で決めておけば、オリパを作るたびに入れる必要はありません。表を変えたいときだけ変更します（販売中のBOXには影響せず、次の周から反映）。</div>
+</section>
+
+<section id="s3"><h2><span class="n">3</span>ユーザーから見たゲームの流れ</h2>
+<div class="flow"><span>レートを選ぶ</span><i>→</i><span>START</span><i>→</i><span>プチュン（暗転）</span><i>→</i><span>OP「見せてやる」「虎拳アタック」</span><i>→</i><span>押せ！で7が揃う（何連も）</span><i>→</i><span>7が揃わないゲームで終了</span><i>→</i><span>TOTAL</span><i>→</i><span>景品：発送 or ポイント</span></div>
+<table><tr><th>7の種類</th><th class="n">1回の価値</th><th>例：レート5,000</th></tr>
+<tr><td>紫7シングル</td><td class="n">レート×0.1</td><td>500 PT</td></tr><tr><td>紫7ダブル</td><td class="n">レート×0.2</td><td>1,000 PT</td></tr><tr><td>白7シングル</td><td class="n">レート×1</td><td>5,000 PT（これ1回で元が取れる）</td></tr><tr><td>白7ダブル</td><td class="n">レート×2</td><td>10,000 PT</td></tr></table>
+<ul style="margin:6px 0 0;padding-left:20px">
+<li>7が揃うたびに「+PT」と累計SCOREが増える。<b>7の合計は必ずSCOREちょうど</b>（上乗せ・端数は出ない）</li>
+<li>どんな7の並びで見せるかは、10種類のシナリオ（白7多め・後半爆発など）から自動で選ぶ。結果には影響しない</li>
+<li><b>ダブル</b>＝7が2ライン揃う（中段＋斜め）。ダブルの前に暗転＋心音の<b>フリーズ</b>が入ることがある</li>
+<li><b>逆転演出</b>（11/28追加）：RUSH終了・TOTALのあと暗転して「7を狙え」（倍プッシュ）または「輪廻転生」。揃えば<b>SCORE×2</b>。期待度は弱（青）・中（緑）・強（赤）・プレミア（虹＝確定）。失敗するガセもある。成功・失敗も購入時に決まっていて、見せ方だけの違い</li>
+<li>結果は購入した時点で決まっている。押せ！・AUTO・一撃・スピードで結果は変わらない</li>
+</ul></section>
+
+<section id="s4"><h2><span class="n">4</span>景品の払い出し（全部自動）</h2>
+<ol class="steps">
+<li><b>目玉景品</b>（オリパごとに任意で登録）…SCOREが目玉のPTと同じで、在庫があれば最優先</li>
+<li><b>PSA景品</b>（PSA景品マスタ・全オリパ共通）…SCOREと同じPTの景品。目玉がない・弾切れのとき</li>
+<li><b>代替景品</b>…その価格帯のPSA景品の在庫がないとき</li>
+<li><b>ポイントのみ（発送不可）</b>…代替景品もないとき</li></ol>
+<p>SCOREが1万未満のときはポイントで自動付与。景品が当たったら、ユーザーが<b>「発送」か「ポイント（SCORE分）」</b>を選びます（ハイトレ仕様）。</p></section>
+
+<section id="s5"><h2><span class="n">5</span>管理画面：RUSHガチャの作り方</h2>
+<p style="margin-top:0">既存のオリパ管理（tora-oripa console）に組み込む形です。RUSHは「オリパ」の1種類として作ります。</p>
+<ol class="steps">
+<li>オリパ一覧で<b>「新規作成（TORAMI RUSH）」</b></li>
+<li><b>オリパ名・カテゴリ・ヘッダー画像・公開予定日</b>を入れる（ここは通常のオリパと同じ）</li>
+<li><b>販売するレート</b>にチェック（500〜100万の15段階から選ぶだけ）</li>
+<li>（任意）<b>目玉景品</b>を登録：カードデータベースから選び、交換ポイント（PT）と個数を入れて「追加」。どのレート×倍率で出るかが自動で表示される</li>
+<li><b>保存</b> → 公開。BOXはレートごとに自動で作られ、完売すると自動で再販</li></ol>
+<table><tr><th>RUSHのときに使わない既存項目</th><th>理由</th></tr>
+<tr><td>ポイント消費量</td><td>販売レートのチェックで決まる</td></tr><tr><td>S〜その他の景品登録</td><td>BOXの中身は倍率の口。景品は目玉景品とPSA景品マスタから払い出す</td></tr><tr><td>1回／10連／100連ボタン</td><td>RUSHは1回ずつ</td></tr><tr><td>残数表示</td><td>BOXの残り状況は出さない（7章）</td></tr></table>
+</section>
+
+<section id="s6"><h2><span class="n">6</span>管理画面：全体設定と見る画面</h2>
+<p style="margin-top:0">左メニューに<b>「TORAMI RUSH」</b>のグループを新設します。最初に一度設定すれば、普段はほとんど触りません。</p>
+<table><tr><th>画面</th><th>何をするか</th><th>頻度</th></tr>
+<tr><td>倍率の表・レート帯</td><td>BOXの中身（倍率×口数）と、どのレートでどの表を使うか。保存時に還元率・最低3連などを自動チェック</td><td>最初だけ</td></tr>
+<tr><td>PSA景品マスタ</td><td>価格帯ごとのPSA景品・代替景品の在庫。少なくなったら通知</td><td>在庫補充のとき</td></tr>
+<tr><td>BOXモニター</td><td>レートごとに、何周目の何口目まで売れたか・この周の還元率・最大の当たりが出たか・持ち出し。<b>運営だけが見る</b></td><td>日々の確認</td></tr>
+<tr><td>当選履歴</td><td>誰がどのレートで何倍・SCORE・何が払い出されたか・発送かポイントか。問い合わせ時は同じ演出を再生できる</td><td>問い合わせ対応</td></tr>
+<tr><td>シナリオ</td><td>7の出方10種の出やすさ</td><td>最初だけ</td></tr>
+<tr><td>表示設定</td><td>注意書きの文言・当たり速報の条件</td><td>最初だけ</td></tr></table>
+</section>
+
+<section id="s7"><h2><span class="n">7</span>表示するもの・しないもの</h2>
+<table><tr><th>ユーザーに見せる</th><th>見せない</th></tr>
+<tr><td>還元率（設計値の97.5%）<br>平均継続率<br>7の価値（レートごと）<br>目玉景品と在庫<br>注意書き</td><td><b>最大倍率</b>（入江さん 11/27）<br>倍率の表（口数・確率）※最大倍率が分かってしまうため<br>BOXの残り口数・残り倍率・残り還元率</td></tr></table>
+<div class="warn"><b>注意書き（案）</b>：表示している還元率は、BOX全体（1周分）の設計値です。BOXは販売開始時に全口をシャッフルしており、販売中のBOXでは上位の倍率がすでに排出されている場合があります。完売したBOXは同じ内容で自動的に再販されます。<br><span class="small">文言は弁護士の確認後に確定。購入ボタンの近くに表示する。</span></div>
+</section>
+
+<section id="s8"><h2><span class="n">8</span>よくある質問</h2><dl class="qa">
+<dt>口数は運営が決めるの？</dt><dd>決めません。レート帯ごとの「倍率の表」で自動的に決まります（1,000口／100口／50口）。オリパごとに入力するのは販売レートと目玉景品だけです。</dd>
+<dt>最大の当たりが早く出たら、そのBOXはどうなる？</dt><dd>そのまま売り切ります。止めると運営が取り戻すはずの残りを捨てることになり、赤字になります（試算で実際の還元率が100.5〜106%）。残り状況は見せないので、ユーザーから「もう出た」は分かりません。</dd>
+<dt>目玉景品はいつ出る？</dt><dd>SCOREが目玉のPTとちょうど同じになったときです（例：15万のリザードン＝5,000×30、5万×3 など）。登録画面に出る組み合わせが表示されます。在庫がなくなったらPSA景品マスタから出ます。</dd>
+<dt>還元率は変えられる？</dt><dd>「倍率の表」の口数を変えれば変わります。保存時に95〜99%の範囲かを自動チェックします。変更は次の周から反映。</dd>
+<dt>高いレートで大きな当たりが出たら資金繰りは？</dt><dd>BOXなので持ち出しに上限があります。100万レート（50口）なら最悪でも1,300万、通常は800万以内。1周売り切れば必ず取り戻せます。BOXモニターで監視し、しきい値を超えたら通知します。</dd>
+<dt>RUSHが始まらないことはある？</dt><dd>ありません。一番下の口（×0.3）でも紫7シングルが3回揃ってから終わります。</dd>
+</dl></section>
+
+<section id="s9"><h2><span class="n">9</span>まだ決まっていないこと</h2>
+<ul style="margin:0;padding-left:20px">
+<li>レート帯の区切り（5万／30万）と、持ち出しをいくらまで許容するか</li>
+<li>弁護士確認：上位倍率が出たBOXをそのまま販売してよいか（注意書きで足りるか）／還元率を「設計値」と表示する書き方／ポイント受け取りの換金性</li>
+<li>目玉景品を「負け」の結果（×1未満）でも出してよいか／PTが近い額でも出すか</li>
+<li>500で300万の「奇跡」を入れるか</li>
+<li>RUSH中の細かな動き（11/27 入江さん指摘分は修正済み：待機中にリールの7が揃って見えない位置に変更、ハズレ時は右リールの7が1コマ手前で止まる、「見せてやる」は暗転明けに再生）</li></ul></section>
+<footer>パレットグループ トレカ商事カンパニー｜TORAMI RUSH 説明書（2026-11-27）</footer>
+</div></body></html>
